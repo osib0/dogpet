@@ -194,3 +194,10 @@
   opacity: 0.4 !important;
   filter: blur(4px);
 }
+
+
+
+*::selection {
+  background-color: #72e3ad;
+  color: var(--color-accent-foreground);
+}
