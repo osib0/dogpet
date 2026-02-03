@@ -191,9 +191,9 @@ export function AppSidebar() {
 
   return (
     <Sidebar className="py-4  flex flex-col justify-between  h-full">
-      <div className="px-5 ">
-          <Link href={"/"} className="h-10">
-            <Image className="-translate-y-5" width={120} height={0} src={'/logo-main.svg'} alt="logo"  />
+      <div className="px-5 h-20">
+          <Link href={"/"} className="relative">
+            <Image className="-translate-y-5 absolute flex-1 shrink-0" width={150} height={30} src={'/logo.svg'} alt="logo"  />
           </Link>
         {/* <div className="mx-auto">
           <InputGroup className="bg-[#f9f9f9]">

@@ -13,36 +13,37 @@ const Sorafont = Noto_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: "LibEase – Smart Library Management Software",
-    template: "%s | LibEase",
+    default: "DogPet Clinic – Trusted Veterinary Care for Your Pets",
+    template: "%s | DogPet Clinic",
   },
   description:
-    "LibEase is a smart library management software for schools, colleges, and institutions in India. Manage books, students, issues, returns, and reports easily with LibEase.",
+    "DogPet Clinic provides professional veterinary services for dogs and pets. Book appointments, vaccinations, health checkups, grooming, and emergency care with trusted vets.",
   keywords: [
-    "library management software",
-    "library software India",
-    "school library management system",
-    "college library software",
-    "digital library management",
-    "LibEase",
+    "dog clinic",
+    "pet clinic",
+    "veterinary clinic",
+    "dog hospital",
+    "pet hospital",
+    "veterinary services India",
+    "DogPet Clinic",
   ],
-  authors: [{ name: "LibEase Team" }],
-  creator: "LibEase",
-  publisher: "LibEase",
-  metadataBase: new URL("https://libease.co.in"),
+  authors: [{ name: "DogPet Clinic Team" }],
+  creator: "DogPet Clinic",
+  publisher: "DogPet Clinic",
+  metadataBase: new URL("https://dogpetclinic.com"),
 
   openGraph: {
-    title: "LibEase – Smart Library Management Software",
+    title: "DogPet Clinic – Trusted Veterinary Care for Your Pets",
     description:
-      "Simplify your library operations with LibEase. A modern library management system built for Indian schools and institutions.",
-    url: "https://libease.co.in",
-    siteName: "LibEase",
+      "Compassionate and professional veterinary care for dogs and pets. DogPet Clinic offers checkups, vaccinations, grooming, and emergency services.",
+    url: "https://dogpetclinic.com",
+    siteName: "DogPet Clinic",
     images: [
       {
-        url: "https://i.ibb.co/hFtY1kN8/favicon.jpg", 
+        url: "https://i.ibb.co/hFtY1kN8/favicon.jpg",
         width: 1200,
         height: 630,
-        alt: "LibEase Library Management Software",
+        alt: "DogPet Clinic Veterinary Services",
       },
     ],
     locale: "en_IN",
@@ -51,9 +52,9 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "LibEase – Smart Library Management Software",
+    title: "DogPet Clinic – Trusted Veterinary Care for Your Pets",
     description:
-      "Manage your library smarter with LibEase. Built for schools and colleges in India.",
+      "Quality veterinary care for dogs and pets. Book appointments and services easily with DogPet Clinic.",
     images: ["https://i.ibb.co/hFtY1kN8/favicon.jpg"],
   },
 
@@ -63,7 +64,7 @@ export const metadata: Metadata = {
   },
 
   alternates: {
-    canonical: "https://libease.co.in",
+    canonical: "https://dogpetclinic.com",
   },
 };
 
@@ -77,10 +78,7 @@ export default function RootLayout({
       <body
         className={`${Sorafont.variable} ${Sorafont.className} antialiased`}
       >
-        <Toaster
-          position="top-center"
-          reverseOrder={false}
-        />
+        <Toaster position="top-center" reverseOrder={false} />
         <Header />
         {children}
         <Footer />
