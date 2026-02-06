@@ -98,7 +98,7 @@ export default function Page() {
                     <div className="relative group">
                       <FormControl>
                         <Input
-                          className="peer shadow-none text-xs h-12 pt-4"
+                          className="peer shadow-none text-xs h-11 pt-4"
                           disabled={submiting}
                           autoComplete="off"
                           placeholder=" "
@@ -140,7 +140,7 @@ export default function Page() {
                     <div className="relative group">
                       <FormControl>
                         <Input
-                          className="peer shadow-none text-xs h-12 pt-4"
+                          className="peer shadow-none text-xs h-11 pt-4"
                           autoComplete="off"
                           disabled={submiting}
                           type="password"

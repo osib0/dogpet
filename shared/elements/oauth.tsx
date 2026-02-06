@@ -28,7 +28,7 @@ const Oauth = () => {
       onClick={signInWithGoogle}
       variant="outline"
       disabled={submitting === "google"}
-      className="flex-1 gap-2 text-xs py-2 cursor-pointer rounded-md shadow-none disabled:opacity-60 disabled:cursor-not-allowed"
+      className="flex-1 gap-2 text-xs py-2 h-11 cursor-pointer rounded-md shadow-none disabled:opacity-60 disabled:cursor-not-allowed"
     >
       {submitting === "google" ? (
         <>
