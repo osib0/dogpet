@@ -22,7 +22,6 @@ export const auth = betterAuth({
                 text: `Click the link to verify your email: ${url}`,
             })
         },
-
   },
   emailAndPassword: {
     requireEmailVerification: true,

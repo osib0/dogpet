@@ -1,22 +1,14 @@
 "use client";
 
 import {
-  Command,
-  Search,
-  User,
   Book,
   Layers,
   LayoutDashboard,
-  Plus,
-  List,
   CreditCard,
   Building,
   Settings,
   FileText,
   Users,
-  LogOut,
-  Repeat,
-  BadgeDollarSign,
   ClipboardList,
   Crown,
   Bell,
@@ -159,14 +151,13 @@ export function AppSidebar() {
   const [isActive, setActive] = useState<string>("");
   const [activeIndex, setActiveIndex] = useState<string>();
   const router = useRouter();
-  const { isMobile,setOpenMobile } = useSidebar();
+  const { isMobile, setOpenMobile } = useSidebar();
 
   const mobileSidebar = () => {
-    if (isMobile ) {
+    if (isMobile) {
       setOpenMobile(false);
     }
-    
-  }
+  };
 
   useEffect(() => {
     menuItem.forEach((ele, ind) => {
@@ -182,7 +173,6 @@ export function AppSidebar() {
         }
       });
     });
-    
   }, [pathname]);
 
   function handleValueChange(value: string) {
@@ -192,9 +182,15 @@ export function AppSidebar() {
   return (
     <Sidebar className="py-4  flex flex-col justify-between  h-full">
       <div className="px-5 h-20">
-          <Link href={"/"} className="relative">
-            <Image className="-translate-y-5 absolute flex-1 shrink-0" width={150} height={30} src={'/logo.svg'} alt="logo"  />
-          </Link>
+        <Link href={"/"} className="overflow-hidden">
+          <Image
+            src={"logo.svg"}
+            alt="logo"
+            className="object-cover"
+            width={100}
+            height={100}
+          />
+        </Link>
         {/* <div className="mx-auto">
           <InputGroup className="bg-[#f9f9f9]">
             <InputGroupInput placeholder="Search..." />
@@ -210,9 +206,9 @@ export function AppSidebar() {
           </InputGroup>
         </div> */}
       </div>
-        <SidebarGroupLabel className="p-0 px-5 text-sm mb-2 text-black">
-          Library Management
-        </SidebarGroupLabel>
+      <SidebarGroupLabel className="p-0 px-5 text-sm mb-2 text-black">
+        Library Management
+      </SidebarGroupLabel>
       <SidebarContent className="">
         {/* APPLICATION MENU */}
         <SidebarGroup>

@@ -25,10 +25,16 @@ export default function Footer() {
 
           {/* Brand */}
           <div>
-            <Link href="/" className="inline-block mb-4 h-10 -translate-x-12 -translate-y-12">
-              <Image src="/logo.svg" alt="DogPet Clinic" width={150} height={100} />
+             <Link href={"/"} className="overflow-hidden">
+              <Image
+                src={"logo.svg"}
+                alt="logo"
+                className="object-cover"
+                width={100}
+                height={100}
+              />
             </Link>
-            <p className="text-sm text-gray-600 leading-relaxed max-w-sm">
+            <p className="text-sm text-gray-600 leading-relaxed max-w-sm mt-3">
               DogPet Clinic provides compassionate, reliable, and modern
               veterinary care to keep your pets healthy and happy.
             </p>
