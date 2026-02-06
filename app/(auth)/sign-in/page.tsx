@@ -18,7 +18,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Oauth from "@/shared/elements/oauth";
-import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
 
@@ -59,8 +58,8 @@ export default function Page() {
         onError: (ctx) => {
           setError(ctx.error.message);
         },
-        onRequest: () => { },
-      }
+        onRequest: () => {},
+      },
     );
 
     setSubmitting(false);
@@ -72,15 +71,21 @@ export default function Page() {
     }
   }, [session, router]);
   return (
-    <div className="grid h-screen place-items-center">
-      <div className="w-full max-w-100 px-1 py-1 rounded-xl bg-gray-50 border">
-        <div className="px-5 bg-white rounded-lg">
-          <div className="w-fulll grid justify-center">
-            <Link href={"/"} className="">
-              <Image width={100} height={50} src={'logo-main.svg'} alt="logo" />
+    <div className="grid h-screen place-items-center bg-gray-50">
+      <div className="w-full max-w-100 rounded-xl bg-white border">
+        <div className="px-5 pt-5 rounded-lg">
+          <div className="w-fulll grid justify-center pb-4">
+            <Link href={"/"} className="overflow-hidden">
+              <Image
+                src={"logo.svg"}
+                alt="logo"
+                className="object-cover"
+                width={100}
+                height={100}
+              />
             </Link>
           </div>
-          <p className="text-center font-light text-sm mb-2">
+          <p className="text-center font-normal text-xs  mb-4">
             Welcome back! Please sign in to continue
           </p>
           <Form {...form}>
@@ -90,15 +95,39 @@ export default function Page() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs text-gray-600">
-                      Email address
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        disabled={submiting}
-                        placeholder="Enter your email" {...field} />
-                    </FormControl>
-                    <FormMessage />
+                    <div className="relative group">
+                      <FormControl>
+                        <Input
+                          className="peer shadow-none text-xs h-12 pt-4"
+                          disabled={submiting}
+                          autoComplete="off"
+                          placeholder=" "
+                          {...field}
+                        />
+                      </FormControl>
+
+                      <FormLabel
+                        className="
+        absolute left-4 top-1/2
+        -translate-y-1/2
+        text-xs text-gray-600
+        pointer-events-none
+        transition-all duration-200
+
+        group-focus-within:top-2
+        group-focus-within:translate-y-0
+        group-focus-within:text-[10px]
+
+        peer-not-placeholder-shown:top-2
+        peer-not-placeholder-shown:translate-y-0
+        peer-not-placeholder-shown:text-[10px]
+      "
+                      >
+                        Email
+                      </FormLabel>
+                    </div>
+
+                    <FormMessage className="text-xs" />
                   </FormItem>
                 )}
               />
@@ -108,32 +137,52 @@ export default function Page() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs text-gray-600">
-                      Password
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        disabled={submiting}
-                        type="password"
-                        placeholder="password"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
+                    <div className="relative group">
+                      <FormControl>
+                        <Input
+                          className="peer shadow-none text-xs h-12 pt-4"
+                          autoComplete="off"
+                          disabled={submiting}
+                          type="password"
+                          placeholder=" "
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormLabel
+                        className="
+        absolute left-4 top-1/2
+        -translate-y-1/2
+        text-xs text-gray-600
+        pointer-events-none
+        transition-all duration-200
+
+        group-focus-within:top-2
+        group-focus-within:translate-y-0
+        group-focus-within:text-[10px]
+
+        peer-not-placeholder-shown:top-2
+        peer-not-placeholder-shown:translate-y-0
+        peer-not-placeholder-shown:text-[10px]
+      "
+                      >
+                        Password
+                      </FormLabel>
+                    </div>
+                    <FormMessage className="text-xs" />
                   </FormItem>
                 )}
               />
 
               <Button
-                type="submit"
+                variant={"outline"}
                 disabled={submiting}
-                className="w-full bg-linear-to-r to-blue-600 from-blue-500 hover:from-blue-600 rounded-md  hover:to-blue-700"
+                className="shadow-none w-full text-xs hover:bg-[#4fe09a] bg-[#72e3ad] border border-[#16b674bf] cursor-pointer"
               >
                 {submiting ? (
-                  "Loading..."
+                  "Submitting..."
                 ) : (
                   <>
-                    Continue <ChevronRight />
+                    <span className="flex-1">Continue</span> <ChevronRight />
                   </>
                 )}
               </Button>
@@ -147,11 +196,14 @@ export default function Page() {
           <div className="flex items-center justify-center mt-3 pb-3">
             <Oauth />
           </div>
-        <p className="text-red-500 text-sm text-center pb-2">{isError}</p>
+          <p className="text-red-500 text-sm text-center pb-2">{isError}</p>
         </div>
-        <div className="bg-gray-50 p-3  rounded-lg text-center text-sm text-gray-500">
+        <div className="p-3 rounded-lg text-center text-xs text-gray-500">
           Don't have an account?{" "}
-          <Link href="/sign-up" className="text-primary hover:underline">
+          <Link
+            href="/sign-up"
+            className="text-primary text-xs hover:underline"
+          >
             Sign up
           </Link>
         </div>
