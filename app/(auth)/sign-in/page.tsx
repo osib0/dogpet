@@ -74,7 +74,7 @@ export default function Page() {
     <div className="grid h-screen place-items-center bg-gray-50">
       <div className="w-full max-w-100 rounded-xl bg-white border">
         <div className="px-5 pt-5 rounded-lg">
-          <div className="w-fulll grid justify-center pb-4">
+          <div className="w-full flex justify-center pb-4">
             <Link href={"/"} className="overflow-hidden">
               <Image
                 src={"logo.svg"}
@@ -105,7 +105,6 @@ export default function Page() {
                           {...field}
                         />
                       </FormControl>
-
                       <FormLabel
                         className="
         absolute left-4 top-1/2

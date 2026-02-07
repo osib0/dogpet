@@ -1,13 +1,13 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { Noto_Sans } from "next/font/google";
+import { Roboto } from "next/font/google";
 import Header from "@/shared/components/header/header";
 import Footer from "@/shared/components/footer";
 import { Toaster } from "react-hot-toast";
 import Script from "next/script";
 
-const Sorafont = Noto_Sans({
-  variable: "--font-noto-sans",
+const Sorafont = Roboto({
+  variable: "--font-roboto",
   subsets: ["latin"],
 });
 
