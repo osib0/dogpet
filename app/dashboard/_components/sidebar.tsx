@@ -181,13 +181,13 @@ export function AppSidebar() {
 
   return (
     <Sidebar className="py-4  flex flex-col justify-between  h-full">
-      <div className="px-5 h-20">
+      <div className="px-5 h-13 pb-4 flex items-center">
         <Link href={"/"} className="overflow-hidden">
           <Image
             src={"logo.svg"}
             alt="logo"
             className="object-cover"
-            width={100}
+            width={130}
             height={100}
           />
         </Link>
@@ -206,10 +206,10 @@ export function AppSidebar() {
           </InputGroup>
         </div> */}
       </div>
-      <SidebarGroupLabel className="p-0 px-5 text-sm mb-2 text-black">
+      {/* <SidebarGroupLabel className="p-0 px-5 text-sm mb-2 text-black">
         Library Management
-      </SidebarGroupLabel>
-      <SidebarContent className="">
+      </SidebarGroupLabel> */}
+      <SidebarContent className="mt-5">
         {/* APPLICATION MENU */}
         <SidebarGroup>
           {links.map(({ href, label, icon: Icon }) => (
