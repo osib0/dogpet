@@ -1,7 +1,5 @@
 "use client";
 import React from "react";
-import { NavigationMenuDemo } from "./_components/menu";
-import { MobileMenu } from "./_components/mobileMenu";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
@@ -43,7 +41,7 @@ function Header() {
               </Link>
             )}
 
-            <MobileMenu />
+            {/* <MobileMenu /> */}
           </div>
         </div>
       </header>
