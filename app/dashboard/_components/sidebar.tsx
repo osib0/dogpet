@@ -9,11 +9,7 @@ import {
   Settings,
   FileText,
   Users,
-  ClipboardList,
-  Crown,
-  Bell,
   Calendar,
-  Sprout,
   Settings2,
   Banknote,
   PawPrint,
@@ -24,23 +20,9 @@ import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
-  SidebarGroupLabel,
-  SidebarMenu,
   useSidebar,
 } from "@/components/ui/sidebar";
 import Image from "next/image";
-import logo from "@/public/logo.svg";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from "@/components/ui/input-group";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -125,35 +107,35 @@ export const links = [
     icon: LayoutDashboard,
   },
   {
-    href: "/dashboard/books",
+    href: "/dashboard/appoinment",
     label: "Appoinment",
     icon: Calendar,
   },
   {
-    href: "/dashboard/member",
+    href: "/dashboard/pets",
     label: "Pets",
     icon: PawPrint,
   },
   {
-    href: "/dashboard/borrow-record",
+    href: "/dashboard/doctors",
     label: "Doctors",
     icon: Stethoscope,
   },
   {
-    href: "/dashboard/reminder",
+    href: "/dashboard/billing",
     label: "Billing",
     icon: Banknote,
   },
   {
-    href: "/dashboard/reminder",
+    href: "/dashboard/reports",
     label: "Reports",
     icon: ChartNoAxesColumnIncreasing,
   },
-  {
-    href: "/dashboard/subscription",
-    label: "Settings",
-    icon: Settings2,
-  },
+  // {
+  //   href: "/dashboard/settings",
+  //   label: "Settings",
+  //   icon: Settings2,
+  // },
 ];
 
 // ===================== SIDEBAR COMPONENT ===================== //
@@ -203,24 +185,7 @@ export function AppSidebar() {
             height={100}
           />
         </Link>
-        {/* <div className="mx-auto">
-          <InputGroup className="bg-[#f9f9f9]">
-            <InputGroupInput placeholder="Search..." />
-            <InputGroupAddon>
-              <Search />
-            </InputGroupAddon>
-            <InputGroupAddon align="inline-end">
-              <span className=" border p-1 rounded">
-                <Command className="w-4 h-4" />
-              </span>
-              <span className=" border py-1 px-1.5 rounded text-xs">K</span>
-            </InputGroupAddon>
-          </InputGroup>
-        </div> */}
       </div>
-      {/* <SidebarGroupLabel className="p-0 px-5 text-sm mb-2 text-black">
-        Library Management
-      </SidebarGroupLabel> */}
       <SidebarContent className="mt-5">
         {/* APPLICATION MENU */}
         <SidebarGroup>
