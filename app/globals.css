@@ -192,7 +192,7 @@
 [data-slot="drawer-overlay"],[data-slot="dialog-overlay"],[data-slot="sheet-overlay"]{
   background-color: white;
   opacity: 0.4 !important;
-  filter: blur(4px);
+  backdrop-filter: blur(1px);
 }
 
 

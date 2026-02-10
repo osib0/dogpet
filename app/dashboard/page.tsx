@@ -26,7 +26,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-
 /* ---------------- MOCK DATA (DOG / PET CLINIC) ---------------- */
 
 const stats = {
@@ -121,7 +120,7 @@ export default function Page() {
             <span className="capitalize">
               {session.user.name?.split(" ")[0]}
             </span>{" "}
-👋
+            👋
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
             Here’s what’s happening in your pet clinic today.
@@ -129,11 +128,19 @@ export default function Page() {
         </div>
 
         <div className="flex gap-3">
-          <Button variant={'outline'} size={'sm'} className="shadow-none text-xs cursor-pointer">
+          <Button
+            variant={"outline"}
+            size={"sm"}
+            className="shadow-none text-xs cursor-pointer"
+          >
             <UserPlus className="h-4 w-4" />
             Add Pet
           </Button>
-          <Button variant={'outline'} size={'sm'} className="shadow-none text-xs hover:bg-[#4fe09a] bg-[#72e3ad] border border-[#16b674bf] cursor-pointer">
+          <Button
+            variant={"outline"}
+            size={"sm"}
+            className="shadow-none text-xs hover:bg-[#4fe09a] bg-[#72e3ad] border border-[#16b674bf] cursor-pointer"
+          >
             <Plus className="h-4 w-4" />
             New Appointment
           </Button>
@@ -174,78 +181,83 @@ export default function Page() {
       {/* CHART + RECENT */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* CHART */}
-       <Card className="rounded-xl shadow-none border">
-  <CardHeader className="pb-2">
-    <CardTitle className="text-base font-semibold">
-      Appointments This Week
-    </CardTitle>
-    <p className="text-xs text-muted-foreground">
-      Daily appointment trend
-    </p>
-  </CardHeader>
+        <Card className="rounded-xl shadow-none border">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base font-semibold">
+              Appointments This Week
+            </CardTitle>
+            <p className="text-xs text-muted-foreground">
+              Daily appointment trend
+            </p>
+          </CardHeader>
 
-  <CardContent className="h-65 px-2">
-    <ResponsiveContainer width="100%" height="100%">
-      <AreaChart
-        data={appointmentsByWeek}
-        margin={{ top: 20, right: 20, left: -10, bottom: 0 }}
-      >
-        {/* Gradient */}
-        <defs>
-          <linearGradient id="appointmentsGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#72e3ad" stopOpacity={0.45} />
-            <stop offset="100%" stopColor="#72e3ad" stopOpacity={0} />
-          </linearGradient>
-        </defs>
+          <CardContent className="h-65 px-2">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart
+                data={appointmentsByWeek}
+                margin={{ top: 20, right: 20, left: -10, bottom: 0 }}
+              >
+                {/* Gradient */}
+                <defs>
+                  <linearGradient
+                    id="appointmentsGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
+                    <stop offset="0%" stopColor="#72e3ad" stopOpacity={0.45} />
+                    <stop offset="100%" stopColor="#72e3ad" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
 
-        {/* Grid */}
-        <CartesianGrid
-          strokeDasharray="3 3"
-          vertical={false}
-          stroke="#e5e7eb"
-        />
+                {/* Grid */}
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="#e5e7eb"
+                />
 
-        {/* Axis */}
-        <XAxis
-          dataKey="day"
-          axisLine={false}
-          tickLine={false}
-          tick={{ fontSize: 12, fill: "#6b7280" }}
-        />
-        <YAxis
-          allowDecimals={false}
-          axisLine={false}
-          tickLine={false}
-          tick={{ fontSize: 12, fill: "#6b7280" }}
-        />
+                {/* Axis */}
+                <XAxis
+                  dataKey="day"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 12, fill: "#6b7280" }}
+                />
+                <YAxis
+                  allowDecimals={false}
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 12, fill: "#6b7280" }}
+                />
 
-        {/* Tooltip */}
-        <Tooltip
-          cursor={{ stroke: "#72e3ad", strokeWidth: 1 }}
-          contentStyle={{
-            backgroundColor: "#ffffff",
-            borderRadius: "8px",
-            border: "1px solid #e5e7eb",
-            fontSize: "12px",
-          }}
-          labelStyle={{ fontWeight: 600 }}
-        />
+                {/* Tooltip */}
+                <Tooltip
+                  cursor={{ stroke: "#72e3ad", strokeWidth: 1 }}
+                  contentStyle={{
+                    backgroundColor: "#ffffff",
+                    borderRadius: "8px",
+                    border: "1px solid #e5e7eb",
+                    fontSize: "12px",
+                  }}
+                  labelStyle={{ fontWeight: 600 }}
+                />
 
-        {/* Area */}
-        <Area
-          type="monotone"
-          dataKey="value"
-          stroke="#72e3ad"
-          strokeWidth={3}
-          fill="url(#appointmentsGradient)"
-          dot={false}
-          activeDot={{ r: 6 }}
-        />
-      </AreaChart>
-    </ResponsiveContainer>
-  </CardContent>
-</Card>
-
+                {/* Area */}
+                <Area
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#72e3ad"
+                  strokeWidth={3}
+                  fill="url(#appointmentsGradient)"
+                  dot={false}
+                  activeDot={{ r: 6 }}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
 
         {/* RECENT APPOINTMENTS */}
         <Card className="rounded-xl shadow-none border">

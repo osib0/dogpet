@@ -158,11 +158,11 @@ export default function ProfileModal({
           {/* Avatar */}
           <div className="flex flex-col items-center gap-4">
             <div className="relative">
-              <Avatar className="h-40 w-40">
+              <Avatar className="h-40 w-40 border border-[#16b674bf]">
                 <AvatarImage
                   src={profile.profileImage || session?.user?.image || ""}
                 />
-                <AvatarFallback className="text-2xl">
+                <AvatarFallback className="text-2xl hover:bg-[#4fe09a] bg-[#72e3ad] uppercase">
                   {profile.name.charAt(0)}
                 </AvatarFallback>
               </Avatar>

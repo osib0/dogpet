@@ -181,7 +181,7 @@ export function AppSidebar() {
             src={"logo.svg"}
             alt="logo"
             className="object-cover"
-            width={130}
+            width={100}
             height={100}
           />
         </Link>

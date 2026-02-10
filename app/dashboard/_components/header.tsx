@@ -58,20 +58,20 @@ function DashboardHeader() {
               </AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="min-w-60">
             <DropdownMenuItem className="flex flex-col items-start ">
               {session?.user?.name}
               <p className="text-slate-500 text-xs">{session?.user?.email}</p>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => setOpen(true)}>
+            <DropdownMenuItem className="text-[13px] cursor-pointer" onClick={() => setOpen(true)}>
               <Settings className="mr-2 h-4 w-4" />
               Settings
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
+            {/* <DropdownMenuSeparator /> */}
             <DropdownMenuItem
               onClick={handleLogout}
-              className="text-red-600 focus:text-red-600"
+              className="text-red-600 focus:text-red-600 text-[13px] cursor-pointer"
             >
               <LogOut className="mr-2 h-4 w-4" />
               Logout
