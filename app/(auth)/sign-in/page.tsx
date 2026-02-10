@@ -120,6 +120,10 @@ export default function Page() {
       router.replace("/dashboard");
     }
   }, [session, router]);
+
+
+
+  
   return (
     <div className="h-screen w-screen flex">
       <div className="bg-gray-50 border-r p-5 shadow-xl max-w-full xl:max-w-187 w-full z-10 flex flex-col items-center">

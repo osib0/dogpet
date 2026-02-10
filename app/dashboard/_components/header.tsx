@@ -46,14 +46,14 @@ function DashboardHeader() {
           <h2 className="capitalize">{heading}</h2>
         </div>
         <DropdownMenu>
-          <DropdownMenuTrigger className="flex capitalize items-center gap-3 rounded-full hover:bg-slate-100 pl-3 pr-2 py-1.5">
+          <DropdownMenuTrigger className="flex capitalize text-sm items-center gap-3 rounded-full hover:bg-slate-100 pl-3 pr-2 py-1.5 cursor-pointer">
             {session?.user?.name}
             <Avatar>
               <AvatarImage
                 src={session?.user?.image || ""}
                 alt="Hallie Richards"
               />
-              <AvatarFallback className="text-sm uppercase bg-blue-500 text-white hover:bg-blue-600">
+              <AvatarFallback className="shadow-none text-xs hover:bg-[#4fe09a] bg-[#72e3ad] uppercase border border-[#16b674bf] cursor-pointer">
                 {session?.user.name.charAt(0)}
               </AvatarFallback>
             </Avatar>

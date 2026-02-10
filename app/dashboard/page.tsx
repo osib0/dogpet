@@ -1,268 +1,281 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import {
-  Book,
-  Users,
-  ClipboardList,
-  TrendingUp,
-  Activity,
-  UserPlus,
-  Plus,
-  BookOpen,
-  RotateCw,
-  AlertTriangle,
-} from "lucide-react";
+import React from "react";
 import { authClient } from "@/lib/auth-client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  PawPrint,
+  CalendarCheck,
+  Stethoscope,
+  DollarSign,
+  Activity,
+  Plus,
+  UserPlus,
+} from "lucide-react";
+import Link from "next/link";
 import { format } from "date-fns";
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
-interface BookType {
-  _id: string;
-  title: string;
-  availableCopies: number;
-}
 
-interface MemberType {
-  _id: string;
-  fullName: string;
-}
+/* ---------------- MOCK DATA (DOG / PET CLINIC) ---------------- */
 
-interface BorrowType {
-  _id: string;
-  book_id: { title: string };
-  member_id: { fullName: string };
-  borrow_date: string;
-  status: "borrowed" | "returned" | "overdue";
-  createdAt: string;
-}
+const stats = {
+  totalPets: 1248,
+  todayAppointments: 18,
+  activeDoctors: 6,
+  monthlyRevenue: 42500,
+};
+
+const appointmentsByWeek = [
+  { day: "Mon", value: 12 },
+  { day: "Tue", value: 18 },
+  { day: "Wed", value: 14 },
+  { day: "Thu", value: 22 },
+  { day: "Fri", value: 19 },
+  { day: "Sat", value: 9 },
+  { day: "Sun", value: 16 },
+];
+
+const recentAppointments = [
+  {
+    id: "1",
+    pet: "Luna",
+    owner: "Emma Watson",
+    service: "Vaccination",
+    status: "Upcoming",
+    time: new Date(),
+  },
+  {
+    id: "2",
+    pet: "Max",
+    owner: "James Anderson",
+    service: "Dental Care",
+    status: "Completed",
+    time: new Date(),
+  },
+  {
+    id: "3",
+    pet: "Bella",
+    owner: "Sophia Martinez",
+    service: "Annual Check-up",
+    status: "Upcoming",
+    time: new Date(),
+  },
+  {
+    id: "4",
+    pet: "Charlie",
+    owner: "Michael Brown",
+    service: "Surgery",
+    status: "In Progress",
+    time: new Date(),
+  },
+];
+
+/* ---------------- PAGE ---------------- */
 
 export default function Page() {
   const { data: session, isPending } = authClient.useSession();
 
-  const [books, setBooks] = useState<BookType[]>([]);
-  const [members, setMembers] = useState<MemberType[]>([]);
-  const [records, setRecords] = useState<BorrowType[]>([]);
+  /* ---------- LOADING SKELETON ---------- */
+  if (isPending) {
+    return (
+      <div className="p-6 space-y-6">
+        <Skeleton className="h-8 w-64" />
+        <Skeleton className="h-4 w-96" />
 
-  const fetchDashboard = async () => {
-    try {
-      const [b, m, r] = await Promise.all([
-        fetch("/api/books/get").then((r) => r.json()),
-        fetch("/api/members/get").then((r) => r.json()),
-        fetch("/api/borrow-record/get").then((r) => r.json()),
-      ]);
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-28 rounded-xl" />
+          ))}
+        </div>
 
-      if (b.success) setBooks(b.data);
-      if (m.success) setMembers(m.data);
-      if (r.success) setRecords(r.data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Skeleton className="h-80 rounded-xl" />
+          <Skeleton className="h-80 rounded-xl" />
+        </div>
+      </div>
+    );
+  }
 
-  useEffect(() => {
-    fetchDashboard();
-  }, []);
-
-  if (isPending) return <div>Loading session…</div>;
-  if (!session) return <div>Not logged in</div>;
-
-  const totalBooks = books.length;
-  const availableBooks = books.reduce(
-    (sum, b) => sum + (b.availableCopies || 0),
-    0
-  );
-
-  const activeStudents = members.length;
-  const issuedBooks = records.filter((r) => r.status === "borrowed").length;
-  const overdueBooks = records.filter((r) => r.status === "overdue").length;
-
-  const issuesByMonth = Array.from({ length: 12 }).map((_, i) => {
-    const count = records.filter(
-      (r) => new Date(r.borrow_date).getMonth() === i
-    ).length;
-
-    return {
-      month: format(new Date(2025, i, 1), "MMM"),
-      value: count,
-    };
-  });
-
-  const recent = [...records]
-    .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt))
-    .slice(0, 6);
+  if (!session) {
+    return <div className="p-6">Not logged in</div>;
+  }
 
   return (
     <div className="p-6 space-y-6 mt-5">
       {/* HEADER */}
-      <div className="w-full flex flex-wrap space-y-5 justify-between items-start">
-        {/* LEFT — WELCOME */}
+      <div className="flex flex-wrap gap-4 justify-between items-start">
         <div>
           <h1 className="text-2xl font-semibold">
-            Welcome back, <span className="capitalize">{session.user.name?.split(" ")[0]}</span> 👋
+            Welcome back,{" "}
+            <span className="capitalize">
+              {session.user.name?.split(" ")[0]}
+            </span>{" "}
+👋
           </h1>
-
           <p className="text-sm text-muted-foreground mt-1">
-            Here’s what’s happening in your library today.
+            Here’s what’s happening in your pet clinic today.
           </p>
         </div>
 
-        {/* RIGHT — ACTION BUTTONS */}
         <div className="flex gap-3">
-          <Link href={"/dashboard/member"}>
-            <Button className="cursor-pointer" variant={'outline'}>
-              <UserPlus />
-              Add Member
-            </Button>
-          </Link>
-          <Link href={"/dashboard/books"}>
-            <Button className="cursor-pointer bg-blue-500 hover:bg-blue-600">
-              <Plus />
-              Add Book
-            </Button>
-          </Link>
+          <Button variant={'outline'} size={'sm'} className="shadow-none text-xs cursor-pointer">
+            <UserPlus className="h-4 w-4" />
+            Add Pet
+          </Button>
+          <Button variant={'outline'} size={'sm'} className="shadow-none text-xs hover:bg-[#4fe09a] bg-[#72e3ad] border border-[#16b674bf] cursor-pointer">
+            <Plus className="h-4 w-4" />
+            New Appointment
+          </Button>
         </div>
       </div>
 
-      {/* STATS GRID */}
+      {/* STATS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          icon={<Book className="text-indigo-600" />}
-          label="Total Books"
-          value={totalBooks}
-          sub={`${availableBooks} available`}
+          icon={<PawPrint className="text-blue-600" />}
+          label="Total Pets"
+          value={stats.totalPets}
+          sub="+12% this month"
         />
 
         <StatCard
-          icon={<Users className="text-purple-600" />}
-          label="Active Students"
-          value={activeStudents}
-          sub={`${activeStudents} total enrolled`}
+          icon={<CalendarCheck className="text-purple-600" />}
+          label="Today's Appointments"
+          value={stats.todayAppointments}
+          sub="Stable"
         />
 
         <StatCard
-          icon={<ClipboardList className="text-yellow-600" />}
-          label="Books Issued"
-          value={issuedBooks}
-          sub={overdueBooks === 0 ? "All on time" : `${overdueBooks} overdue`}
+          icon={<Stethoscope className="text-green-600" />}
+          label="Active Doctors"
+          value={stats.activeDoctors}
+          sub="All available"
         />
 
         <StatCard
-          icon={<TrendingUp className="text-green-600" />}
-          label="This Month Issues"
-          value={
-            records.filter(
-              (r) =>
-                new Date(r.borrow_date).getMonth() === new Date().getMonth()
-            ).length
-          }
-          sub="Updated live"
+          icon={<DollarSign className="text-emerald-600" />}
+          label="Monthly Revenue"
+          value={`$${stats.monthlyRevenue.toLocaleString()}`}
+          sub="+5.2% growth"
         />
       </div>
 
-      {/* CHART + ACTIVITY */}
+      {/* CHART + RECENT */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* CHART */}
-        <Card className="rounded-xl shadow-none border-0">
-          <CardHeader>
-            <CardTitle>Issues Over Time</CardTitle>
-          </CardHeader>
-          <CardContent style={{ height: "270px" }}>
-            <ResponsiveContainer>
-              <LineChart data={issuesByMonth}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis allowDecimals={false} />
-                <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="value"
-                  stroke="#2563eb"
-                  strokeWidth={3}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+       <Card className="rounded-xl shadow-none border">
+  <CardHeader className="pb-2">
+    <CardTitle className="text-base font-semibold">
+      Appointments This Week
+    </CardTitle>
+    <p className="text-xs text-muted-foreground">
+      Daily appointment trend
+    </p>
+  </CardHeader>
 
-        {/* ACTIVITY */}
-          <Card className="rounded-xl shadow-none border-0">
+  <CardContent className="h-65 px-2">
+    <ResponsiveContainer width="100%" height="100%">
+      <AreaChart
+        data={appointmentsByWeek}
+        margin={{ top: 20, right: 20, left: -10, bottom: 0 }}
+      >
+        {/* Gradient */}
+        <defs>
+          <linearGradient id="appointmentsGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#72e3ad" stopOpacity={0.45} />
+            <stop offset="100%" stopColor="#72e3ad" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+
+        {/* Grid */}
+        <CartesianGrid
+          strokeDasharray="3 3"
+          vertical={false}
+          stroke="#e5e7eb"
+        />
+
+        {/* Axis */}
+        <XAxis
+          dataKey="day"
+          axisLine={false}
+          tickLine={false}
+          tick={{ fontSize: 12, fill: "#6b7280" }}
+        />
+        <YAxis
+          allowDecimals={false}
+          axisLine={false}
+          tickLine={false}
+          tick={{ fontSize: 12, fill: "#6b7280" }}
+        />
+
+        {/* Tooltip */}
+        <Tooltip
+          cursor={{ stroke: "#72e3ad", strokeWidth: 1 }}
+          contentStyle={{
+            backgroundColor: "#ffffff",
+            borderRadius: "8px",
+            border: "1px solid #e5e7eb",
+            fontSize: "12px",
+          }}
+          labelStyle={{ fontWeight: 600 }}
+        />
+
+        {/* Area */}
+        <Area
+          type="monotone"
+          dataKey="value"
+          stroke="#72e3ad"
+          strokeWidth={3}
+          fill="url(#appointmentsGradient)"
+          dot={false}
+          activeDot={{ r: 6 }}
+        />
+      </AreaChart>
+    </ResponsiveContainer>
+  </CardContent>
+</Card>
+
+
+        {/* RECENT APPOINTMENTS */}
+        <Card className="rounded-xl shadow-none border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5" /> Recent Activity
+              <Activity className="h-5 w-5" /> Recent Appointments
             </CardTitle>
           </CardHeader>
 
           <CardContent className="p-0">
-            {recent.length === 0 && (
-              <p className="text-sm text-muted-foreground py-4 px-4">
-                No activity yet.
-              </p>
-            )}
-
             <div className="w-full">
-              {/* TABLE HEADER */}
               <div className="grid grid-cols-12 px-4 py-2 text-xs font-medium text-muted-foreground border-b">
-                <div className="col-span-6">Activity</div>
-                <div className="col-span-3">Member</div>
-                <div className="col-span-3 text-right">Time</div>
+                <div className="col-span-4">Pet</div>
+                <div className="col-span-4">Owner</div>
+                <div className="col-span-2">Service</div>
+                <div className="col-span-2 text-right">Time</div>
               </div>
 
-              {/* ROWS */}
-              {recent.map((r) => (
+              {recentAppointments.map((a) => (
                 <div
-                  key={r._id}
-                  className="grid grid-cols-12 px-4 py-3 text-sm border-b hover:bg-gray-50 transition"
+                  key={a.id}
+                  className="grid grid-cols-12 px-4 py-3 text-sm border-b hover:bg-gray-50"
                 >
-                  {/* Activity */}
-                  <div className="col-span-6 flex items-center gap-2">
-                    {r.status === "borrowed" && (
-                      <>
-                        <BookOpen className="h-4 w-4 text-blue-600" />
-                        <span>
-                          Book issued: <b className="ms-1 text-zinc-600 font-medium">{r.book_id.title}</b>
-                        </span>
-                      </>
-                    )}
-
-                    {r.status === "returned" && (
-                      <>
-                        <RotateCw className="h-4 w-4 text-green-600" />
-                        <span>
-                          Returned: <b>{r.book_id.title}</b>
-                        </span>
-                      </>
-                    )}
-
-                    {r.status === "overdue" && (
-                      <>
-                        <AlertTriangle className="h-4 w-4 text-red-600" />
-                        <span>
-                          Overdue: <b>{r.book_id.title}</b>
-                        </span>
-                      </>
-                    )}
+                  <div className="col-span-4 font-medium">{a.pet}</div>
+                  <div className="col-span-4 text-muted-foreground">
+                    {a.owner}
                   </div>
-
-                  {/* Member */}
-                  <div className="col-span-3 text-muted-foreground">
-                    {r.member_id.fullName}
-                  </div>
-
-                  {/* Time */}
-                  <div className="col-span-3 text-right text-xs text-gray-400">
-                    {format(new Date(r.createdAt), "MMM d, h:mm a")}
+                  <div className="col-span-2 text-xs">{a.service}</div>
+                  <div className="col-span-2 text-right text-xs text-gray-400">
+                    {format(a.time, "hh:mm a")}
                   </div>
                 </div>
               ))}
@@ -274,19 +287,21 @@ export default function Page() {
   );
 }
 
+/* ---------------- STAT CARD ---------------- */
+
 function StatCard({
   icon,
   label,
   value,
   sub,
 }: {
-  icon: any;
+  icon: React.ReactNode;
   label: string;
-  value: number;
+  value: string | number;
   sub: string;
 }) {
   return (
-    <Card className="rounded-xl border-0 shadow-none">
+    <Card className="rounded-xl border shadow-none">
       <CardContent className="p-5 flex items-center gap-4">
         <div className="p-3 bg-gray-100 rounded-xl">{icon}</div>
         <div>
