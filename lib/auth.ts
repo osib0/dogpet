@@ -1,7 +1,6 @@
 import { betterAuth } from "better-auth";
 import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
-import { sendEmail } from "@/lib/send-email";
 
 const client = new MongoClient(process.env.MONGODB_URI!, {
   appName: "libease",
@@ -15,13 +14,6 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     autoSignInAfterVerification:true,
     expiresIn:3600,
-    sendVerificationEmail: async ({ user, url, token }, request) => {
-            void sendEmail({
-                to: user.email,
-                subject: 'Verify your email address',
-                text: `Click the link to verify your email: ${url}`,
-            })
-        },
   },
   emailAndPassword: {
     requireEmailVerification: false,
