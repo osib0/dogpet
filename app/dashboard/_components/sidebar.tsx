@@ -12,6 +12,13 @@ import {
   ClipboardList,
   Crown,
   Bell,
+  Calendar,
+  Sprout,
+  Settings2,
+  Banknote,
+  PawPrint,
+  Stethoscope,
+  ChartNoAxesColumnIncreasing,
 } from "lucide-react";
 import {
   Sidebar,
@@ -119,28 +126,33 @@ export const links = [
   },
   {
     href: "/dashboard/books",
-    label: "Books",
-    icon: Book,
+    label: "Appoinment",
+    icon: Calendar,
   },
   {
     href: "/dashboard/member",
-    label: "Members",
-    icon: Users,
+    label: "Pets",
+    icon: PawPrint,
   },
   {
     href: "/dashboard/borrow-record",
-    label: "Borrow Record",
-    icon: ClipboardList,
+    label: "Doctors",
+    icon: Stethoscope,
   },
   {
     href: "/dashboard/reminder",
-    label: "Reminder",
-    icon: Bell,
+    label: "Billing",
+    icon: Banknote,
+  },
+  {
+    href: "/dashboard/reminder",
+    label: "Reports",
+    icon: ChartNoAxesColumnIncreasing,
   },
   {
     href: "/dashboard/subscription",
-    label: "subscription",
-    icon: Crown,
+    label: "Settings",
+    icon: Settings2,
   },
 ];
 
