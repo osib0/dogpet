@@ -34,17 +34,25 @@ export default function PatientList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
-    fetchPatients();
-  }, []);
+    fetchPatients(page);
+  }, [page]);
 
-  const fetchPatients = async () => {
+  const handleRefresh = () => {
+    setPage(1);
+    fetchPatients(1);
+  };
+
+  const fetchPatients = async (currentPage = 1) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const res = await fetch("/api/patients/get");
+      const res = await fetch(`/api/patients/get?page=${currentPage}&limit=10`);
       if (!res.ok) {
         throw new Error(`API returned ${res.status}`);
       }
@@ -62,6 +70,9 @@ export default function PatientList() {
 
       setPatients(sorted);
       setFilteredPatients(sorted);
+      setPage(data.pagination.page);
+      setTotalPages(data.pagination.totalPages);
+      setTotal(data.pagination.total);
       console.log("Fetched patients:", sorted);
     } catch (fetchError) {
       console.error("Failed to fetch patients:", fetchError);
@@ -113,7 +124,7 @@ export default function PatientList() {
             <Button
               variant="outline"
               className="h-9 text-xs"
-              onClick={fetchPatients}
+              onClick={handleRefresh}
             >
               Refresh
             </Button>
@@ -194,8 +205,45 @@ export default function PatientList() {
       </Card>
 
       <p className="text-xs text-gray-500 mt-4 text-center">
-        Click any row to select • Press F1 (in real app) for quick selection • Total: {filteredPatients.length} patients
+        Click any row to select • Press F1 (in real app) for quick selection • Total: {total} patients • Page {page} of {totalPages}
       </p>
+
+      {/* Pagination */}
+      <div className="flex justify-center items-center gap-2 mt-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setPage(Math.max(1, page - 1))}
+          disabled={page === 1 || isLoading}
+        >
+          Previous
+        </Button>
+
+        {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+          const pageNum = Math.max(1, Math.min(totalPages - 4, page - 2)) + i;
+          if (pageNum > totalPages) return null;
+          return (
+            <Button
+              key={pageNum}
+              variant={pageNum === page ? "default" : "outline"}
+              size="sm"
+              onClick={() => setPage(pageNum)}
+              disabled={isLoading}
+            >
+              {pageNum}
+            </Button>
+          );
+        })}
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setPage(Math.min(totalPages, page + 1))}
+          disabled={page === totalPages || isLoading}
+        >
+          Next
+        </Button>
+      </div>
     </div>
   );
 }

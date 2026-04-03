@@ -12,9 +12,8 @@ import { authClient } from "@/lib/auth-client";
 import { LogOut, Settings } from "lucide-react";
 import AccountSettingsModal from "./account";
 import { usePathname, useRouter } from "next/navigation";
-import { links } from "./sidebar";
+// import { links } from "./sidebar";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-
 
 
 function DashboardHeader() {
@@ -25,13 +24,13 @@ function DashboardHeader() {
   const [heading, setHeading] = useState<string|undefined>(undefined);
 
   useEffect(() => {
-    const title = getName();
-    setHeading(title?.label);
+    // const title = getName();
+    // setHeading(title?.label);
   }, [pathName]);
 
-  function getName() {
-    return links.find((el) => el.href == pathName);
-  }
+  // function getName() {
+  //   return links.find((el) => el.href == pathName);
+  // }
 
   const handleLogout = async () => {
     await authClient.signOut();

@@ -40,9 +40,7 @@ type FormData = z.infer<typeof patientSchema>;
 export default function Page() {
   const form = useForm<FormData>({
     resolver: zodResolver(patientSchema),
-    defaultValues: {
-      sendSms: "vaccination", // default as shown in screenshot
-    },
+    defaultValues: {},
   });
 
   async function onSubmit(data: FormData) {
