@@ -108,7 +108,7 @@ export default function PatientList() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <Card>
+      <Card className="shadow-none">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-lg font-semibold">All Patients List</CardTitle>
           <div className="flex items-center gap-4">
@@ -118,7 +118,7 @@ export default function PatientList() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-80 h-9 text-sm"
             />
-            <Link href="/patient-entry">
+            <Link href="/dashboard/patient/add">
               <Button className="h-9 text-xs">+ New Patient Entry</Button>
             </Link>
             <Button
@@ -182,7 +182,7 @@ export default function PatientList() {
                           })
                         : "-"}
                     </TableCell>
-                    <TableCell className="max-w-[180px] truncate">{patient.next_visit_note || "-"}</TableCell>
+                    <TableCell className="max-w-45 truncate">{patient.next_visit_note || "-"}</TableCell>
                     <TableCell>
                       <Link href={`/patient-entry?edit=${patient._id}`}>
                         <Button
@@ -204,9 +204,6 @@ export default function PatientList() {
         </CardContent>
       </Card>
 
-      <p className="text-xs text-gray-500 mt-4 text-center">
-        Click any row to select • Press F1 (in real app) for quick selection • Total: {total} patients • Page {page} of {totalPages}
-      </p>
 
       {/* Pagination */}
       <div className="flex justify-center items-center gap-2 mt-4">
