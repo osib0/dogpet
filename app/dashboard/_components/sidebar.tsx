@@ -107,6 +107,11 @@ export const links = [
     icon: LayoutDashboard,
   },
   {
+    href: "/dashboard/patient/add",
+    label: "Patient",
+    icon: LayoutDashboard,
+  },
+  {
     href: "/dashboard/appoinment",
     label: "Appoinment",
     icon: Calendar,

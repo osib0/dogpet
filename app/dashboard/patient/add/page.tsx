@@ -23,41 +23,16 @@ import {
 } from "@/components/ui/select";
 
 const patientSchema = z.object({
-  ownerName: z.string().min(1, "Owner name is required"),
-  petName: z.string().min(1, "Pet name is required"),
-
-  type: z.string().optional(),
-  breed: z.string().optional(),
-  color: z.string().optional(),
-
-  gender: z.enum(["male", "female"]).optional(),
-
+  pet_id: z.string().min(1, "Pet ID is required"),
+  owner_name: z.string().min(1, "Owner name is required"),
+  phone: z.string().optional(),
+  sex: z.enum(["MALE", "FEMALE"]).optional(),
   age: z.string().optional(),
-  mobile: z.string().optional(),
-  address: z.string().optional(),
-
-  dateOfBirth: z.string().optional(),
-  dateOfVisit: z.string().optional(),
-
-  complaint: z.string().optional(),
-  batchNo: z.string().optional(),
-
-  sendSms: z.enum(["vaccination", "vaccinationType"]).optional(),
-
-  vaccination: z.string().optional(),
-  vaccinationType: z.string().optional(),
-
-  disease: z.string().optional(),
-  diseaseType: z.string().optional(),
-  medication: z.string().optional(),
-
-  diagnosis: z.string().optional(),
-
-  duration: z.string().optional(),
-  dueDate: z.string().optional(),
-
-  email: z.string().email().optional(),
-  remarks: z.string().optional(),
+  pet_name: z.string().min(1, "Pet name is required"),
+  breed: z.string().optional(),
+  vaccine: z.string().optional(),
+  visit_date: z.string().optional(),
+  next_visit_note: z.string().optional(),
 });
 
 type FormData = z.infer<typeof patientSchema>;
@@ -88,10 +63,25 @@ export default function Page() {
           onSubmit={form.handleSubmit(onSubmit)}
           className="grid grid-cols-4 gap-3 text-xs"
         >
+          {/* Pet ID */}
+          <FormField
+            control={form.control}
+            name="pet_id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-xs">Pet ID</FormLabel>
+                <FormControl>
+                  <Input className="h-7 text-xs" placeholder="PETS/123/2024" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           {/* Owner Name */}
           <FormField
             control={form.control}
-            name="ownerName"
+            name="owner_name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-xs">Owner Name</FormLabel>
@@ -103,78 +93,36 @@ export default function Page() {
             )}
           />
 
-          {/* Pet Name */}
+          {/* Phone */}
           <FormField
             control={form.control}
-            name="petName"
+            name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-xs">Pet Name</FormLabel>
+                <FormLabel className="text-xs">Phone</FormLabel>
                 <FormControl>
-                  <Input className="h-7 text-xs" placeholder="LUCY" {...field} />
+                  <Input className="h-7 text-xs" placeholder="9876543210" {...field} />
                 </FormControl>
               </FormItem>
             )}
           />
 
-          {/* Type */}
+          {/* Sex */}
           <FormField
             control={form.control}
-            name="type"
+            name="sex"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-xs">Type</FormLabel>
-                <FormControl>
-                  <Input className="h-7 text-xs" placeholder="PUP" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          {/* Breed */}
-          <FormField
-            control={form.control}
-            name="breed"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-xs">Breed</FormLabel>
-                <FormControl>
-                  <Input className="h-7 text-xs" placeholder="PIT BULL" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          {/* Color */}
-          <FormField
-            control={form.control}
-            name="color"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-xs">Color</FormLabel>
-                <FormControl>
-                  <Input className="h-7 text-xs" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          {/* Gender - Dropdown */}
-          <FormField
-            control={form.control}
-            name="gender"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-xs">Gender</FormLabel>
+                <FormLabel className="text-xs">Sex</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger className="h-7 text-xs">
-                      <SelectValue placeholder="Select gender" />
+                      <SelectValue placeholder="Select sex" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="male">Male</SelectItem>
-                    <SelectItem value="female">Female</SelectItem>
+                    <SelectItem value="MALE">Male</SelectItem>
+                    <SelectItem value="FEMALE">Female</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -196,274 +144,82 @@ export default function Page() {
             )}
           />
 
-          {/* Mobile */}
+          {/* Pet Name */}
           <FormField
             control={form.control}
-            name="mobile"
+            name="pet_name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-xs">Mobile No.</FormLabel>
+                <FormLabel className="text-xs">Pet Name</FormLabel>
                 <FormControl>
-                  <Input className="h-7 text-xs" placeholder="08875124601" {...field} />
+                  <Input className="h-7 text-xs" placeholder="LUCY" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Breed */}
+          <FormField
+            control={form.control}
+            name="breed"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-xs">Breed</FormLabel>
+                <FormControl>
+                  <Input className="h-7 text-xs" placeholder="PIT BULL" {...field} />
                 </FormControl>
               </FormItem>
             )}
           />
 
-          {/* Address - Textarea (full width) */}
+          {/* Vaccine */}
           <FormField
             control={form.control}
-            name="address"
+            name="vaccine"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-xs">Vaccine</FormLabel>
+                <FormControl>
+                  <Input className="h-7 text-xs" placeholder="DHPP" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          {/* Visit Date */}
+          <FormField
+            control={form.control}
+            name="visit_date"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-xs">Visit Date</FormLabel>
+                <FormControl>
+                  <Input className="h-7 text-xs" type="date" {...field} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          {/* Next Visit Note */}
+          <FormField
+            control={form.control}
+            name="next_visit_note"
             render={({ field }) => (
               <FormItem className="col-span-4">
-                <FormLabel className="text-xs">Address</FormLabel>
+                <FormLabel className="text-xs">Next Visit Note</FormLabel>
                 <FormControl>
-                  <Textarea className="h-8 text-xs resize-none" placeholder="Enter address" {...field} />
+                  <Textarea className="text-xs" placeholder="Notes for next visit..." {...field} />
                 </FormControl>
               </FormItem>
             )}
           />
 
-          {/* Date of Birth */}
-          <FormField
-            control={form.control}
-            name="dateOfBirth"
-            render={({ field }) => (
-              <FormItem className="col-span-2">
-                <FormLabel className="text-xs">Date Of Birth</FormLabel>
-                <FormControl>
-                  <Input type="date" className="h-7 text-xs" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          {/* Date of Visit */}
-          <FormField
-            control={form.control}
-            name="dateOfVisit"
-            render={({ field }) => (
-              <FormItem className="col-span-2">
-                <FormLabel className="text-xs">Date Of Visit</FormLabel>
-                <FormControl>
-                  <Input type="date" className="h-7 text-xs" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          {/* Current Complaint - Textarea (full width) */}
-          <FormField
-            control={form.control}
-            name="complaint"
-            render={({ field }) => (
-              <FormItem className="col-span-4">
-                <FormLabel className="text-xs">Current Complaint</FormLabel>
-                <FormControl>
-                  <Textarea className="h-8 text-xs resize-none" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          {/* Batch No. */}
-          <FormField
-            control={form.control}
-            name="batchNo"
-            render={({ field }) => (
-              <FormItem className="col-span-2">
-                <FormLabel className="text-xs">Batch No.</FormLabel>
-                <FormControl>
-                  <Input className="h-7 text-xs" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          {/* Send SMS Radio Buttons (full width) */}
-          <FormField
-            control={form.control}
-            name="sendSms"
-            render={({ field }) => (
-              <FormItem className="col-span-2 flex flex-col">
-                <FormLabel className="text-xs">Send SMS</FormLabel>
-                <div className="flex items-center gap-6 mt-1">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      value="vaccination"
-                      checked={field.value === "vaccination"}
-                      onChange={() => field.onChange("vaccination")}
-                      className="accent-blue-600"
-                    />
-                    Send Sms for vaccination
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      value="vaccinationType"
-                      checked={field.value === "vaccinationType"}
-                      onChange={() => field.onChange("vaccinationType")}
-                      className="accent-blue-600"
-                    />
-                    Send Sms for vaccination type
-                  </label>
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* Select Vaccination - Input (can be replaced with Select later) */}
-          <FormField
-            control={form.control}
-            name="vaccination"
-            render={({ field }) => (
-              <FormItem className="col-span-2">
-                <FormLabel className="text-xs">Select Vaccination</FormLabel>
-                <FormControl>
-                  <Input className="h-7 text-xs" placeholder="Select Vaccination" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          {/* Select Vaccination Type - Input (can be replaced with Select later) */}
-          <FormField
-            control={form.control}
-            name="vaccinationType"
-            render={({ field }) => (
-              <FormItem className="col-span-2">
-                <FormLabel className="text-xs">Select Vaccination Type</FormLabel>
-                <FormControl>
-                  <Input className="h-7 text-xs" placeholder="Select Vaccination Type" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          {/* Medications Section */}
-          <div className="col-span-4 mt-2 mb-1 text-xs font-medium text-gray-600">Medications</div>
-
-          {/* Select Disease */}
-          <FormField
-            control={form.control}
-            name="disease"
-            render={({ field }) => (
-              <FormItem className="col-span-2">
-                <FormLabel className="text-xs">Select Disease</FormLabel>
-                <FormControl>
-                  <Input className="h-7 text-xs" placeholder="Select Disease" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          {/* Select Disease Type */}
-          <FormField
-            control={form.control}
-            name="diseaseType"
-            render={({ field }) => (
-              <FormItem className="col-span-2">
-                <FormLabel className="text-xs">Select Disease Type</FormLabel>
-                <FormControl>
-                  <Input className="h-7 text-xs" placeholder="Select Disease Type" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          {/* Medication */}
-          <FormField
-            control={form.control}
-            name="medication"
-            render={({ field }) => (
-              <FormItem className="col-span-4">
-                <FormLabel className="text-xs">Medication</FormLabel>
-                <FormControl>
-                  <Input className="h-7 text-xs" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          {/* Diagnosis - Textarea (full width) */}
-          <FormField
-            control={form.control}
-            name="diagnosis"
-            render={({ field }) => (
-              <FormItem className="col-span-4">
-                <FormLabel className="text-xs">Diagnosis</FormLabel>
-                <FormControl>
-                  <Textarea className="h-8 text-xs resize-none" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          {/* Duration */}
-          <FormField
-            control={form.control}
-            name="duration"
-            render={({ field }) => (
-              <FormItem className="col-span-2">
-                <FormLabel className="text-xs">Duration</FormLabel>
-                <FormControl>
-                  <Input className="h-7 text-xs" placeholder="0" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          {/* Due Date */}
-          <FormField
-            control={form.control}
-            name="dueDate"
-            render={({ field }) => (
-              <FormItem className="col-span-2">
-                <FormLabel className="text-xs">Due date</FormLabel>
-                <FormControl>
-                  <Input type="date" className="h-7 text-xs" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          {/* Email Id */}
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem className="col-span-4">
-                <FormLabel className="text-xs">Email Id</FormLabel>
-                <FormControl>
-                  <Input type="email" className="h-7 text-xs" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          {/* Remarks - Textarea (full width) */}
-          <FormField
-            control={form.control}
-            name="remarks"
-            render={({ field }) => (
-              <FormItem className="col-span-4">
-                <FormLabel className="text-xs">Remarks</FormLabel>
-                <FormControl>
-                  <Textarea className="h-16 text-xs resize-none" {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            className="h-8 text-xs col-span-1 mt-4"
-            variant="outline"
-          >
-            Submit
-          </Button>
+          <div className="col-span-4">
+            <Button type="submit" className="h-8 text-xs">
+              Save Patient
+            </Button>
+          </div>
         </form>
       </Form>
     </div>

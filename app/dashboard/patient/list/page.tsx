@@ -16,56 +16,82 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Patient {
   _id: string;
-  ownerName: string;
-  petName: string;
+  pet_id: string;
+  owner_name: string;
+  phone: string;
+  sex: string;
   age: string;
-  dateOfVisit: string;
-  complaint: string;
-  disease: string;
-  diseaseType: string;
-  medication: string;
-  diagnosis: string;
-  gender?: string;
-  breed?: string;
-  mobile?: string;
+  pet_name: string;
+  breed: string;
+  vaccine: string;
+  visit_date: string;
+  next_visit_note: string;
 }
 
 export default function PatientList() {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchPatients();
   }, []);
 
   const fetchPatients = async () => {
+    setIsLoading(true);
+    setError(null);
+
     try {
       const res = await fetch("/api/patients/get");
+      if (!res.ok) {
+        throw new Error(`API returned ${res.status}`);
+      }
+
       const data = await res.json();
-      const sorted = data.patients.sort((a: any, b: any) =>
-        new Date(b.dateOfVisit).getTime() - new Date(a.dateOfVisit).getTime()
-      );
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
+      const sorted = (data.patients ?? []).sort((a: any, b: any) => {
+        const dateA = a.visit_date ? new Date(a.visit_date).getTime() : new Date(a.createdAt).getTime();
+        const dateB = b.visit_date ? new Date(b.visit_date).getTime() : new Date(b.createdAt).getTime();
+        return dateB - dateA;
+      });
+
       setPatients(sorted);
       setFilteredPatients(sorted);
-    } catch (error) {
-      console.error("Failed to fetch patients:", error);
-      alert("Failed to load patient list");
+      console.log("Fetched patients:", sorted);
+    } catch (fetchError) {
+      console.error("Failed to fetch patients:", fetchError);
+      setError("Failed to load patient list. Please refresh.");
+      setPatients([]);
+      setFilteredPatients([]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   // Live search
   useEffect(() => {
-    const filtered = patients.filter((p) =>
-      p.ownerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.petName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.complaint?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const normalizedTerm = searchTerm.toLowerCase();
+    const filtered = patients.filter((p) => {
+      const owner = p.owner_name?.toLowerCase() ?? "";
+      const pet = p.pet_name?.toLowerCase() ?? "";
+      const breed = p.breed?.toLowerCase() ?? "";
+
+      return (
+        owner.includes(normalizedTerm) ||
+        pet.includes(normalizedTerm) ||
+        breed.includes(normalizedTerm)
+      );
+    });
     setFilteredPatients(filtered);
   }, [searchTerm, patients]);
 
   const handleRowClick = (patient: Patient) => {
-    alert(`Selected Patient: ${patient.ownerName} - ${patient.petName}\n\nClick "Edit" button in actions to edit this patient.`);
+    alert(`Selected Patient: ${patient.owner_name} - ${patient.pet_name}\n\nClick "Edit" button in actions to edit this patient.`);
     // Future: router.push(`/patients/edit/${patient._id}`)
   };
 
@@ -76,7 +102,7 @@ export default function PatientList() {
           <CardTitle className="text-lg font-semibold">All Patients List</CardTitle>
           <div className="flex items-center gap-4">
             <Input
-              placeholder="Search by owner, pet or complaint..."
+              placeholder="Search by owner, pet or breed..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-80 h-9 text-sm"
@@ -95,22 +121,27 @@ export default function PatientList() {
         </CardHeader>
 
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Owner Name</TableHead>
-                <TableHead>Pet Name</TableHead>
+          {isLoading ? (
+            <div className="py-16 text-center text-sm text-gray-500">Loading patients...</div>
+          ) : error ? (
+            <div className="py-16 text-center text-sm text-red-500">{error}</div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Owner Name</TableHead>
+                  <TableHead>Pet Name</TableHead>
+                <TableHead>Breed</TableHead>
                 <TableHead>Age</TableHead>
-                <TableHead>Date of Visit</TableHead>
-                <TableHead>Complaints</TableHead>
-                <TableHead>Disease</TableHead>
-                <TableHead>Disease Type</TableHead>
-                <TableHead>Medication</TableHead>
-                <TableHead>Diagnosis</TableHead>
-                <TableHead className="w-24">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+                <TableHead>Sex</TableHead>
+                <TableHead>Phone</TableHead>
+                <TableHead>Vaccine</TableHead>
+                <TableHead>Visit Date</TableHead>
+                <TableHead>Next Visit Note</TableHead>
+                  <TableHead className="w-24">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
               {filteredPatients.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={10} className="text-center py-8 text-gray-500">
@@ -124,21 +155,23 @@ export default function PatientList() {
                     className="cursor-pointer hover:bg-gray-50"
                     onClick={() => handleRowClick(patient)}
                   >
-                    <TableCell className="font-medium">{patient.ownerName}</TableCell>
-                    <TableCell>{patient.petName}</TableCell>
-                    <TableCell>{patient.age}</TableCell>
+                    <TableCell className="font-medium">{patient.owner_name}</TableCell>
+                    <TableCell>{patient.pet_name}</TableCell>
+                    <TableCell>{patient.breed || "-"}</TableCell>
+                    <TableCell>{patient.age || "-"}</TableCell>
+                    <TableCell>{patient.sex || "-"}</TableCell>
+                    <TableCell>{patient.phone || "-"}</TableCell>
+                    <TableCell>{patient.vaccine || "-"}</TableCell>
                     <TableCell>
-                      {new Date(patient.dateOfVisit).toLocaleDateString("en-IN", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })}
+                      {patient.visit_date
+                        ? new Date(patient.visit_date).toLocaleDateString("en-IN", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })
+                        : "-"}
                     </TableCell>
-                    <TableCell className="max-w-[180px] truncate">{patient.complaint || "-"}</TableCell>
-                    <TableCell>{patient.disease || "-"}</TableCell>
-                    <TableCell>{patient.diseaseType || "-"}</TableCell>
-                    <TableCell>{patient.medication || "-"}</TableCell>
-                    <TableCell className="max-w-[180px] truncate">{patient.diagnosis || "-"}</TableCell>
+                    <TableCell className="max-w-[180px] truncate">{patient.next_visit_note || "-"}</TableCell>
                     <TableCell>
                       <Link href={`/patient-entry?edit=${patient._id}`}>
                         <Button
@@ -156,6 +189,7 @@ export default function PatientList() {
               )}
             </TableBody>
           </Table>
+          )}
         </CardContent>
       </Card>
 
