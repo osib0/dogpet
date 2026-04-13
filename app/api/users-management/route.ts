@@ -6,6 +6,7 @@ import roleModel from "@/models/role.model";
 import { NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 
+
 export async function POST(req: Request) {
   try {
     await connectDB();
