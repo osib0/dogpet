@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboard, Users, ChevronDown } from "lucide-react";
+import { LayoutDashboard, Users, ChevronDown, Package, Lock } from "lucide-react";
 
 import {
   Sidebar,
@@ -36,6 +36,43 @@ export const menu = [
       { title: "Add Patient", url: "/dashboard/patient/add" },
       { title: "Patient List", url: "/dashboard/patient/list" },
     ],
+  },
+  {
+    title: "Modules",
+    icon: Package,
+    submenu: [
+      { title: "Add Module", url: "/dashboard/modules/add" },
+      { title: "Module List", url: "/dashboard/modules/list" },
+    ],
+  },
+  {
+    title: "Users",
+    icon: Users,
+    submenu: [
+      { title: "Add User", url: "/dashboard/user/add" },
+      { title: "User List", url: "/dashboard/user/list" },
+    ],
+  },
+  {
+    title: "Roles",
+    icon: Lock,
+    submenu: [
+      { title: "Add Role", url: "/dashboard/roles/add" },
+      { title: "Role List", url: "/dashboard/roles/list" },
+    ],
+  },
+  {
+    title: "Actions",
+    icon: Package,
+    submenu: [
+      { title: "Add Action", url: "/dashboard/actions/add" },
+      { title: "Action List", url: "/dashboard/actions/list" },
+    ],
+  },
+  {
+    title: "Permissions",
+    url: "/dashboard/user/permissions",
+    icon: Users,
   },
 ];
 
