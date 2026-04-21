@@ -38,8 +38,8 @@ const patientSchema = z.object({
   visit_date: z.string().optional(),
   current_complaint: z.string().optional(),
   batch_no: z.string().optional(),
-  send_sms_vaccination: z.boolean().default(false),
-  send_sms_vaccination_type: z.boolean().default(false),
+  send_sms_vaccination: z.boolean().optional(),
+  send_sms_vaccination_type: z.boolean().optional(),
   medications: z.array(z.object({
     disease: z.string().optional(),
     disease_type: z.string().optional(),
