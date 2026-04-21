@@ -4,7 +4,7 @@ import Patient from "@/models/patient.model";
 import { z } from "zod";
 
 const patientSchema = z.object({
-  pet_id: z.string().min(1, "Pet ID is required"),
+  pet_id: z.string().optional(),
   owner_name: z.string().min(1, "Owner name is required"),
   phone: z.string().optional(),
   sex: z.enum(["MALE", "FEMALE"]).optional(),
@@ -14,6 +14,24 @@ const patientSchema = z.object({
   vaccine: z.string().optional(),
   visit_date: z.string().optional(),
   next_visit_note: z.string().optional(),
+  type: z.string().optional(),
+  color: z.string().optional(),
+  address: z.string().optional(),
+  dob: z.string().optional(),
+  current_complaint: z.string().optional(),
+  batch_no: z.string().optional(),
+  send_sms_vaccination: z.boolean().optional(),
+  send_sms_vaccination_type: z.boolean().optional(),
+  medications: z.array(z.object({
+    disease: z.string().optional(),
+    disease_type: z.string().optional(),
+    medicine: z.string().optional(),
+  })).optional(),
+  diagnosis: z.string().optional(),
+  duration: z.string().optional(),
+  due_date: z.string().optional(),
+  email: z.string().optional(),
+  remarks: z.string().optional(),
 });
 
 export async function POST(req: Request) {

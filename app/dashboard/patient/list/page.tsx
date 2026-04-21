@@ -87,15 +87,25 @@ export default function PatientList() {
   // Live search
   useEffect(() => {
     const normalizedTerm = searchTerm.toLowerCase();
-    const filtered = patients.filter((p) => {
+    const filtered = patients.filter((p: any) => {
       const owner = p.owner_name?.toLowerCase() ?? "";
       const pet = p.pet_name?.toLowerCase() ?? "";
       const breed = p.breed?.toLowerCase() ?? "";
+      const type = p.type?.toLowerCase() ?? "";
+      const phone = p.phone?.toLowerCase() ?? "";
+      const address = p.address?.toLowerCase() ?? "";
+      const email = p.email?.toLowerCase() ?? "";
+      const batchNo = p.batch_no?.toLowerCase() ?? "";
 
       return (
         owner.includes(normalizedTerm) ||
         pet.includes(normalizedTerm) ||
-        breed.includes(normalizedTerm)
+        breed.includes(normalizedTerm) ||
+        type.includes(normalizedTerm) ||
+        phone.includes(normalizedTerm) ||
+        address.includes(normalizedTerm) ||
+        email.includes(normalizedTerm) ||
+        batchNo.includes(normalizedTerm)
       );
     });
     setFilteredPatients(filtered);

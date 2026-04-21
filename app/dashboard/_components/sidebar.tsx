@@ -38,6 +38,14 @@ export const menu = [
     ],
   },
   {
+    title: "Medications",
+    icon: Package,
+    submenu: [
+      { title: "Add Medication", url: "/dashboard/medication/add" },
+      { title: "Medication List", url: "/dashboard/medication/list" },
+    ],
+  },
+  {
     title: "Modules",
     icon: Package,
     submenu: [
@@ -78,9 +86,11 @@ export const menu = [
 
 // ===================== SIDEBAR ===================== //
 
-export function AppSidebar() {
+export function AppSidebar({ userEmail }: { userEmail?: string }) {
   const pathname = usePathname();
   const [activeIndex, setActiveIndex] = useState<string>("");
+  const [allowedModules, setAllowedModules] = useState<string[]>([]);
+  const [filteredMenu, setFilteredMenu] = useState(menu);
 
   const { isMobile, setOpenMobile } = useSidebar();
 
@@ -88,9 +98,33 @@ export function AppSidebar() {
     if (isMobile) setOpenMobile(false);
   };
 
+  useEffect(() => {
+    if (userEmail) {
+      fetch(`/api/auth/me/permissions?email=${encodeURIComponent(userEmail)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.modules.length > 0) {
+            // For now, let's say 'Admin' module grants all, or they filter exactly
+            // To prevent blocking everything if not set up, we could just filter if data.modules exist
+            const modules = data.modules.map((m: string) => m.toLowerCase());
+            // This is a simple implementation. In a real scenario, map menu titles to module page_names.
+            // Let's assume Dashboard is always visible.
+            const newMenu = menu.filter(m => 
+              m.title === "Dashboard" || modules.includes(m.title.toLowerCase())
+            );
+            // If they have any roles set up, apply filter, otherwise show all to avoid breaking dev
+            if (modules.length > 0) {
+                setFilteredMenu(newMenu);
+            }
+          }
+        })
+        .catch(console.error);
+    }
+  }, [userEmail]);
+
   // 🔥 auto open submenu if active
   useEffect(() => {
-    menu.forEach((item, index) => {
+    filteredMenu.forEach((item, index) => {
       if (item.submenu) {
         item.submenu.forEach((sub) => {
           if (sub.url === pathname) {
@@ -99,7 +133,7 @@ export function AppSidebar() {
         });
       }
     });
-  }, [pathname]);
+  }, [pathname, filteredMenu]);
 
   return (
     <Sidebar className="py-4 flex flex-col h-full">
@@ -118,7 +152,7 @@ export function AppSidebar() {
             value={activeIndex}
             onValueChange={setActiveIndex}
           >
-            {menu.map((item, index) => {
+            {filteredMenu.map((item, index) => {
               const isSubmenu = !!item.submenu;
 
               // ================= SIMPLE LINK =================

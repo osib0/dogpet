@@ -20,7 +20,7 @@ export default async function RootLayout({
 
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar userEmail={session.user.email} />
       <main className="bg-[#f9f9f9] w-full">
         <DashboardHeader/>
         {children}

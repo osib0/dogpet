@@ -103,7 +103,7 @@ export default function Page() {
         onError: (ctx) => {
           setError(ctx.error.message);
         },
-        onRequest: () => {},
+        onRequest: () => { },
       },
     );
 
@@ -123,7 +123,7 @@ export default function Page() {
 
 
 
-  
+
   return (
     <div className="h-screen w-screen flex">
       <div className="bg-gray-50 border-r p-5 shadow-xl max-w-full xl:max-w-187 w-full z-10 flex flex-col items-center">
@@ -274,7 +274,7 @@ export default function Page() {
             </div>
 
             <div>
-              <p className="text-sm font-medium text-gray-900">Mohammad Osib</p>
+              <p className="text-sm font-medium text-gray-900">Osib</p>
               <p className="text-sm text-gray-500">@osibdev</p>
             </div>
           </div>
