@@ -3,6 +3,10 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useState } from "react";
+import {
+  upload,
+} from "@imagekit/next";
 import {
   Form,
   FormField,
@@ -54,6 +58,46 @@ export default function Page() {
       dob: "",
     },
   });
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const authenticator = async () => {
+    const res = await fetch("/api/upload-auth");
+    if (!res.ok) throw new Error("Auth failed");
+    return res.json();
+  };
+
+  const handleUploadPicture = async () => {
+    if (!selectedFile) {
+      alert("Please select a file first");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const auth = await authenticator();
+      const ext = selectedFile.type.split("/")[1] || "jpg";
+
+      const uploadRes = await upload({
+        ...auth,
+        file: selectedFile,
+        fileName: `patient_${Date.now()}.${ext}`,
+      });
+
+      if (!uploadRes.url) {
+        throw new Error("Image upload failed");
+      }
+
+      form.setValue("picture", uploadRes.url);
+      alert("Picture uploaded successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to upload picture");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   async function onSubmit(data: FormData) {
     const res = await fetch("/api/patients/add", {
@@ -233,19 +277,30 @@ export default function Page() {
               />
 
               {/* Picture Upload */}
-              <FormField
-                control={form.control}
-                name="picture"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Upload Picture (URL or path)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Picture URL" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+              <div className="space-y-2">
+                <FormLabel className="text-sm font-medium">Upload Picture</FormLabel>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) setSelectedFile(file);
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleUploadPicture}
+                    disabled={!selectedFile || isUploading}
+                  >
+                    {isUploading ? "Uploading..." : "Upload"}
+                  </Button>
+                </div>
+                {form.watch("picture") && (
+                  <p className="text-xs text-green-600 font-medium">Picture uploaded successfully!</p>
                 )}
-              />
+              </div>
 
               {/* Is Active */}
               <FormField
