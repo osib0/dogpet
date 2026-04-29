@@ -115,8 +115,8 @@ export default function Page() {
   }
 
   return (
-    <div className="p-4 max-w-5xl bg-[#f0f0f0] min-h-screen mx-auto">
-      <div className="bg-white p-6 rounded shadow-sm border border-gray-200">
+    <div className="p-4 max-w-5xl min-h-screen mx-auto">
+      <div className="bg-white p-6 rounded-sm border">
         <h1 className="text-sm font-semibold mb-6 bg-[#c7915b] text-white py-2 px-3 uppercase">Patient Entry</h1>
 
         <Form {...form}>
