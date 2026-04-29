@@ -143,70 +143,70 @@ export default function PatientList() {
             <div className="py-16 text-center text-sm text-red-500">{error}</div>
           ) : (
             <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Owner Name</TableHead>
-                  <TableHead>Pet Name</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Breed</TableHead>
-                  <TableHead>Color</TableHead>
-                  <TableHead>Sex</TableHead>
-                  <TableHead>DOB</TableHead>
-                  <TableHead>Phone</TableHead>
-                  <TableHead>Active</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead className="w-24">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-              {filteredPatients.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={11} className="text-center py-8 text-gray-500">
-                    No patients found
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredPatients.map((patient) => (
-                  <TableRow
-                    key={patient._id}
-                    className="cursor-pointer hover:bg-gray-50"
-                    onClick={() => handleRowClick(patient)}
-                  >
-                    <TableCell className="font-medium">{patient.owner_name}</TableCell>
-                    <TableCell>{patient.pet_name}</TableCell>
-                    <TableCell>{patient.type || "-"}</TableCell>
-                    <TableCell>{patient.breed || "-"}</TableCell>
-                    <TableCell>{patient.color || "-"}</TableCell>
-                    <TableCell>{patient.sex || "-"}</TableCell>
-                    <TableCell>{patient.dob || "-"}</TableCell>
-                    <TableCell>{patient.phone || "-"}</TableCell>
-                    <TableCell>
-                      {patient.is_active ? (
-                        <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">Y</span>
-                      ) : (
-                        <span className="px-2 py-1 text-xs text-red-700 bg-red-100 rounded-full">N</span>
-                      )}
-                    </TableCell>
-                    <TableCell>{patient.email || "-"}</TableCell>
-                    <TableCell>
-                      <Link href={`/patient-entry?edit=${patient._id}`}>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-7 text-xs"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          Edit
-                        </Button>
-                      </Link>
-                    </TableCell>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Owner Name</TableHead>
+                    <TableHead>Pet Name</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Breed</TableHead>
+                    <TableHead>Color</TableHead>
+                    <TableHead>Sex</TableHead>
+                    <TableHead>DOB</TableHead>
+                    <TableHead>Phone</TableHead>
+                    <TableHead>Active</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead className="w-24">Actions</TableHead>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {filteredPatients.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={11} className="text-center py-8 text-gray-500">
+                        No patients found
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredPatients.map((patient) => (
+                      <TableRow
+                        key={patient._id}
+                        className="cursor-pointer hover:bg-gray-50"
+                        onClick={() => handleRowClick(patient)}
+                      >
+                        <TableCell className="font-medium">{patient.owner_name}</TableCell>
+                        <TableCell>{patient.pet_name}</TableCell>
+                        <TableCell>{patient.type || "-"}</TableCell>
+                        <TableCell>{patient.breed || "-"}</TableCell>
+                        <TableCell>{patient.color || "-"}</TableCell>
+                        <TableCell>{patient.sex || "-"}</TableCell>
+                        <TableCell>{patient.dob || "-"}</TableCell>
+                        <TableCell>{patient.phone || "-"}</TableCell>
+                        <TableCell>
+                          {patient.is_active ? (
+                            <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">Y</span>
+                          ) : (
+                            <span className="px-2 py-1 text-xs text-red-700 bg-red-100 rounded-full">N</span>
+                          )}
+                        </TableCell>
+                        <TableCell>{patient.email || "-"}</TableCell>
+                        <TableCell>
+                          <Link href={`/patient-entry?edit=${patient._id}`}>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-7 text-xs"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              Edit
+                            </Button>
+                          </Link>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>

@@ -52,7 +52,7 @@ function DashboardHeader() {
                 src={session?.user?.image || ""}
                 alt="Hallie Richards"
               />
-              <AvatarFallback className="shadow-none text-xs hover:bg-[#4fe09a] bg-[#72e3ad] uppercase border border-[#16b674bf] cursor-pointer">
+              <AvatarFallback className="text-xs uppercase bg-primary text-primary-foreground">
                 {session?.user.name.charAt(0)}
               </AvatarFallback>
             </Avatar>

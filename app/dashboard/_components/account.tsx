@@ -162,7 +162,7 @@ export default function ProfileModal({
                 <AvatarImage
                   src={profile.profileImage || session?.user?.image || ""}
                 />
-                <AvatarFallback className="text-2xl hover:bg-[#4fe09a] bg-[#72e3ad] uppercase">
+                <AvatarFallback className="text-2xl uppercase bg-primary text-primary-foreground">
                   {profile.name.charAt(0)}
                 </AvatarFallback>
               </Avatar>
@@ -205,7 +205,6 @@ export default function ProfileModal({
           <div className="space-y-2">
             <Label className="text-xs">Full Name</Label>
             <Input
-            className="shadow-none"
               value={profile.name}
               onChange={(e) =>
                 setProfile({ ...profile, name: e.target.value })
@@ -217,7 +216,7 @@ export default function ProfileModal({
           <Button
             onClick={updateProfile}
             disabled={loading}
-            variant={'outline'} size={'sm'} className="shadow-none text-xs hover:bg-[#4fe09a] bg-[#72e3ad] border border-[#16b674bf] cursor-pointer"
+            size={'sm'} className="text-xs"
           >
             {loading ? "Saving..." : "Save Profile"}
           </Button>

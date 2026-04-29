@@ -62,7 +62,7 @@ export default function MedicationList() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <Card className="shadow-none">
+      <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-lg font-semibold">Medications List</CardTitle>
           <div className="flex items-center gap-4">
