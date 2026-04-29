@@ -16,16 +16,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Patient {
   _id: string;
-  pet_id: string;
   owner_name: string;
-  phone: string;
-  sex: string;
-  age: string;
   pet_name: string;
+  type: string;
   breed: string;
-  vaccine: string;
-  visit_date: string;
-  next_visit_note: string;
+  color: string;
+  sex: string;
+  dob: string;
+  phone: string;
+  is_active: boolean;
+  email: string;
+  picture: string;
+  createdAt: string;
 }
 
 export default function PatientList() {
@@ -63,9 +65,7 @@ export default function PatientList() {
       }
 
       const sorted = (data.patients ?? []).sort((a: any, b: any) => {
-        const dateA = a.visit_date ? new Date(a.visit_date).getTime() : new Date(a.createdAt).getTime();
-        const dateB = b.visit_date ? new Date(b.visit_date).getTime() : new Date(b.createdAt).getTime();
-        return dateB - dateA;
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
 
       setPatients(sorted);
@@ -73,7 +73,6 @@ export default function PatientList() {
       setPage(data.pagination.page);
       setTotalPages(data.pagination.totalPages);
       setTotal(data.pagination.total);
-      console.log("Fetched patients:", sorted);
     } catch (fetchError) {
       console.error("Failed to fetch patients:", fetchError);
       setError("Failed to load patient list. Please refresh.");
@@ -93,9 +92,7 @@ export default function PatientList() {
       const breed = p.breed?.toLowerCase() ?? "";
       const type = p.type?.toLowerCase() ?? "";
       const phone = p.phone?.toLowerCase() ?? "";
-      const address = p.address?.toLowerCase() ?? "";
       const email = p.email?.toLowerCase() ?? "";
-      const batchNo = p.batch_no?.toLowerCase() ?? "";
 
       return (
         owner.includes(normalizedTerm) ||
@@ -103,9 +100,7 @@ export default function PatientList() {
         breed.includes(normalizedTerm) ||
         type.includes(normalizedTerm) ||
         phone.includes(normalizedTerm) ||
-        address.includes(normalizedTerm) ||
-        email.includes(normalizedTerm) ||
-        batchNo.includes(normalizedTerm)
+        email.includes(normalizedTerm)
       );
     });
     setFilteredPatients(filtered);
@@ -147,25 +142,27 @@ export default function PatientList() {
           ) : error ? (
             <div className="py-16 text-center text-sm text-red-500">{error}</div>
           ) : (
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Owner Name</TableHead>
                   <TableHead>Pet Name</TableHead>
-                <TableHead>Breed</TableHead>
-                <TableHead>Age</TableHead>
-                <TableHead>Sex</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Vaccine</TableHead>
-                <TableHead>Visit Date</TableHead>
-                <TableHead>Next Visit Note</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Breed</TableHead>
+                  <TableHead>Color</TableHead>
+                  <TableHead>Sex</TableHead>
+                  <TableHead>DOB</TableHead>
+                  <TableHead>Phone</TableHead>
+                  <TableHead>Active</TableHead>
+                  <TableHead>Email</TableHead>
                   <TableHead className="w-24">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
               {filteredPatients.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={10} className="text-center py-8 text-gray-500">
+                  <TableCell colSpan={11} className="text-center py-8 text-gray-500">
                     No patients found
                   </TableCell>
                 </TableRow>
@@ -178,21 +175,20 @@ export default function PatientList() {
                   >
                     <TableCell className="font-medium">{patient.owner_name}</TableCell>
                     <TableCell>{patient.pet_name}</TableCell>
+                    <TableCell>{patient.type || "-"}</TableCell>
                     <TableCell>{patient.breed || "-"}</TableCell>
-                    <TableCell>{patient.age || "-"}</TableCell>
+                    <TableCell>{patient.color || "-"}</TableCell>
                     <TableCell>{patient.sex || "-"}</TableCell>
+                    <TableCell>{patient.dob || "-"}</TableCell>
                     <TableCell>{patient.phone || "-"}</TableCell>
-                    <TableCell>{patient.vaccine || "-"}</TableCell>
                     <TableCell>
-                      {patient.visit_date
-                        ? new Date(patient.visit_date).toLocaleDateString("en-IN", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                          })
-                        : "-"}
+                      {patient.is_active ? (
+                        <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">Y</span>
+                      ) : (
+                        <span className="px-2 py-1 text-xs text-red-700 bg-red-100 rounded-full">N</span>
+                      )}
                     </TableCell>
-                    <TableCell className="max-w-45 truncate">{patient.next_visit_note || "-"}</TableCell>
+                    <TableCell>{patient.email || "-"}</TableCell>
                     <TableCell>
                       <Link href={`/patient-entry?edit=${patient._id}`}>
                         <Button
@@ -210,6 +206,7 @@ export default function PatientList() {
               )}
             </TableBody>
           </Table>
+          </div>
           )}
         </CardContent>
       </Card>

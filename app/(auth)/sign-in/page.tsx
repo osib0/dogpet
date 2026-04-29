@@ -264,15 +264,6 @@ export default function Page() {
           </p>
 
           <div className="flex items-center gap-4">
-            <div className="h-10 w-10 rounded-full bg-gray-200 overflow-hidden">
-              <Image
-                src="/avatar.png" // apni image ya placeholder
-                alt="user"
-                width={40}
-                height={40}
-              />
-            </div>
-
             <div>
               <p className="text-sm font-medium text-gray-900">Osib</p>
               <p className="text-sm text-gray-500">@osibdev</p>

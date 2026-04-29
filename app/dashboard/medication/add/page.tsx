@@ -53,7 +53,7 @@ export default function AddMedicationPage() {
   }
 
   return (
-    <div className="p-4 max-w-4xl mx-auto">
+    <div className="p-4 max-w-4xl mx-auto bg-white shadow border rounded p-6">
       <h1 className="text-xl font-semibold mb-4">Add Medication</h1>
 
       <Form {...form}>
