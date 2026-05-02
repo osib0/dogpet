@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Pencil, Trash2 } from "lucide-react";
 
 interface Medication {
   _id: string;
@@ -49,6 +50,22 @@ export default function MedicationList() {
     }
   };
 
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this medication?")) return;
+
+    try {
+      const res = await fetch(`/api/medications?id=${id}`, { method: "DELETE" });
+      if (res.ok) {
+        alert("Medication deleted successfully!");
+        fetchMedications();
+      } else {
+        alert("Failed to delete medication.");
+      }
+    } catch (err) {
+      console.error("Delete error:", err);
+    }
+  };
+
   useEffect(() => {
     const term = searchTerm.toLowerCase();
     const filtered = medications.filter(
@@ -62,7 +79,7 @@ export default function MedicationList() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <Card>
+      <Card className="shadow-none rounded-md">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-lg font-semibold">Medications List</CardTitle>
           <div className="flex items-center gap-4">
@@ -73,7 +90,7 @@ export default function MedicationList() {
               className="w-80 h-9 text-sm"
             />
             <Link href="/dashboard/medication/add">
-              <Button className="h-9 text-xs">+ Add Medication</Button>
+              <Button className="shadow-none text-black text-xs hover:bg-[#4fe09a] bg-[#72e3ad] border border-[#16b674bf] cursor-pointer">+ Add Medication</Button>
             </Link>
           </div>
         </CardHeader>
@@ -88,12 +105,13 @@ export default function MedicationList() {
                   <TableHead>Disease Type</TableHead>
                   <TableHead>Medicine</TableHead>
                   <TableHead>Description</TableHead>
+                  <TableHead className="w-24 text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredMedications.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center py-8">
+                    <TableCell colSpan={5} className="text-center py-8">
                       No medications found
                     </TableCell>
                   </TableRow>
@@ -104,6 +122,23 @@ export default function MedicationList() {
                       <TableCell>{med.disease_type}</TableCell>
                       <TableCell>{med.medicine_name}</TableCell>
                       <TableCell>{med.description || "-"}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Link href={`/dashboard/medication/add?edit=${med._id}`}>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600">
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                          </Link>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-red-600"
+                            onClick={() => handleDelete(med._id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
                     </TableRow>
                   ))
                 )}

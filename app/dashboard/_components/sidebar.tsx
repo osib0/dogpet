@@ -38,6 +38,14 @@ export const menu = [
     ],
   },
   {
+    title: "Pets",
+    icon: Package,
+    submenu: [
+      { title: "Add Pet", url: "/dashboard/pets/add" },
+      { title: "Pet List", url: "/dashboard/pets/list" },
+    ],
+  },
+  {
     title: "Medications",
     icon: Package,
     submenu: [

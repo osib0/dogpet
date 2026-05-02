@@ -119,7 +119,7 @@ export function ModuleForm({ moduleId }: ModuleFormProps) {
   };
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md shadow-none rounded-md mt-5">
       <CardHeader>
         <CardTitle>
           {moduleId ? "Edit Module" : "Add New Module"}
@@ -179,22 +179,22 @@ export function ModuleForm({ moduleId }: ModuleFormProps) {
           </div>
 
           <div className="flex gap-2 pt-4">
-            <Button
-              type="submit"
-              disabled={loading}
-              className="flex-1"
-            >
-              {loading
-                ? "Saving..."
-                : moduleId
-                ? "Update Module"
-                : "Add Module"}
-            </Button>
             <Link href="/dashboard/modules/list" className="flex-1">
               <Button type="button" variant="outline" className="w-full">
                 Cancel
               </Button>
             </Link>
+            <Button
+              type="submit"
+              disabled={loading}
+              className="flex-1 shadow-none text-black text-xs hover:bg-[#4fe09a] bg-[#72e3ad] border border-[#16b674bf] cursor-pointer"
+            >
+              {loading
+                ? "Saving..."
+                : moduleId
+                  ? "Update Module"
+                  : "Add Module"}
+            </Button>
           </div>
         </form>
       </CardContent>

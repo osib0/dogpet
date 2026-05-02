@@ -3,7 +3,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   upload,
 } from "@imagekit/next";
@@ -29,7 +30,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 const patientSchema = z.object({
   owner_name: z.string().min(1, "Owner name is required"),
   pet_name: z.string().min(1, "Pet name is required"),
-  type: z.enum(["PUP", "ADULT"]).optional(),
+  pet_category: z.string().optional(),
+  pet_type: z.string().optional(),
+  // type: z.enum(["PUP", "ADULT"]).optional(),
   breed: z.string().optional(),
   color: z.string().optional(),
   sex: z.enum(["MALE", "FEMALE"]).optional(),
@@ -43,13 +46,24 @@ const patientSchema = z.object({
 type FormData = z.infer<typeof patientSchema>;
 
 export default function Page() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const editId = searchParams.get("edit");
+
+  const [pets, setPets] = useState<any[]>([]);
+  const [availableTypes, setAvailableTypes] = useState<string[]>([]);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
   const form = useForm<FormData>({
     resolver: zodResolver(patientSchema),
     defaultValues: {
-      type: "PUP",
+      // type: "PUP",
       is_active: true,
       owner_name: "",
       pet_name: "",
+      pet_category: "",
+      pet_type: "",
       breed: "",
       color: "",
       phone: "",
@@ -59,8 +73,44 @@ export default function Page() {
     },
   });
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
+  useEffect(() => {
+    fetch("/api/pets/get")
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) setPets(data.data);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (editId && pets.length > 0) {
+      fetch(`/api/patients/get?id=${editId}`)
+        .then(res => res.json())
+        .then(data => {
+          const patient = data.patients?.find((p: any) => p._id === editId) || data;
+          if (patient) {
+            form.reset({
+              ...patient,
+              email: patient.email || "",
+            });
+            if (patient.pet_category) {
+              const selectedPet = pets.find(p => p.name === patient.pet_category);
+              if (selectedPet) setAvailableTypes(selectedPet.types);
+            }
+          }
+        });
+    }
+  }, [editId, pets, form]);
+
+  const onCategoryChange = (val: string) => {
+    form.setValue("pet_category", val);
+    form.setValue("pet_type", "");
+    const selectedPet = pets.find(p => p.name === val);
+    if (selectedPet) {
+      setAvailableTypes(selectedPet.types);
+    } else {
+      setAvailableTypes([]);
+    }
+  };
 
   const authenticator = async () => {
     const res = await fetch("/api/upload-auth");
@@ -102,13 +152,14 @@ export default function Page() {
   async function onSubmit(data: FormData) {
     const res = await fetch("/api/patients/add", {
       method: "POST",
-      body: JSON.stringify(data),
+      body: JSON.stringify({ ...data, _id: editId }),
       headers: { "Content-Type": "application/json" },
     });
 
     if (res.ok) {
-      alert("Patient saved successfully!");
-      form.reset();
+      alert(editId ? "Patient updated successfully!" : "Patient saved successfully!");
+      if (!editId) form.reset();
+      router.push("/dashboard/patient/list");
     } else {
       alert("Failed to save patient.");
     }
@@ -117,7 +168,9 @@ export default function Page() {
   return (
     <div className="p-4 max-w-5xl min-h-screen mx-auto">
       <div className="bg-white p-6 rounded-sm border">
-        <h1 className="text-sm font-semibold mb-6 bg-[#c7915b] text-white py-2 px-3 uppercase">Patient Entry</h1>
+        <h1 className="text-sm font-semibold mb-6 bg-[#c7915b] text-white py-2 px-3 uppercase">
+          {editId ? "Edit Patient" : "Patient Entry"}
+        </h1>
 
         <Form {...form}>
           <form
@@ -155,14 +208,66 @@ export default function Page() {
                 )}
               />
 
-              {/* Pet Type */}
+              {/* Pet Category (Added) */}
               <FormField
+                control={form.control}
+                name="pet_category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Pet Category</FormLabel>
+                    <Select onValueChange={onCategoryChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {pets.map((p) => (
+                          <SelectItem key={p._id} value={p.name}>
+                            {p.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Pet Type (Added) */}
+              <FormField
+                control={form.control}
+                name="pet_type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Pet Type / Breed</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger disabled={!form.watch("pet_category")}>
+                          <SelectValue placeholder="Select Type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {availableTypes.map((t) => (
+                          <SelectItem key={t} value={t}>
+                            {t}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Pet Type (PUP/ADULT) */}
+              {/* <FormField
                 control={form.control}
                 name="type"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Pet Type</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormLabel>Age Group</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select type" />
@@ -176,15 +281,15 @@ export default function Page() {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
 
-              {/* Breed */}
+              {/* Breed (Keeping it but naming it specific breed if needed) */}
               <FormField
                 control={form.control}
                 name="breed"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Breed</FormLabel>
+                    <FormLabel>Other Breed Details (Optional)</FormLabel>
                     <FormControl>
                       <Input placeholder="Enter breed" {...field} />
                     </FormControl>
@@ -319,7 +424,7 @@ export default function Page() {
             </div>
 
             <div className="flex justify-end mt-4">
-              <Button type="submit" className="w-full md:w-auto px-8">
+              <Button type="submit" className="shadow-none text-black text-xs hover:bg-[#4fe09a] bg-[#72e3ad] border border-[#16b674bf] cursor-pointer">
                 Submit
               </Button>
             </div>

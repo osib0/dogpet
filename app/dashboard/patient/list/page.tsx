@@ -106,6 +106,25 @@ export default function PatientList() {
     setFilteredPatients(filtered);
   }, [searchTerm, patients]);
 
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this patient?")) return;
+
+    try {
+      const res = await fetch(`/api/patients/delete?id=${id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        alert("Patient deleted successfully!");
+        fetchPatients(page);
+      } else {
+        alert("Failed to delete patient.");
+      }
+    } catch (err) {
+      console.error("Delete error:", err);
+      alert("Error deleting patient.");
+    }
+  };
+
   const handleRowClick = (patient: Patient) => {
     alert(`Selected Patient: ${patient.owner_name} - ${patient.pet_name}\n\nClick "Edit" button in actions to edit this patient.`);
     // Future: router.push(`/patients/edit/${patient._id}`)
@@ -124,7 +143,7 @@ export default function PatientList() {
               className="w-80 h-9 text-sm"
             />
             <Link href="/dashboard/patient/add">
-              <Button className="h-9 text-xs">+ New Patient Entry</Button>
+              <Button className="shadow-none text-black text-xs hover:bg-[#4fe09a] bg-[#72e3ad] border border-[#16b674bf] cursor-pointer">+ New Patient Entry</Button>
             </Link>
             <Button
               variant="outline"
@@ -190,16 +209,29 @@ export default function PatientList() {
                         </TableCell>
                         <TableCell>{patient.email || "-"}</TableCell>
                         <TableCell>
-                          <Link href={`/patient-entry?edit=${patient._id}`}>
+                          <div className="flex gap-2">
+                            <Link href={`/dashboard/patient/add?edit=${patient._id}`}>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-7 text-xs text-blue-600"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                Edit
+                              </Button>
+                            </Link>
                             <Button
                               variant="outline"
                               size="sm"
-                              className="h-7 text-xs"
-                              onClick={(e) => e.stopPropagation()}
+                              className="h-7 text-xs text-red-600"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(patient._id);
+                              }}
                             >
-                              Edit
+                              Delete
                             </Button>
-                          </Link>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))

@@ -9,7 +9,7 @@ const DOCTORS = [
     role: "Senior Veterinary Surgeon",
     experience: "12+ Years Experience",
     specialization: "Surgery & Emergency Care",
-    image: "/doctors/doctor-1.jpg", 
+    image: "/doctors/doctor-1.jpg",
   },
   {
     name: "Dr. Rahul Verma",
@@ -53,7 +53,7 @@ export default function DoctorsSection() {
             <div
               key={index}
               className="bg-white rounded-2xl overflow-hidden shadow-sm
-              hover:shadow-lg transition-all duration-300"
+              hover:shadow-none transition-all duration-300"
             >
               {/* Image */}
               <div className="relative h-64 w-full overflow-hidden">

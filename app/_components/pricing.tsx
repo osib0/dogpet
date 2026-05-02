@@ -153,9 +153,8 @@ const Pricing = () => {
         {plans.map((plan, index) => (
           <div key={index} className="p-1 bg-gray-50 rounded-2xl border">
             <Card
-              className={`relative border-0 ${
-                plan.popular ? "shadow-lg" : ""
-              } hover:shadow-xl transition-all`}
+              className={`relative border-0 ${plan.popular ? "shadow-none" : ""
+                } hover:shadow-xl transition-all`}
             >
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
@@ -193,11 +192,10 @@ const Pricing = () => {
               <CardFooter>
                 <Button
                   onClick={() => handlePayment(plan)}
-                  className={`w-full ${
-                    plan.popular
-                      ? "bg-primary text-white"
-                      : "bg-slate-100 text-slate-800"
-                  }`}
+                  className={`w-full ${plan.popular
+                    ? "bg-primary text-white"
+                    : "bg-slate-100 text-slate-800"
+                    }`}
                 >
                   {plan.popular ? "Get Started" : "Choose Plan"}
                 </Button>

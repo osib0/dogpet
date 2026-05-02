@@ -4,6 +4,8 @@ const PatientSchema = new Schema(
   {
     owner_name: { type: String, required: true },
     pet_name: { type: String, required: true },
+    pet_category: { type: String },
+    pet_type: { type: String },
     type: { type: String, enum: ["PUP", "ADULT"] },
     breed: String,
     color: String,

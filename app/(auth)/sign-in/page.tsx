@@ -90,8 +90,9 @@ export default function Page() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setSubmitting(true);
 
-    const { data, error } = await authClient.signIn.email(
+    const { data, error } = await authClient.signUp.email(
       {
+        name: 'test',
         email: values.email,
         password: values.password,
         callbackURL: "/dashboard",

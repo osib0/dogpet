@@ -70,11 +70,11 @@ export function ModulesList() {
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full max-w-7xl mt-5 shadow-none rounded-md">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Modules</CardTitle>
         <Link href="/dashboard/modules/add">
-          <Button className="gap-2">
+          <Button className="gap-2 shadow-none text-black text-xs hover:bg-[#4fe09a] bg-[#72e3ad] border border-[#16b674bf] cursor-pointer">
             <Plus className="w-4 h-4" /> Add Module
           </Button>
         </Link>
@@ -94,7 +94,7 @@ export function ModulesList() {
           <div className="flex flex-col items-center justify-center p-8">
             <p className="text-gray-500 mb-4">No modules found</p>
             <Link href="/dashboard/modules/add">
-              <Button>Create First Module</Button>
+              <Button className="shadow-none text-black text-xs hover:bg-[#4fe09a] bg-[#72e3ad] border border-[#16b674bf] cursor-pointer">Create First Module</Button>
             </Link>
           </div>
         ) : (

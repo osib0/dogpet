@@ -53,7 +53,7 @@ export default function AddMedicationPage() {
   }
 
   return (
-    <div className="p-4 max-w-4xl mx-auto bg-white shadow border rounded p-6">
+    <div className="p-4 max-w-4xl mx-auto bg-white border rounded-md p-6 m-5">
       <h1 className="text-xl font-semibold mb-4">Add Medication</h1>
 
       <Form {...form}>
@@ -118,7 +118,7 @@ export default function AddMedicationPage() {
           />
 
           <div className="col-span-2">
-            <Button type="submit">Save Medication</Button>
+            <Button type="submit" className="shadow-none text-black text-xs hover:bg-[#4fe09a] bg-[#72e3ad] border border-[#16b674bf] cursor-pointer">Save Medication</Button>
           </div>
         </form>
       </Form>

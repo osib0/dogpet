@@ -4,8 +4,11 @@ import Patient from "@/models/patient.model";
 import { z } from "zod";
 
 const patientSchema = z.object({
+  _id: z.string().optional(),
   owner_name: z.string().min(1, "Owner name is required"),
   pet_name: z.string().min(1, "Pet name is required"),
+  pet_category: z.string().optional(),
+  pet_type: z.string().optional(),
   type: z.enum(["PUP", "ADULT"]).optional(),
   breed: z.string().optional(),
   color: z.string().optional(),
@@ -25,8 +28,14 @@ export async function POST(req: Request) {
 
     // Validate the input
     const validatedData = patientSchema.parse(body);
+    const { _id, ...data } = validatedData;
 
-    const patient = await Patient.create(validatedData);
+    let patient;
+    if (_id) {
+      patient = await Patient.findByIdAndUpdate(_id, data, { new: true });
+    } else {
+      patient = await Patient.create(data);
+    }
 
     return NextResponse.json(patient);
   } catch (error) {
@@ -37,9 +46,9 @@ export async function POST(req: Request) {
       );
     }
 
-    console.error("Error creating patient:", error);
+    console.error("Error saving patient:", error);
     return NextResponse.json(
-      { error: "Failed to create patient" },
+      { error: "Failed to save patient" },
       { status: 500 }
     );
   }

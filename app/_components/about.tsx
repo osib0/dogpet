@@ -112,8 +112,8 @@ export default function AboutSection() {
                     className={`group bg-white rounded-2xl p-6 shadow
               border
               hover:border-[#72e3ad]
-              hover:shadow-lg
-              transition-all duration-300 h-full ${hoveredIndex === index ? 'shadow-lg border-[#72e3ad]' : ''}`}
+              hover:shadow-none
+              transition-all duration-300 h-full ${hoveredIndex === index ? 'shadow-none border-[#72e3ad]' : ''}`}
                     onMouseOver={() => setHoveredIndex(index)}
                   >
                     {/* Icon */}
