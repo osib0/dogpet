@@ -4,15 +4,15 @@ import Patient from "@/models/patient.model";
 import { z } from "zod";
 
 const patientSchema = z.object({
-  _id: z.string().optional(),
-  owner_name: z.string().min(1, "Owner name is required"),
-  pet_name: z.string().min(1, "Pet name is required"),
+  _id: z.string().nullable().optional(),
+  owner_name: z.string().optional(),
+  pet_name: z.string().optional(),
   pet_category: z.string().optional(),
   pet_type: z.string().optional(),
-  type: z.enum(["PUP", "ADULT"]).optional(),
+  type: z.string().optional(),
   breed: z.string().optional(),
   color: z.string().optional(),
-  sex: z.enum(["MALE", "FEMALE"]).optional(),
+  sex: z.string().optional(),
   dob: z.string().optional(),
   phone: z.string().optional(),
   is_active: z.boolean().optional(),

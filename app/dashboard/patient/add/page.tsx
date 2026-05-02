@@ -28,8 +28,8 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 
 const patientSchema = z.object({
-  owner_name: z.string().min(1, "Owner name is required"),
-  pet_name: z.string().min(1, "Pet name is required"),
+  owner_name: z.string().optional(),
+  pet_name: z.string().optional(),
   pet_category: z.string().optional(),
   pet_type: z.string().optional(),
   // type: z.enum(["PUP", "ADULT"]).optional(),
@@ -86,8 +86,9 @@ export default function Page() {
       fetch(`/api/patients/get?id=${editId}`)
         .then(res => res.json())
         .then(data => {
-          const patient = data.patients?.find((p: any) => p._id === editId) || data;
-          if (patient) {
+          // The API now returns a single patient object if id is provided
+          const patient = data;
+          if (patient && !patient.error) {
             form.reset({
               ...patient,
               email: patient.email || "",
@@ -150,18 +151,25 @@ export default function Page() {
   };
 
   async function onSubmit(data: FormData) {
-    const res = await fetch("/api/patients/add", {
-      method: "POST",
-      body: JSON.stringify({ ...data, _id: editId }),
-      headers: { "Content-Type": "application/json" },
-    });
+    try {
+      const res = await fetch("/api/patients/add", {
+        method: "POST",
+        body: JSON.stringify({ ...data, _id: editId }),
+        headers: { "Content-Type": "application/json" },
+      });
 
-    if (res.ok) {
-      alert(editId ? "Patient updated successfully!" : "Patient saved successfully!");
-      if (!editId) form.reset();
-      router.push("/dashboard/patient/list");
-    } else {
-      alert("Failed to save patient.");
+      const result = await res.json();
+
+      if (res.ok) {
+        alert(editId ? "Patient updated successfully!" : "Patient saved successfully!");
+        if (!editId) form.reset();
+        router.push("/dashboard/patient/list");
+      } else {
+        alert(result.error || "Failed to save patient.");
+      }
+    } catch (err) {
+      console.error("Submit error:", err);
+      alert("Failed to save patient. Please check your connection.");
     }
   }
 

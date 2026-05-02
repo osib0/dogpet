@@ -2,14 +2,14 @@ import { Schema, models, model } from "mongoose";
 
 const PatientSchema = new Schema(
   {
-    owner_name: { type: String, required: true },
-    pet_name: { type: String, required: true },
+    owner_name: { type: String, },
+    pet_name: { type: String, },
     pet_category: { type: String },
     pet_type: { type: String },
-    type: { type: String, enum: ["PUP", "ADULT"] },
+    type: { type: String },
     breed: String,
     color: String,
-    sex: { type: String, enum: ["MALE", "FEMALE"] },
+    sex: { type: String },
     dob: String,
     phone: String,
     is_active: { type: Boolean, default: true },
