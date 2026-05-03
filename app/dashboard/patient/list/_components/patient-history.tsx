@@ -60,7 +60,7 @@ export function PatientHistory({ patient, isOpen, onClose }: { patient: Patient 
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [medications, setMedications] = useState<MedicationMaster[]>([]);
-  
+
   // Form state for new assignment
   const [showAddForm, setShowAddForm] = useState(false);
   const [newRecord, setNewRecord] = useState<{
@@ -172,7 +172,7 @@ export function PatientHistory({ patient, isOpen, onClose }: { patient: Patient 
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl">
+      <DialogContent className="min-w-5xl max-h-[90vh] overflow-y-auto p-0 border-none shadow-2xl">
         <div className="bg-gradient-to-r from-primary/10 to-transparent p-6 border-b border-gray-100">
           <DialogHeader>
             <div className="flex items-center gap-3 mb-2">
@@ -199,13 +199,13 @@ export function PatientHistory({ patient, isOpen, onClose }: { patient: Patient 
 
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-              Visit Records 
+              Visit Records
               <Badge variant="secondary" className="bg-gray-100 text-gray-600 border-none">
                 {history.length}
               </Badge>
             </h3>
             {!showAddForm && patient.phone && (
-              <Button 
+              <Button
                 onClick={() => setShowAddForm(true)}
                 className="bg-[#72e3ad] hover:bg-[#4fe09a] text-black font-bold border border-[#16b674bf] shadow-sm transition-all hover:scale-105"
               >
@@ -224,13 +224,13 @@ export function PatientHistory({ patient, isOpen, onClose }: { patient: Patient 
                   Cancel
                 </Button>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1">Record Type</label>
-                  <Select 
-                    value={newRecord.type} 
-                    onValueChange={(val: any) => setNewRecord({...newRecord, type: val})}
+                  <Select
+                    value={newRecord.type}
+                    onValueChange={(val: any) => setNewRecord({ ...newRecord, type: val })}
                   >
                     <SelectTrigger className="bg-gray-50 border-gray-200 focus:ring-primary">
                       <SelectValue />
@@ -261,38 +261,38 @@ export function PatientHistory({ patient, isOpen, onClose }: { patient: Patient 
 
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1">Item Name *</label>
-                  <Input 
-                    placeholder="e.g. Rabies Vaccine, Blood Test" 
+                  <Input
+                    placeholder="e.g. Rabies Vaccine, Blood Test"
                     value={newRecord.item_name}
                     className="bg-gray-50 border-gray-200 focus:ring-primary"
-                    onChange={e => setNewRecord({...newRecord, item_name: e.target.value})}
+                    onChange={e => setNewRecord({ ...newRecord, item_name: e.target.value })}
                   />
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1">Disease / Purpose</label>
-                  <Input 
-                    placeholder="e.g. Fever, General Checkup" 
+                  <Input
+                    placeholder="e.g. Fever, General Checkup"
                     value={newRecord.disease}
                     className="bg-gray-50 border-gray-200 focus:ring-primary"
-                    onChange={e => setNewRecord({...newRecord, disease: e.target.value})}
+                    onChange={e => setNewRecord({ ...newRecord, disease: e.target.value })}
                   />
                 </div>
 
                 <div className="md:col-span-2 space-y-1.5">
                   <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1">Description / Notes</label>
-                  <Input 
-                    placeholder="Additional notes for this visit..." 
+                  <Input
+                    placeholder="Additional notes for this visit..."
                     value={newRecord.description}
                     className="bg-gray-50 border-gray-200 focus:ring-primary"
-                    onChange={e => setNewRecord({...newRecord, description: e.target.value})}
+                    onChange={e => setNewRecord({ ...newRecord, description: e.target.value })}
                   />
                 </div>
               </div>
 
               <div className="flex justify-end pt-2">
-                <Button 
-                  onClick={handleSaveRecord} 
+                <Button
+                  onClick={handleSaveRecord}
                   disabled={isSaving || !newRecord.item_name}
                   className="bg-primary text-white shadow-md hover:shadow-lg transition-all font-bold px-6"
                 >
@@ -341,20 +341,19 @@ export function PatientHistory({ patient, isOpen, onClose }: { patient: Patient 
                         {format(new Date(record.date), "dd MMM yyyy")}
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className={`text-[10px] font-black tracking-tighter border-none px-2 py-0.5 ${
-                          record.type === "VACCINATION" ? "bg-blue-100 text-blue-700" :
+                        <Badge variant="outline" className={`text-[10px] font-black tracking-tighter border-none px-2 py-0.5 ${record.type === "VACCINATION" ? "bg-blue-100 text-blue-700" :
                           record.type === "TEST" ? "bg-purple-100 text-purple-700" :
-                          "bg-green-100 text-green-700"
-                        }`}>
+                            "bg-green-100 text-green-700"
+                          }`}>
                           {record.type}
                         </Badge>
                       </TableCell>
                       <TableCell className="font-bold text-gray-900">{record.item_name}</TableCell>
                       <TableCell className="text-sm text-gray-500 font-medium">{record.disease || "-"}</TableCell>
                       <TableCell className="text-right">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           className="h-8 px-3 text-xs text-primary hover:text-primary hover:bg-primary/10 font-black rounded-full transition-all"
                           onClick={() => handleReassign(record)}
                         >
