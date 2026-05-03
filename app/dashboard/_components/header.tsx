@@ -21,7 +21,7 @@ function DashboardHeader() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const pathName = usePathname();
-  const [heading, setHeading] = useState<string|undefined>(undefined);
+  const [heading, setHeading] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     // const title = getName();
@@ -39,7 +39,7 @@ function DashboardHeader() {
 
   return (
     <>
-      <header className="bg-white flex sticky top-0 justify-between items-center p-3">
+      <header className="bg-white flex sticky top-0 justify-between items-center p-3 border-b z-50">
         <div className="flex items-center gap-2.5">
           <SidebarTrigger className="flex md:hidden"></SidebarTrigger>
           <h2 className="capitalize">{heading}</h2>
