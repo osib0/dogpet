@@ -20,6 +20,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { PatientHistory } from "./_components/patient-history";
+import { History } from "lucide-react";
 
 interface Patient {
   _id: string;
@@ -49,6 +51,8 @@ export default function PatientList() {
   const [limit, setLimit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   // Debounce search
   useEffect(() => {
@@ -117,6 +121,11 @@ export default function PatientList() {
 
   const handleRowClick = (patient: Patient) => {
     // Optional: show details or redirect
+  };
+
+  const handleOpenHistory = (patient: Patient) => {
+    setSelectedPatient(patient);
+    setIsHistoryOpen(true);
   };
 
   return (
@@ -256,6 +265,18 @@ export default function PatientList() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0 text-gray-400 hover:text-primary hover:bg-primary/5"
+                              title="View History"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenHistory(patient);
+                              }}
+                            >
+                              <History className="h-4 w-4" />
+                            </Button>
                             <Link href={`/dashboard/patient/add?edit=${patient._id}`}>
                               <Button
                                 variant="ghost"
@@ -345,6 +366,11 @@ export default function PatientList() {
           </div>
         </CardContent>
       </Card>
+      <PatientHistory 
+        patient={selectedPatient} 
+        isOpen={isHistoryOpen} 
+        onClose={() => setIsHistoryOpen(false)} 
+      />
     </div>
   );
 }
