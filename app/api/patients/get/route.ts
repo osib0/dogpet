@@ -19,11 +19,27 @@ export async function GET(req: Request) {
 
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");
+    const search = searchParams.get("search") || "";
 
     const skip = (page - 1) * limit;
 
-    const total = await Patient.countDocuments();
-    const patients = await Patient.find({}).sort({ createdAt: -1 }).skip(skip).limit(limit);
+    let query = {};
+    if (search) {
+      query = {
+        $or: [
+          { owner_name: { $regex: search, $options: "i" } },
+          { pet_name: { $regex: search, $options: "i" } },
+          { phone: { $regex: search, $options: "i" } },
+          { email: { $regex: search, $options: "i" } },
+          { breed: { $regex: search, $options: "i" } },
+          { pet_category: { $regex: search, $options: "i" } },
+          { pet_type: { $regex: search, $options: "i" } },
+        ],
+      };
+    }
+
+    const total = await Patient.countDocuments(query);
+    const patients = await Patient.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit);
 
     const totalPages = Math.ceil(total / limit);
 
