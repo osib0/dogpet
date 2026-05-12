@@ -24,7 +24,7 @@ export async function POST(req: Request) {
   try {
     await connectDB();
     const body = await req.json();
-    const { patient_id, phone, type, item_name, disease, disease_type, description, date } = body;
+    const { patient_id, phone, type, item_name, disease, disease_type, description, date, visit_date, next_visit_date } = body;
 
     if (!phone || !type || !item_name) {
       return NextResponse.json(
@@ -42,6 +42,8 @@ export async function POST(req: Request) {
       disease_type,
       description,
       date: date || new Date(),
+      visit_date: visit_date || new Date(),
+      next_visit_date: next_visit_date || null,
     });
 
     return NextResponse.json({ success: true, data: newRecord });

@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PatientHistory } from "./_components/patient-history";
+import { PatientSidebar } from "./_components/patient-sidebar";
 import { History } from "lucide-react";
 
 interface Patient {
@@ -53,6 +54,7 @@ export default function PatientList() {
   const [total, setTotal] = useState(0);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Debounce search
   useEffect(() => {
@@ -120,7 +122,8 @@ export default function PatientList() {
   };
 
   const handleRowClick = (patient: Patient) => {
-    // Optional: show details or redirect
+    setSelectedPatient(patient);
+    setIsSidebarOpen(true);
   };
 
   const handleOpenHistory = (patient: Patient) => {
@@ -229,8 +232,19 @@ export default function PatientList() {
                             <span className="text-xs text-gray-500">{patient.email || "No email"}</span>
                           </div>
                         </TableCell>
-                        <TableCell>
-                          <span className="font-medium text-primary">{patient.pet_name}</span>
+                        <TableCell className="cursor-pointer">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200">
+                              {patient.picture ? (
+                                <img src={patient.picture} alt={patient.pet_name} className="w-full h-full object-cover" />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-gray-400 font-bold text-xs">
+                                  {patient.pet_name?.charAt(0)?.toUpperCase()}
+                                </div>
+                              )}
+                            </div>
+                            <span className="font-medium text-primary">{patient.pet_name}</span>
+                          </div>
                         </TableCell>
                         <TableCell>
                           <span className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-600 rounded">
@@ -370,6 +384,11 @@ export default function PatientList() {
         patient={selectedPatient} 
         isOpen={isHistoryOpen} 
         onClose={() => setIsHistoryOpen(false)} 
+      />
+      <PatientSidebar
+        patient={selectedPatient}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
       />
     </div>
   );

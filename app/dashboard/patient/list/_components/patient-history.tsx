@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, History, RefreshCcw, Loader2, Search } from "lucide-react";
-import { format } from "date-fns";
+import { format, addDays } from "date-fns";
 
 interface Patient {
   _id: string;
@@ -44,6 +44,8 @@ interface MedicalRecord {
   disease_type?: string;
   description?: string;
   date: string;
+  visit_date?: string;
+  next_visit_date?: string;
   createdAt: string;
 }
 
@@ -69,12 +71,16 @@ export function PatientHistory({ patient, isOpen, onClose }: { patient: Patient 
     disease: string;
     disease_type: string;
     description: string;
+    visit_date: string;
+    next_visit_date: string;
   }>({
     type: "VACCINATION",
     item_name: "",
     disease: "",
     disease_type: "",
     description: "",
+    visit_date: format(new Date(), "yyyy-MM-dd"),
+    next_visit_date: format(addDays(new Date(), 30), "yyyy-MM-dd"),
   });
 
   useEffect(() => {
@@ -135,6 +141,8 @@ export function PatientHistory({ patient, isOpen, onClose }: { patient: Patient 
           disease: "",
           disease_type: "",
           description: "",
+          visit_date: format(new Date(), "yyyy-MM-dd"),
+          next_visit_date: format(addDays(new Date(), 30), "yyyy-MM-dd"),
         });
       }
     } catch (error) {
@@ -151,6 +159,8 @@ export function PatientHistory({ patient, isOpen, onClose }: { patient: Patient 
       disease: record.disease || "",
       disease_type: record.disease_type || "",
       description: record.description || "",
+      visit_date: format(new Date(), "yyyy-MM-dd"),
+      next_visit_date: format(addDays(new Date(), 30), "yyyy-MM-dd"),
     });
     setShowAddForm(true);
   };
@@ -279,6 +289,33 @@ export function PatientHistory({ patient, isOpen, onClose }: { patient: Patient 
                   />
                 </div>
 
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1">Visit Date</label>
+                  <Input
+                    type="date"
+                    value={newRecord.visit_date}
+                    className="bg-gray-50 border-gray-200 focus:ring-primary"
+                    onChange={e => {
+                      const newDate = e.target.value;
+                      setNewRecord({ 
+                        ...newRecord, 
+                        visit_date: newDate,
+                        next_visit_date: newDate ? format(addDays(new Date(newDate), 30), "yyyy-MM-dd") : ""
+                      });
+                    }}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1">Next Visit / Due Date</label>
+                  <Input
+                    type="date"
+                    value={newRecord.next_visit_date}
+                    className="bg-gray-50 border-gray-200 focus:ring-primary"
+                    onChange={e => setNewRecord({ ...newRecord, next_visit_date: e.target.value })}
+                  />
+                </div>
+
                 <div className="md:col-span-2 space-y-1.5">
                   <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1">Description / Notes</label>
                   <Input
@@ -307,17 +344,18 @@ export function PatientHistory({ patient, isOpen, onClose }: { patient: Patient 
             <Table>
               <TableHeader className="bg-gray-50/50">
                 <TableRow className="border-b border-gray-100">
-                  <TableHead className="font-bold text-gray-500 uppercase text-[10px] tracking-wider">Date</TableHead>
+                  <TableHead className="font-bold text-gray-500 uppercase text-[10px] tracking-wider">Visit Date</TableHead>
                   <TableHead className="font-bold text-gray-500 uppercase text-[10px] tracking-wider">Type</TableHead>
                   <TableHead className="font-bold text-gray-500 uppercase text-[10px] tracking-wider">Item / Medication</TableHead>
                   <TableHead className="font-bold text-gray-500 uppercase text-[10px] tracking-wider">Disease</TableHead>
+                  <TableHead className="font-bold text-gray-500 uppercase text-[10px] tracking-wider">Next Visit</TableHead>
                   <TableHead className="text-right font-bold text-gray-500 uppercase text-[10px] tracking-wider">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="h-48 text-center">
+                    <TableCell colSpan={6} className="h-48 text-center">
                       <div className="flex flex-col items-center justify-center gap-3">
                         <Loader2 className="w-8 h-8 animate-spin text-primary/40" />
                         <p className="text-sm font-medium text-gray-400">Loading patient history...</p>
@@ -326,7 +364,7 @@ export function PatientHistory({ patient, isOpen, onClose }: { patient: Patient 
                   </TableRow>
                 ) : history.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="h-48 text-center">
+                    <TableCell colSpan={6} className="h-48 text-center">
                       <div className="flex flex-col items-center justify-center gap-2 opacity-40">
                         <History className="w-10 h-10 mb-2" />
                         <p className="text-base font-bold text-gray-400">No medical records found</p>
@@ -338,7 +376,7 @@ export function PatientHistory({ patient, isOpen, onClose }: { patient: Patient 
                   history.map((record) => (
                     <TableRow key={record._id} className="hover:bg-primary/[0.02] transition-colors border-b border-gray-50 last:border-0">
                       <TableCell className="text-sm font-semibold text-gray-700 py-4">
-                        {format(new Date(record.date), "dd MMM yyyy")}
+                        {format(new Date(record.visit_date || record.date), "dd MMM yyyy")}
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline" className={`text-[10px] font-black tracking-tighter border-none px-2 py-0.5 ${record.type === "VACCINATION" ? "bg-blue-100 text-blue-700" :
@@ -350,6 +388,9 @@ export function PatientHistory({ patient, isOpen, onClose }: { patient: Patient 
                       </TableCell>
                       <TableCell className="font-bold text-gray-900">{record.item_name}</TableCell>
                       <TableCell className="text-sm text-gray-500 font-medium">{record.disease || "-"}</TableCell>
+                      <TableCell className="text-sm text-gray-600 font-medium">
+                        {record.next_visit_date ? format(new Date(record.next_visit_date), "dd MMM yyyy") : "-"}
+                      </TableCell>
                       <TableCell className="text-right">
                         <Button
                           variant="ghost"

@@ -392,27 +392,40 @@ export default function Page() {
               {/* Picture Upload */}
               <div className="space-y-2">
                 <FormLabel className="text-sm font-medium">Upload Picture</FormLabel>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) setSelectedFile(file);
-                    }}
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleUploadPicture}
-                    disabled={!selectedFile || isUploading}
-                  >
-                    {isUploading ? "Uploading..." : "Upload"}
-                  </Button>
+                <div className="flex items-center gap-4">
+                  {form.watch("picture") && (
+                    <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-primary/20">
+                      <img 
+                        src={form.watch("picture")} 
+                        alt="Patient preview" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <div className="flex flex-col gap-2 flex-1">
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) setSelectedFile(file);
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleUploadPicture}
+                        disabled={!selectedFile || isUploading}
+                      >
+                        {isUploading ? "Uploading..." : "Upload"}
+                      </Button>
+                    </div>
+                    {form.watch("picture") && (
+                      <p className="text-xs text-green-600 font-medium">Picture uploaded successfully!</p>
+                    )}
+                  </div>
                 </div>
-                {form.watch("picture") && (
-                  <p className="text-xs text-green-600 font-medium">Picture uploaded successfully!</p>
-                )}
               </div>
 
               {/* Is Active */}

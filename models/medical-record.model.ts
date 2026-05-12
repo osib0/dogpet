@@ -10,6 +10,8 @@ const MedicalRecordSchema = new Schema(
     disease_type: String,
     description: String,
     date: { type: Date, default: Date.now },
+    visit_date: { type: Date, default: Date.now },
+    next_visit_date: { type: Date },
   },
   { timestamps: true }
 );
