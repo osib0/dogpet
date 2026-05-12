@@ -54,6 +54,7 @@ export default function PatientList() {
   const [total, setTotal] = useState(0);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [historyNeedsAddForm, setHistoryNeedsAddForm] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Debounce search
@@ -126,9 +127,17 @@ export default function PatientList() {
     setIsSidebarOpen(true);
   };
 
-  const handleOpenHistory = (patient: Patient) => {
+  const handleOpenHistory = (patient: Patient, showAddForm = false) => {
     setSelectedPatient(patient);
+    setHistoryNeedsAddForm(showAddForm);
     setIsHistoryOpen(true);
+  };
+
+  const handleNewAssignFromSidebar = () => {
+    if (selectedPatient) {
+      setIsSidebarOpen(false);
+      handleOpenHistory(selectedPatient, true);
+    }
   };
 
   return (
@@ -383,12 +392,17 @@ export default function PatientList() {
       <PatientHistory 
         patient={selectedPatient} 
         isOpen={isHistoryOpen} 
-        onClose={() => setIsHistoryOpen(false)} 
+        onClose={() => {
+          setIsHistoryOpen(false);
+          setHistoryNeedsAddForm(false);
+        }} 
+        defaultShowAddForm={historyNeedsAddForm}
       />
       <PatientSidebar
         patient={selectedPatient}
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
+        onNewAssign={handleNewAssignFromSidebar}
       />
     </div>
   );

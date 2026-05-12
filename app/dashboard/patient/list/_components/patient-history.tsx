@@ -57,14 +57,14 @@ interface MedicationMaster {
   description?: string;
 }
 
-export function PatientHistory({ patient, isOpen, onClose }: { patient: Patient | null; isOpen: boolean; onClose: () => void }) {
+export function PatientHistory({ patient, isOpen, onClose, defaultShowAddForm = false }: { patient: Patient | null; isOpen: boolean; onClose: () => void; defaultShowAddForm?: boolean }) {
   const [history, setHistory] = useState<MedicalRecord[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [medications, setMedications] = useState<MedicationMaster[]>([]);
 
   // Form state for new assignment
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(defaultShowAddForm);
   const [newRecord, setNewRecord] = useState<{
     type: "VACCINATION" | "TEST" | "MEDICATION";
     item_name: string;
@@ -87,8 +87,11 @@ export function PatientHistory({ patient, isOpen, onClose }: { patient: Patient 
     if (isOpen && patient?.phone) {
       fetchHistory();
       fetchMedicationMaster();
+      setShowAddForm(defaultShowAddForm);
+    } else if (!isOpen) {
+      setShowAddForm(false);
     }
-  }, [isOpen, patient]);
+  }, [isOpen, patient, defaultShowAddForm]);
 
   const fetchHistory = async () => {
     if (!patient?.phone) return;

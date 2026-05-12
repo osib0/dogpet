@@ -7,7 +7,8 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
-import { User, Phone, Mail, Calendar, Activity, Info } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { User, Phone, Mail, Calendar, Activity, Info, Plus } from "lucide-react";
 
 interface Patient {
   _id: string;
@@ -31,9 +32,10 @@ interface PatientSidebarProps {
   patient: Patient | null;
   isOpen: boolean;
   onClose: () => void;
+  onNewAssign?: () => void;
 }
 
-export function PatientSidebar({ patient, isOpen, onClose }: PatientSidebarProps) {
+export function PatientSidebar({ patient, isOpen, onClose, onNewAssign }: PatientSidebarProps) {
   if (!patient) return null;
 
   return (
@@ -75,6 +77,17 @@ export function PatientSidebar({ patient, isOpen, onClose }: PatientSidebarProps
         </div>
 
         <div className="p-6 space-y-8">
+          {onNewAssign && (
+            <div className="flex justify-center w-full pb-2 border-b border-gray-100">
+              <Button
+                onClick={onNewAssign}
+                className="w-full bg-[#72e3ad] hover:bg-[#4fe09a] text-black font-bold border border-[#16b674bf] shadow-sm transition-all hover:scale-[1.02]"
+              >
+                <Plus className="w-4 h-4 mr-2" /> New Assignment
+              </Button>
+            </div>
+          )}
+
           <section className="space-y-4">
             <h3 className="text-sm font-black uppercase tracking-wider text-gray-400 border-b pb-2 flex items-center gap-2">
               <User className="w-4 h-4" /> Owner Information
