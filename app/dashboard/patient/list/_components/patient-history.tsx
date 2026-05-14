@@ -267,6 +267,34 @@ export function PatientHistory({ patient, isOpen, onClose, defaultShowAddForm = 
                   </Select>
                 </div>
 
+                <div className="space-y-1.5 flex flex-col">
+                  <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1 mb-1">Select Date</label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full justify-start text-left font-normal bg-gray-50 border-gray-200 focus:ring-primary",
+                          !newRecord.date && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {newRecord.date ? format(new Date(newRecord.date + "T00:00:00"), "PPP") : <span>Pick a date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={newRecord.date ? new Date(newRecord.date + "T00:00:00") : undefined}
+                        onSelect={(date) => {
+                          setNewRecord({ ...newRecord, date: date ? format(date, "yyyy-MM-dd") : "" });
+                        }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1">Quick Select (From Master)</label>
                   <Select onValueChange={onSelectMedication}>
@@ -301,34 +329,6 @@ export function PatientHistory({ patient, isOpen, onClose, defaultShowAddForm = 
                     className="bg-gray-50 border-gray-200 focus:ring-primary"
                     onChange={e => setNewRecord({ ...newRecord, disease: e.target.value })}
                   />
-                </div>
-
-                <div className="space-y-1.5 flex flex-col">
-                  <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1 mb-1">Select Date</label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full justify-start text-left font-normal bg-gray-50 border-gray-200 focus:ring-primary",
-                          !newRecord.date && "text-muted-foreground"
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {newRecord.date ? format(new Date(newRecord.date + "T00:00:00"), "PPP") : <span>Pick a date</span>}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={newRecord.date ? new Date(newRecord.date + "T00:00:00") : undefined}
-                        onSelect={(date) => {
-                          setNewRecord({ ...newRecord, date: date ? format(date, "yyyy-MM-dd") : "" });
-                        }}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
                 </div>
 
                 <div className="space-y-1.5 flex flex-col">

@@ -41,6 +41,9 @@ const patientSchema = z.object({
   is_active: z.boolean().optional(),
   email: z.string().email("Invalid email").optional().or(z.literal("")),
   picture: z.string().optional(),
+  select_date: z.string().optional(),
+  visit_date: z.string().optional(),
+  next_visit_date: z.string().optional(),
 });
 
 type FormData = z.infer<typeof patientSchema>;
@@ -70,6 +73,9 @@ export default function Page() {
       email: "",
       picture: "",
       dob: "",
+      select_date: "",
+      visit_date: "",
+      next_visit_date: "",
     },
   });
 
@@ -351,6 +357,51 @@ export default function Page() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Date Of Birth</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Select Date */}
+              <FormField
+                control={form.control}
+                name="select_date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Select Date</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Visit Date */}
+              <FormField
+                control={form.control}
+                name="visit_date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Visit Date</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Next Visit Date */}
+              <FormField
+                control={form.control}
+                name="next_visit_date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Next Visit Date</FormLabel>
                     <FormControl>
                       <Input type="date" {...field} />
                     </FormControl>

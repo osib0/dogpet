@@ -18,6 +18,9 @@ const patientSchema = z.object({
   is_active: z.boolean().optional(),
   email: z.string().optional(),
   picture: z.string().optional(),
+  select_date: z.string().optional(),
+  visit_date: z.string().optional(),
+  next_visit_date: z.string().optional(),
 });
 
 export async function POST(req: Request) {

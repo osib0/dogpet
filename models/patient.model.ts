@@ -15,6 +15,9 @@ const PatientSchema = new Schema(
     is_active: { type: Boolean, default: true },
     email: String,
     picture: String,
+    select_date: String,
+    visit_date: String,
+    next_visit_date: String,
   },
   { timestamps: true }
 );

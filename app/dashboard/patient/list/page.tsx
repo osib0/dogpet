@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -43,6 +44,7 @@ interface Patient {
 }
 
 export default function PatientList() {
+  const router = useRouter();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -123,8 +125,7 @@ export default function PatientList() {
   };
 
   const handleRowClick = (patient: Patient) => {
-    setSelectedPatient(patient);
-    setIsSidebarOpen(true);
+    router.push(`/dashboard/patient/profile/${patient._id}`);
   };
 
   const handleOpenHistory = (patient: Patient, showAddForm = false) => {
