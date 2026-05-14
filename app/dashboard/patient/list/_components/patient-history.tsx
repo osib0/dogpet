@@ -26,8 +26,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, History, RefreshCcw, Loader2, Search } from "lucide-react";
+import { Plus, History, RefreshCcw, Loader2, Search, CalendarIcon } from "lucide-react";
 import { format, addDays } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 interface Patient {
   _id: string;
@@ -71,6 +78,7 @@ export function PatientHistory({ patient, isOpen, onClose, defaultShowAddForm = 
     disease: string;
     disease_type: string;
     description: string;
+    date: string;
     visit_date: string;
     next_visit_date: string;
   }>({
@@ -79,6 +87,7 @@ export function PatientHistory({ patient, isOpen, onClose, defaultShowAddForm = 
     disease: "",
     disease_type: "",
     description: "",
+    date: format(new Date(), "yyyy-MM-dd"),
     visit_date: format(new Date(), "yyyy-MM-dd"),
     next_visit_date: format(addDays(new Date(), 30), "yyyy-MM-dd"),
   });
@@ -144,6 +153,7 @@ export function PatientHistory({ patient, isOpen, onClose, defaultShowAddForm = 
           disease: "",
           disease_type: "",
           description: "",
+          date: format(new Date(), "yyyy-MM-dd"),
           visit_date: format(new Date(), "yyyy-MM-dd"),
           next_visit_date: format(addDays(new Date(), 30), "yyyy-MM-dd"),
         });
@@ -162,6 +172,7 @@ export function PatientHistory({ patient, isOpen, onClose, defaultShowAddForm = 
       disease: record.disease || "",
       disease_type: record.disease_type || "",
       description: record.description || "",
+      date: format(new Date(), "yyyy-MM-dd"),
       visit_date: format(new Date(), "yyyy-MM-dd"),
       next_visit_date: format(addDays(new Date(), 30), "yyyy-MM-dd"),
     });
@@ -292,31 +303,93 @@ export function PatientHistory({ patient, isOpen, onClose, defaultShowAddForm = 
                   />
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1">Visit Date</label>
-                  <Input
-                    type="date"
-                    value={newRecord.visit_date}
-                    className="bg-gray-50 border-gray-200 focus:ring-primary"
-                    onChange={e => {
-                      const newDate = e.target.value;
-                      setNewRecord({ 
-                        ...newRecord, 
-                        visit_date: newDate,
-                        next_visit_date: newDate ? format(addDays(new Date(newDate), 30), "yyyy-MM-dd") : ""
-                      });
-                    }}
-                  />
+                <div className="space-y-1.5 flex flex-col">
+                  <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1 mb-1">Select Date</label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full justify-start text-left font-normal bg-gray-50 border-gray-200 focus:ring-primary",
+                          !newRecord.date && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {newRecord.date ? format(new Date(newRecord.date + "T00:00:00"), "PPP") : <span>Pick a date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={newRecord.date ? new Date(newRecord.date + "T00:00:00") : undefined}
+                        onSelect={(date) => {
+                          setNewRecord({ ...newRecord, date: date ? format(date, "yyyy-MM-dd") : "" });
+                        }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1">Next Visit / Due Date</label>
-                  <Input
-                    type="date"
-                    value={newRecord.next_visit_date}
-                    className="bg-gray-50 border-gray-200 focus:ring-primary"
-                    onChange={e => setNewRecord({ ...newRecord, next_visit_date: e.target.value })}
-                  />
+                <div className="space-y-1.5 flex flex-col">
+                  <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1 mb-1">Visit Date</label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full justify-start text-left font-normal bg-gray-50 border-gray-200 focus:ring-primary",
+                          !newRecord.visit_date && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {newRecord.visit_date ? format(new Date(newRecord.visit_date + "T00:00:00"), "PPP") : <span>Pick a date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={newRecord.visit_date ? new Date(newRecord.visit_date + "T00:00:00") : undefined}
+                        onSelect={(date) => {
+                          const newDate = date ? format(date, "yyyy-MM-dd") : "";
+                          setNewRecord({ 
+                            ...newRecord, 
+                            visit_date: newDate,
+                            next_visit_date: newDate ? format(addDays(new Date(newDate + "T00:00:00"), 30), "yyyy-MM-dd") : ""
+                          });
+                        }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div className="space-y-1.5 flex flex-col">
+                  <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1 mb-1">Next Visit / Due Date</label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full justify-start text-left font-normal bg-gray-50 border-gray-200 focus:ring-primary",
+                          !newRecord.next_visit_date && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {newRecord.next_visit_date ? format(new Date(newRecord.next_visit_date + "T00:00:00"), "PPP") : <span>Pick a date</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={newRecord.next_visit_date ? new Date(newRecord.next_visit_date + "T00:00:00") : undefined}
+                        onSelect={(date) => {
+                          setNewRecord({ ...newRecord, next_visit_date: date ? format(date, "yyyy-MM-dd") : "" });
+                        }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
 
                 <div className="md:col-span-2 space-y-1.5">
@@ -347,6 +420,7 @@ export function PatientHistory({ patient, isOpen, onClose, defaultShowAddForm = 
             <Table>
               <TableHeader className="bg-gray-50/50">
                 <TableRow className="border-b border-gray-100">
+                  <TableHead className="font-bold text-gray-500 uppercase text-[10px] tracking-wider">Select Date</TableHead>
                   <TableHead className="font-bold text-gray-500 uppercase text-[10px] tracking-wider">Visit Date</TableHead>
                   <TableHead className="font-bold text-gray-500 uppercase text-[10px] tracking-wider">Type</TableHead>
                   <TableHead className="font-bold text-gray-500 uppercase text-[10px] tracking-wider">Item / Medication</TableHead>
@@ -358,7 +432,7 @@ export function PatientHistory({ patient, isOpen, onClose, defaultShowAddForm = 
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="h-48 text-center">
+                    <TableCell colSpan={7} className="h-48 text-center">
                       <div className="flex flex-col items-center justify-center gap-3">
                         <Loader2 className="w-8 h-8 animate-spin text-primary/40" />
                         <p className="text-sm font-medium text-gray-400">Loading patient history...</p>
@@ -367,7 +441,7 @@ export function PatientHistory({ patient, isOpen, onClose, defaultShowAddForm = 
                   </TableRow>
                 ) : history.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="h-48 text-center">
+                    <TableCell colSpan={7} className="h-48 text-center">
                       <div className="flex flex-col items-center justify-center gap-2 opacity-40">
                         <History className="w-10 h-10 mb-2" />
                         <p className="text-base font-bold text-gray-400">No medical records found</p>
@@ -379,7 +453,10 @@ export function PatientHistory({ patient, isOpen, onClose, defaultShowAddForm = 
                   history.map((record) => (
                     <TableRow key={record._id} className="hover:bg-primary/[0.02] transition-colors border-b border-gray-50 last:border-0">
                       <TableCell className="text-sm font-semibold text-gray-700 py-4">
-                        {format(new Date(record.visit_date || record.date), "dd MMM yyyy")}
+                        {record.date ? format(new Date(record.date), "dd MMM yyyy") : "-"}
+                      </TableCell>
+                      <TableCell className="text-sm font-medium text-gray-600 py-4">
+                        {record.visit_date ? format(new Date(record.visit_date), "dd MMM yyyy") : "-"}
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline" className={`text-[10px] font-black tracking-tighter border-none px-2 py-0.5 ${record.type === "VACCINATION" ? "bg-blue-100 text-blue-700" :
