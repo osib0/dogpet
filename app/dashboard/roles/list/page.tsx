@@ -267,20 +267,64 @@ export default function RoleTable() {
 
             {/* Pagination */}
             <div className="flex items-center justify-end space-x-2 py-4">
-                <Button
-                    size="sm"
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                >
-                    Previous
-                </Button>
-                <Button
-                    size="sm"
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                >
-                    Next
-                </Button>
+                <div className="space-x-1 flex items-center w-full">
+                    <div className="bg-white rounded-xl flex items-center gap-0.5">
+                        <Button
+                            size="sm"
+                            onClick={() => table.previousPage()}
+                            disabled={!table.getCanPreviousPage()}
+                            className="bg-transparent border-0 rounded-xl text-black hover:bg-[#f9f9f9]"
+                        >
+                            <ChevronLeft />
+                        </Button>
+                        {(() => {
+                            const currentPage = table.getState().pagination.pageIndex;
+                            const pageCount = table.getPageCount();
+                            const pages: (number | string)[] = [];
+                            if (pageCount <= 5) {
+                                for (let i = 0; i < pageCount; i++) pages.push(i);
+                            } else {
+                                pages.push(0);
+                                if (currentPage > 2) pages.push("start-ellipsis");
+                                const start = Math.max(1, currentPage - 1);
+                                const end = Math.min(pageCount - 2, currentPage + 1);
+                                for (let i = start; i <= end; i++) pages.push(i);
+                                if (currentPage < pageCount - 3) pages.push("end-ellipsis");
+                                pages.push(pageCount - 1);
+                            }
+                            return pages.map((p) =>
+                                typeof p === "string" ? (
+                                    <span key={p} className="px-1 text-[#737373] text-sm select-none">…</span>
+                                ) : (
+                                    <Button
+                                        key={p}
+                                        size="sm"
+                                        onClick={() => table.setPageIndex(p)}
+                                        className={
+                                            currentPage === p
+                                                ? "bg-[#f9f9f9] text-[#737373]"
+                                                : "bg-transparent hover:bg-[#f9f9f9] text-[#737373]"
+                                        }
+                                    >
+                                        {p + 1}
+                                    </Button>
+                                )
+                            );
+                        })()}
+                        <Button
+                            size="sm"
+                            onClick={() => table.nextPage()}
+                            disabled={!table.getCanNextPage()}
+                            className="bg-transparent border-0 rounded-xl text-black hover:bg-[#f9f9f9]"
+                        >
+                            <ChevronRight />
+                        </Button>
+                    </div>
+                </div>
+                <div className="text-muted-foreground flex-1 text-sm whitespace-nowrap text-right">
+                    Page {table.getState().pagination.pageIndex + 1} of{" "}
+                    {table.getPageCount()}
+                </div>
             </div>
 
             {/* Edit Modal */}

@@ -390,7 +390,7 @@ export default function UserTable() {
             {/* ✅ Pagination */}
             <div className="flex items-center justify-end space-x-2 py-4">
                 <div className="space-x-1 flex items-center w-full">
-                    <div className="bg-white rounded-xl flex items-center">
+                    <div className="bg-white rounded-xl flex items-center gap-0.5">
                         <Button
                             size="sm"
                             onClick={() => table.previousPage()}
@@ -399,20 +399,40 @@ export default function UserTable() {
                         >
                             <ChevronLeft />
                         </Button>
-                        {Array.from({ length: table.getPageCount() }).map((_, index) => (
-                            <Button
-                                key={index}
-                                size="sm"
-                                onClick={() => table.setPageIndex(index)}
-                                className={
-                                    table.getState().pagination.pageIndex === index
-                                        ? "bg-[#f9f9f9] text-[#737373]"
-                                        : "bg-transparent hover:bg-[#f9f9f9] text-[#737373]"
-                                }
-                            >
-                                {index + 1}
-                            </Button>
-                        ))}
+                        {(() => {
+                            const currentPage = table.getState().pagination.pageIndex;
+                            const pageCount = table.getPageCount();
+                            const pages: (number | string)[] = [];
+                            if (pageCount <= 5) {
+                                for (let i = 0; i < pageCount; i++) pages.push(i);
+                            } else {
+                                pages.push(0);
+                                if (currentPage > 2) pages.push("start-ellipsis");
+                                const start = Math.max(1, currentPage - 1);
+                                const end = Math.min(pageCount - 2, currentPage + 1);
+                                for (let i = start; i <= end; i++) pages.push(i);
+                                if (currentPage < pageCount - 3) pages.push("end-ellipsis");
+                                pages.push(pageCount - 1);
+                            }
+                            return pages.map((p, idx) =>
+                                typeof p === "string" ? (
+                                    <span key={p} className="px-1 text-[#737373] text-sm select-none">…</span>
+                                ) : (
+                                    <Button
+                                        key={p}
+                                        size="sm"
+                                        onClick={() => table.setPageIndex(p)}
+                                        className={
+                                            currentPage === p
+                                                ? "bg-[#f9f9f9] text-[#737373]"
+                                                : "bg-transparent hover:bg-[#f9f9f9] text-[#737373]"
+                                        }
+                                    >
+                                        {p + 1}
+                                    </Button>
+                                )
+                            );
+                        })()}
                         <Button
                             size="sm"
                             onClick={() => table.nextPage()}
