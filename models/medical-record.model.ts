@@ -9,11 +9,12 @@ const MedicalRecordSchema = new Schema(
     disease: String,
     disease_type: String,
     description: String,
-    date: { type: Date, default: Date.now },
-    visit_date: { type: Date, default: Date.now },
-    next_visit_date: { type: Date },
+    date: { type: Schema.Types.Mixed },
+    visit_date: { type: Schema.Types.Mixed },
+    next_visit_date: { type: Schema.Types.Mixed },
   },
   { timestamps: true }
 );
 
 export default models.MedicalRecord || model("MedicalRecord", MedicalRecordSchema);
+

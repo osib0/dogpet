@@ -64,6 +64,70 @@ interface MedicationMaster {
   description?: string;
 }
 
+const formatRecordDate = (record: MedicalRecord, field: 'date' | 'visit_date' | 'next_visit_date') => {
+  const value = record[field];
+
+  // Helper to check if a value is a valid date from the database
+  const isValidDbValue = (val: any) => {
+    if (!val) return false;
+    if (typeof val === 'string' && (val.includes(':') || val === '00:00.0')) {
+      return false;
+    }
+    const d = new Date(val);
+    return !isNaN(d.getTime());
+  };
+
+  // 1. If the database has a valid, non-placeholder date for this specific field, use it!
+  if (isValidDbValue(value)) {
+    const dateObj = new Date(value);
+    
+    // Timezone-safe formatting for ISO strings
+    if (typeof value === 'string' && value.includes('T')) {
+      const parts = value.split('T')[0].split('-');
+      if (parts.length === 3) {
+        const year = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const day = parseInt(parts[2], 10);
+        return format(new Date(year, month, day), "dd MMM yyyy");
+      }
+    }
+    return format(dateObj, "dd MMM yyyy");
+  }
+
+  // 2. If the database value is missing or invalid, try to parse from description based on context
+  if (record.description) {
+    const match = record.description.match(/(\d{1,2})\s*[\/\-]\s*(\d{1,2})\s*[\/\-]\s*(\d{4})/);
+    if (match) {
+      const day = parseInt(match[1], 10);
+      const month = parseInt(match[2], 10) - 1;
+      const year = parseInt(match[3], 10);
+      const parsedDate = new Date(year, month, day);
+      if (!isNaN(parsedDate.getTime())) {
+        const descLower = record.description.toLowerCase();
+        
+        // Classify based on keywords
+        const isNextVisit = descLower.includes('come') || descLower.includes('next') || descLower.includes('due');
+
+        if (field === 'next_visit_date') {
+          if (isNextVisit) {
+            return format(parsedDate, "dd MMM yyyy");
+          }
+        } else if (field === 'visit_date' || field === 'date') {
+          // If the date in the description is explicitly a next visit date, do not show it in visit_date/date
+          if (isNextVisit) {
+            return "-";
+          }
+          // Otherwise, it's either explicitly a visit date ("came") or the default visit date
+          return format(parsedDate, "dd MMM yyyy");
+        }
+      }
+    }
+  }
+
+  return "-";
+};
+
+
 export function PatientHistory({ patient, isOpen, onClose, defaultShowAddForm = false }: { patient: Patient | null; isOpen: boolean; onClose: () => void; defaultShowAddForm?: boolean }) {
   const [history, setHistory] = useState<MedicalRecord[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -453,10 +517,10 @@ export function PatientHistory({ patient, isOpen, onClose, defaultShowAddForm = 
                   history.map((record) => (
                     <TableRow key={record._id} className="hover:bg-primary/[0.02] transition-colors border-b border-gray-50 last:border-0">
                       <TableCell className="text-sm font-semibold text-gray-700 py-4">
-                        {record.date ? format(new Date(record.date), "dd MMM yyyy") : "-"}
+                        {formatRecordDate(record, 'date')}
                       </TableCell>
                       <TableCell className="text-sm font-medium text-gray-600 py-4">
-                        {record.visit_date ? format(new Date(record.visit_date), "dd MMM yyyy") : "-"}
+                        {formatRecordDate(record, 'visit_date')}
                       </TableCell>
                       <TableCell>
                         <Badge variant="outline" className={`text-[10px] font-black tracking-tighter border-none px-2 py-0.5 ${record.type === "VACCINATION" ? "bg-blue-100 text-blue-700" :
@@ -469,7 +533,7 @@ export function PatientHistory({ patient, isOpen, onClose, defaultShowAddForm = 
                       <TableCell className="font-bold text-gray-900">{record.item_name}</TableCell>
                       <TableCell className="text-sm text-gray-500 font-medium">{record.disease || "-"}</TableCell>
                       <TableCell className="text-sm text-gray-600 font-medium">
-                        {record.next_visit_date ? format(new Date(record.next_visit_date), "dd MMM yyyy") : "-"}
+                        {formatRecordDate(record, 'next_visit_date')}
                       </TableCell>
                       <TableCell className="text-right">
                         <Button

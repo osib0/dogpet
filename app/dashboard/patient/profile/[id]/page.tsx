@@ -68,14 +68,78 @@ interface MedicationMaster {
   description?: string;
 }
 
+const formatRecordDate = (record: MedicalRecord, field: 'date' | 'visit_date' | 'next_visit_date') => {
+  const value = record[field];
+
+  // Helper to check if a value is a valid date from the database
+  const isValidDbValue = (val: any) => {
+    if (!val) return false;
+    if (typeof val === 'string' && (val.includes(':') || val === '00:00.0')) {
+      return false;
+    }
+    const d = new Date(val);
+    return !isNaN(d.getTime());
+  };
+
+  // 1. If the database has a valid, non-placeholder date for this specific field, use it!
+  if (isValidDbValue(value)) {
+    const dateObj = new Date(value);
+    
+    // Timezone-safe formatting for ISO strings
+    if (typeof value === 'string' && value.includes('T')) {
+      const parts = value.split('T')[0].split('-');
+      if (parts.length === 3) {
+        const year = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1;
+        const day = parseInt(parts[2], 10);
+        return format(new Date(year, month, day), "dd MMM yyyy");
+      }
+    }
+    return format(dateObj, "dd MMM yyyy");
+  }
+
+  // 2. If the database value is missing or invalid, try to parse from description based on context
+  if (record.description) {
+    const match = record.description.match(/(\d{1,2})\s*[\/\-]\s*(\d{1,2})\s*[\/\-]\s*(\d{4})/);
+    if (match) {
+      const day = parseInt(match[1], 10);
+      const month = parseInt(match[2], 10) - 1;
+      const year = parseInt(match[3], 10);
+      const parsedDate = new Date(year, month, day);
+      if (!isNaN(parsedDate.getTime())) {
+        const descLower = record.description.toLowerCase();
+        
+        // Classify based on keywords
+        const isNextVisit = descLower.includes('come') || descLower.includes('next') || descLower.includes('due');
+
+        if (field === 'next_visit_date') {
+          if (isNextVisit) {
+            return format(parsedDate, "dd MMM yyyy");
+          }
+        } else if (field === 'visit_date' || field === 'date') {
+          // If the date in the description is explicitly a next visit date, do not show it in visit_date/date
+          if (isNextVisit) {
+            return "-";
+          }
+          // Otherwise, it's either explicitly a visit date ("came") or the default visit date
+          return format(parsedDate, "dd MMM yyyy");
+        }
+      }
+    }
+  }
+
+  return "-";
+};
+
+
 export default function PatientProfile() {
   const { id } = useParams() as { id: string };
   const router = useRouter();
-  
+
   const [patient, setPatient] = useState<Patient | null>(null);
   const [history, setHistory] = useState<MedicalRecord[]>([]);
   const [medications, setMedications] = useState<MedicationMaster[]>([]);
-  
+
   const [isLoadingPatient, setIsLoadingPatient] = useState(true);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -253,12 +317,12 @@ export default function PatientProfile() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left column: Patient Details */}
         <div className="lg:col-span-1 space-y-6">
-          <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+          <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
             <div className="relative h-48 w-full bg-gray-100 flex items-center justify-center overflow-hidden">
               {patient.picture ? (
-                <img 
-                  src={patient.picture} 
-                  alt={patient.pet_name} 
+                <img
+                  src={patient.picture}
+                  alt={patient.pet_name}
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -363,9 +427,9 @@ export default function PatientProfile() {
 
         {/* Right column: Patient History */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <div className="bg-white rounded-2xl border border-gray-100 p-6">
             <div className="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
-              <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+              <h3 className="text-sm md:text-xl font-bold text-gray-800 flex items-center gap-2">
                 <History className="w-5 h-5 text-primary" />
                 Medical History
                 <Badge variant="secondary" className="ml-2 bg-gray-100 text-gray-600 border-none">
@@ -375,7 +439,7 @@ export default function PatientProfile() {
               {!showAddForm && patient.phone && (
                 <Button
                   onClick={() => setShowAddForm(true)}
-                  className="bg-[#72e3ad] hover:bg-[#4fe09a] text-black font-bold border border-[#16b674bf] shadow-sm transition-all hover:scale-105"
+                  className="bg-[#72e3ad] hover:bg-[#4fe09a] text-sm cursor-pointer text-black font-bold border border-[#16b674bf] transition-all hover:scale-105"
                 >
                   <Plus className="w-4 h-4 mr-2" /> New Assignment
                 </Button>
@@ -389,7 +453,7 @@ export default function PatientProfile() {
             )}
 
             {showAddForm && (
-              <div className="mb-8 p-5 bg-gray-50/80 rounded-2xl border border-primary/20 shadow-sm space-y-4 animate-in fade-in zoom-in-95 duration-200">
+              <div className="mb-8 p-5 bg-gray-50/80 rounded-2xl border border-primary/20 space-y-4 animate-in fade-in zoom-in-95 duration-200">
                 <div className="flex justify-between items-center pb-2 border-b border-gray-200">
                   <h4 className="font-bold text-primary flex items-center gap-2">
                     <Plus className="w-4 h-4" /> Add New Assignment
@@ -482,8 +546,8 @@ export default function PatientProfile() {
                           selected={newRecord.visit_date ? new Date(newRecord.visit_date + "T00:00:00") : undefined}
                           onSelect={(date) => {
                             const newDate = date ? format(date, "yyyy-MM-dd") : "";
-                            setNewRecord({ 
-                              ...newRecord, 
+                            setNewRecord({
+                              ...newRecord,
                               visit_date: newDate,
                               next_visit_date: newDate ? format(addDays(new Date(newDate + "T00:00:00"), 30), "yyyy-MM-dd") : ""
                             });
@@ -602,10 +666,10 @@ export default function PatientProfile() {
                     history.map((record) => (
                       <TableRow key={record._id} className="hover:bg-primary/[0.02] transition-colors border-b border-gray-50 last:border-0">
                         <TableCell className="text-sm font-semibold text-gray-700 py-4 whitespace-nowrap">
-                          {record.date ? format(new Date(record.date), "dd MMM yyyy") : "-"}
+                          {formatRecordDate(record, 'date')}
                         </TableCell>
                         <TableCell className="text-sm font-medium text-gray-600 py-4 whitespace-nowrap">
-                          {record.visit_date ? format(new Date(record.visit_date), "dd MMM yyyy") : "-"}
+                          {formatRecordDate(record, 'visit_date')}
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline" className={`text-[10px] font-black tracking-tighter border-none px-2 py-0.5 whitespace-nowrap ${record.type === "VACCINATION" ? "bg-blue-100 text-blue-700" :
@@ -620,7 +684,7 @@ export default function PatientProfile() {
                           {record.disease && <span className="block text-xs text-gray-500 font-normal mt-0.5">{record.disease}</span>}
                         </TableCell>
                         <TableCell className="text-sm text-gray-600 font-medium whitespace-nowrap">
-                          {record.next_visit_date ? format(new Date(record.next_visit_date), "dd MMM yyyy") : "-"}
+                          {formatRecordDate(record, 'next_visit_date')}
                         </TableCell>
                         <TableCell className="text-right">
                           <Button
