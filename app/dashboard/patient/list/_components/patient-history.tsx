@@ -68,7 +68,7 @@ const formatRecordDate = (record: MedicalRecord, field: 'date' | 'visit_date' | 
   const value = record[field];
 
   // Helper to check if a value is a valid date from the database
-  const isValidDbValue = (val: any) => {
+  const isValidDbValue = (val: string | undefined | number | Date) => {
     if (!val) return false;
     if (typeof val === 'string' && (val.includes(':') || val === '00:00.0')) {
       return false;
@@ -79,8 +79,8 @@ const formatRecordDate = (record: MedicalRecord, field: 'date' | 'visit_date' | 
 
   // 1. If the database has a valid, non-placeholder date for this specific field, use it!
   if (isValidDbValue(value)) {
-    const dateObj = new Date(value);
-    
+    const dateObj = new Date(value as string | number | Date);
+
     // Timezone-safe formatting for ISO strings
     if (typeof value === 'string' && value.includes('T')) {
       const parts = value.split('T')[0].split('-');
@@ -104,7 +104,7 @@ const formatRecordDate = (record: MedicalRecord, field: 'date' | 'visit_date' | 
       const parsedDate = new Date(year, month, day);
       if (!isNaN(parsedDate.getTime())) {
         const descLower = record.description.toLowerCase();
-        
+
         // Classify based on keywords
         const isNextVisit = descLower.includes('come') || descLower.includes('next') || descLower.includes('due');
 
@@ -416,8 +416,8 @@ export function PatientHistory({ patient, isOpen, onClose, defaultShowAddForm = 
                         selected={newRecord.visit_date ? new Date(newRecord.visit_date + "T00:00:00") : undefined}
                         onSelect={(date) => {
                           const newDate = date ? format(date, "yyyy-MM-dd") : "";
-                          setNewRecord({ 
-                            ...newRecord, 
+                          setNewRecord({
+                            ...newRecord,
                             visit_date: newDate,
                             next_visit_date: newDate ? format(addDays(new Date(newDate + "T00:00:00"), 30), "yyyy-MM-dd") : ""
                           });
