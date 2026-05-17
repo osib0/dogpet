@@ -6,13 +6,26 @@ export async function GET(req: Request) {
   try {
     await connectDB();
     const { searchParams } = new URL(req.url);
+    const patient_id = searchParams.get("patient_id");
     const phone = searchParams.get("phone");
 
-    if (!phone) {
-      return NextResponse.json({ error: "Phone number is required" }, { status: 400 });
+    if (!phone && !patient_id) {
+      return NextResponse.json({ error: "Phone or Patient ID is required" }, { status: 400 });
     }
 
-    const history = await MedicalRecord.find({ phone }).sort({ date: -1 });
+    let query: any = {};
+    if (patient_id) {
+      query = {
+        $or: [
+          { patient_id },
+          { phone, patient_id: { $exists: false } }
+        ]
+      };
+    } else {
+      query = { phone };
+    }
+
+    const history = await MedicalRecord.find(query).sort({ date: -1 });
     return NextResponse.json({ success: true, data: history });
   } catch (error) {
     console.error("Error fetching medical records:", error);

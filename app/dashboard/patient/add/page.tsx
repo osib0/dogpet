@@ -57,6 +57,8 @@ export default function Page() {
   const [availableTypes, setAvailableTypes] = useState<string[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [existingOwner, setExistingOwner] = useState<{ owner_name: string; email: string } | null>(null);
+
 
   const form = useForm<FormData>({
     resolver: zodResolver(patientSchema),
@@ -107,6 +109,37 @@ export default function Page() {
         });
     }
   }, [editId, pets, form]);
+
+  const watchedPhone = form.watch("phone");
+
+  useEffect(() => {
+    if (watchedPhone && watchedPhone.trim().length >= 10 && !editId) {
+      const controller = new AbortController();
+      fetch(`/api/patients/get?phone=${watchedPhone.trim()}`, { signal: controller.signal })
+        .then(res => res.json())
+        .then(data => {
+          if (data.found && data.patient) {
+            setExistingOwner({
+              owner_name: data.patient.owner_name || "",
+              email: data.patient.email || ""
+            });
+            form.setValue("owner_name", data.patient.owner_name || "");
+            form.setValue("email", data.patient.email || "");
+          } else {
+            setExistingOwner(null);
+          }
+        })
+        .catch(err => {
+          if (err.name !== 'AbortError') {
+            console.error("Lookup error:", err);
+          }
+        });
+      return () => controller.abort();
+    } else {
+      setExistingOwner(null);
+    }
+  }, [watchedPhone, form, editId]);
+
 
   const onCategoryChange = (val: string) => {
     form.setValue("pet_category", val);
@@ -191,7 +224,32 @@ export default function Page() {
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex flex-col gap-6 text-sm"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {existingOwner && (
+              <div className="md:col-span-2 p-4 bg-green-50 text-green-800 border border-green-200 rounded-lg flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-300">
+                <div>
+                  <p className="font-bold text-sm flex items-center gap-1.5">
+                    <span>✨</span> Existing Owner Details Found!
+                  </p>
+                  <p className="text-xs text-green-700 mt-0.5">
+                    This phone number is registered to <strong>{existingOwner.owner_name}</strong>. We've linked the owner details so you can directly add their new pet!
+                  </p>
+                </div>
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-8 text-xs text-green-800 hover:text-green-955 hover:bg-green-100/50 font-black rounded-full"
+                  onClick={() => {
+                    form.setValue("phone", "");
+                    setExistingOwner(null);
+                  }}
+                >
+                  Clear Phone
+                </Button>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
               {/* Owner Name */}
               <FormField
                 control={form.control}
@@ -200,12 +258,18 @@ export default function Page() {
                   <FormItem>
                     <FormLabel>Owner Name *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter owner name" {...field} />
+                      <Input 
+                        placeholder="Enter owner name" 
+                        {...field} 
+                        disabled={!!existingOwner}
+                        className={cn(existingOwner && "bg-gray-50 border-gray-200 text-gray-500 cursor-not-allowed")}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
 
               {/* Pet Name */}
               <FormField
@@ -433,12 +497,19 @@ export default function Page() {
                   <FormItem>
                     <FormLabel>Email Id</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="Enter email address" {...field} />
+                      <Input 
+                        type="email" 
+                        placeholder="Enter email address" 
+                        {...field} 
+                        disabled={!!existingOwner}
+                        className={cn(existingOwner && "bg-gray-50 border-gray-200 text-gray-500 cursor-not-allowed")}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
 
               {/* Picture Upload */}
               <div className="space-y-2">

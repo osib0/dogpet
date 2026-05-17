@@ -33,6 +33,23 @@ export async function POST(req: Request) {
     const validatedData = patientSchema.parse(body);
     const { _id, ...data } = validatedData;
 
+    if (!_id) {
+      // Check if a pet with the same phone number and pet name already exists
+      if (data.phone && data.pet_name) {
+        const trimmedPetName = data.pet_name.trim();
+        const existingPet = await Patient.findOne({
+          phone: data.phone,
+          pet_name: { $regex: new RegExp(`^${trimmedPetName}$`, "i") }
+        });
+        if (existingPet) {
+          return NextResponse.json(
+            { error: `A pet named "${trimmedPetName}" is already registered under this phone number.` },
+            { status: 400 }
+          );
+        }
+      }
+    }
+
     let patient;
     if (_id) {
       patient = await Patient.findByIdAndUpdate(_id, data, { new: true });

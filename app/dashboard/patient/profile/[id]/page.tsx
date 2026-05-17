@@ -198,7 +198,7 @@ export default function PatientProfile() {
     if (!patient?.phone) return;
     setIsLoadingHistory(true);
     try {
-      const res = await fetch(`/api/patients/history?phone=${patient.phone}`);
+      const res = await fetch(`/api/patients/history?patient_id=${patient._id}&phone=${patient.phone}`);
       const data = await res.json();
       if (data.success) {
         setHistory(data.data);

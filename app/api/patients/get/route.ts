@@ -8,6 +8,7 @@ export async function GET(req: Request) {
 
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
+    const phone = searchParams.get("phone");
 
     if (id) {
       const patient = await Patient.findById(id);
@@ -15,6 +16,14 @@ export async function GET(req: Request) {
         return NextResponse.json({ error: "Patient not found" }, { status: 404 });
       }
       return NextResponse.json(patient);
+    }
+
+    if (phone) {
+      const patient = await Patient.findOne({ phone });
+      if (!patient) {
+        return NextResponse.json({ found: false });
+      }
+      return NextResponse.json({ found: true, patient });
     }
 
     const page = parseInt(searchParams.get("page") || "1");
