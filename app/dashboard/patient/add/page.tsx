@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
 
 const patientSchema = z.object({
   owner_name: z.string().optional(),
@@ -234,10 +235,10 @@ export default function Page() {
                     This phone number is registered to <strong>{existingOwner.owner_name}</strong>. We've linked the owner details so you can directly add their new pet!
                   </p>
                 </div>
-                <Button 
-                  type="button" 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
                   className="h-8 text-xs text-green-800 hover:text-green-955 hover:bg-green-100/50 font-black rounded-full"
                   onClick={() => {
                     form.setValue("phone", "");
@@ -258,9 +259,9 @@ export default function Page() {
                   <FormItem>
                     <FormLabel>Owner Name *</FormLabel>
                     <FormControl>
-                      <Input 
-                        placeholder="Enter owner name" 
-                        {...field} 
+                      <Input
+                        placeholder="Enter owner name"
+                        {...field}
                         disabled={!!existingOwner}
                         className={cn(existingOwner && "bg-gray-50 border-gray-200 text-gray-500 cursor-not-allowed")}
                       />
@@ -497,10 +498,10 @@ export default function Page() {
                   <FormItem>
                     <FormLabel>Email Id</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="email" 
-                        placeholder="Enter email address" 
-                        {...field} 
+                      <Input
+                        type="email"
+                        placeholder="Enter email address"
+                        {...field}
                         disabled={!!existingOwner}
                         className={cn(existingOwner && "bg-gray-50 border-gray-200 text-gray-500 cursor-not-allowed")}
                       />
@@ -517,9 +518,9 @@ export default function Page() {
                 <div className="flex items-center gap-4">
                   {form.watch("picture") && (
                     <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-primary/20">
-                      <img 
-                        src={form.watch("picture")} 
-                        alt="Patient preview" 
+                      <img
+                        src={form.watch("picture")}
+                        alt="Patient preview"
                         className="w-full h-full object-cover"
                       />
                     </div>
