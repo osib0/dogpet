@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -164,6 +165,7 @@ export function PatientHistory({
   });
 
   const [newRecord, setNewRecord] = useState(emptyRecord());
+  const [deleteRecordId, setDeleteRecordId] = useState<string | null>(null);
 
   // ── Effects ──────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -237,10 +239,14 @@ export function PatientHistory({
   };
 
   // ── Delete record ─────────────────────────────────────────────────────────
-  const handleDeleteRecord = async (recordId: string) => {
-    if (!confirm("Delete this medical record?")) return;
+  const confirmDeleteRecord = (recordId: string) => {
+    setDeleteRecordId(recordId);
+  };
+
+  const executeDeleteRecord = async () => {
+    if (!deleteRecordId) return;
     try {
-      const res = await fetch(`/api/patients/history?record_id=${recordId}`, {
+      const res = await fetch(`/api/patients/history?record_id=${deleteRecordId}`, {
         method: "DELETE",
       });
       const data = await res.json();
@@ -248,6 +254,7 @@ export function PatientHistory({
     } catch (err) {
       console.error("Failed to delete record:", err);
     }
+    setDeleteRecordId(null);
   };
 
   // ── Re-assign ─────────────────────────────────────────────────────────────
@@ -693,7 +700,7 @@ export function PatientHistory({
                             variant="ghost"
                             size="sm"
                             className="h-8 w-8 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full"
-                            onClick={() => handleDeleteRecord(record._id)}
+                            onClick={() => confirmDeleteRecord(record._id)}
                             title="Delete record"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -708,6 +715,24 @@ export function PatientHistory({
           </div>
         </div>
       </DialogContent>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!deleteRecordId} onOpenChange={(isOpen) => !isOpen && setDeleteRecordId(null)}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this medical record?
+              <br/><br/>
+              This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteRecordId(null)}>Cancel</Button>
+            <Button variant="destructive" onClick={executeDeleteRecord}>Delete</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }

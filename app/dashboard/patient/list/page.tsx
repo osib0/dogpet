@@ -16,6 +16,14 @@ import {
 } from "@/components/ui/select";
 import { PatientHistory } from "./_components/patient-history";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   History,
   ChevronRight,
   Plus,
@@ -152,6 +160,15 @@ export default function PatientList() {
   const [historyPet, setHistoryPet] = useState<EmbeddedPet | null>(null);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
+  // delete confirmation
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    isOpen: boolean;
+    type: "owner" | "pet";
+    ownerId?: string;
+    petId?: string;
+    name: string;
+  } | null>(null);
+
   const hasAnyExpanded = expandedRows.size > 0;
 
   // ── Debounce ──────────────────────────────────────────────────────────────
@@ -211,20 +228,30 @@ export default function PatientList() {
   };
 
   // ── Delete ────────────────────────────────────────────────────────────────
-  const handleDeleteOwner = async (e: React.MouseEvent, id: string, name: string) => {
+  const confirmDeleteOwner = (e: React.MouseEvent, id: string, name: string) => {
     e.stopPropagation();
-    if (!confirm(`Delete owner "${name}" and ALL their pets + history?`)) return;
-    const res = await fetch(`/api/patients/delete?id=${id}`, { method: "DELETE" });
-    if (res.ok) fetchOwners(page, limit, debouncedSearch);
-    else alert("Failed to delete.");
+    setDeleteConfirm({ isOpen: true, type: "owner", ownerId: id, name });
   };
 
-  const handleDeletePet = async (e: React.MouseEvent, ownerId: string, petId: string, petName: string) => {
+  const confirmDeletePet = (e: React.MouseEvent, ownerId: string, petId: string, petName: string) => {
     e.stopPropagation();
-    if (!confirm(`Delete pet "${petName}" and their medical history?`)) return;
-    const res = await fetch(`/api/patients/delete?id=${ownerId}&pet_id=${petId}`, { method: "DELETE" });
-    if (res.ok) fetchOwners(page, limit, debouncedSearch);
-    else alert("Failed to delete.");
+    setDeleteConfirm({ isOpen: true, type: "pet", ownerId, petId, name: petName });
+  };
+
+  const executeDelete = async () => {
+    if (!deleteConfirm) return;
+
+    if (deleteConfirm.type === "owner" && deleteConfirm.ownerId) {
+      const res = await fetch(`/api/patients/delete?id=${deleteConfirm.ownerId}`, { method: "DELETE" });
+      if (res.ok) fetchOwners(page, limit, debouncedSearch);
+      else alert("Failed to delete.");
+    } else if (deleteConfirm.type === "pet" && deleteConfirm.ownerId && deleteConfirm.petId) {
+      const res = await fetch(`/api/patients/delete?id=${deleteConfirm.ownerId}&pet_id=${deleteConfirm.petId}`, { method: "DELETE" });
+      if (res.ok) fetchOwners(page, limit, debouncedSearch);
+      else alert("Failed to delete.");
+    }
+    
+    setDeleteConfirm(null);
   };
 
   const handleOpenHistory = (e: React.MouseEvent, owner: Owner, pet: EmbeddedPet) => {
@@ -426,7 +453,7 @@ export default function PatientList() {
                             variant="ghost" size="sm"
                             className="h-7 w-7 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50"
                             title="Delete Owner"
-                            onClick={(e) => handleDeleteOwner(e, owner._id, owner.owner_name)}
+                            onClick={(e) => confirmDeleteOwner(e, owner._id, owner.owner_name)}
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </Button>
@@ -518,7 +545,7 @@ export default function PatientList() {
                                     variant="ghost" size="sm"
                                     className="h-6 w-6 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50"
                                     title="Delete Pet"
-                                    onClick={(e) => handleDeletePet(e, owner._id, pet._id, pet.pet_name)}
+                                    onClick={(e) => confirmDeletePet(e, owner._id, pet._id, pet.pet_name)}
                                   >
                                     <Trash2 className="h-3 w-3" />
                                   </Button>
@@ -603,6 +630,27 @@ export default function PatientList() {
           }}
         />
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteConfirm?.isOpen} onOpenChange={(isOpen) => !isOpen && setDeleteConfirm(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogDescription>
+              {deleteConfirm?.type === "owner" 
+                ? `Are you sure you want to delete the owner "${deleteConfirm?.name}" and ALL their pets + history?`
+                : `Are you sure you want to delete the pet "${deleteConfirm?.name}" and their medical history?`
+              }
+              <br/><br/>
+              This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteConfirm(null)}>Cancel</Button>
+            <Button variant="destructive" onClick={executeDelete}>Delete</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
