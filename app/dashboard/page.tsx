@@ -128,22 +128,26 @@ export default function Page() {
         </div>
 
         <div className="flex gap-3">
-          <Button
-            variant={"outline"}
-            size={"sm"}
-            className="shadow-none text-xs cursor-pointer"
-          >
-            <UserPlus className="h-4 w-4" />
-            Add Pet
-          </Button>
-          <Button
-            variant={"outline"}
-            size={"sm"}
-            className="shadow-none text-xs hover:bg-[#4fe09a] bg-[#72e3ad] border border-[#16b674bf] cursor-pointer"
-          >
-            <Plus className="h-4 w-4" />
-            New Appointment
-          </Button>
+          <Link href="/dashboard/patient/add">
+            <Button
+              variant={"outline"}
+              size={"sm"}
+              className="shadow-none text-xs cursor-pointer"
+            >
+              <UserPlus className="h-4 w-4" />
+              New Patient
+            </Button>
+          </Link>
+          <Link href="/dashboard/patient/list">
+            <Button
+              variant={"outline"}
+              size={"sm"}
+              className="shadow-none text-xs hover:bg-[#4fe09a] bg-[#72e3ad] border border-[#16b674bf] cursor-pointer"
+            >
+              <Plus className="h-4 w-4" />
+              View Patients
+            </Button>
+          </Link>
         </div>
       </div>
 

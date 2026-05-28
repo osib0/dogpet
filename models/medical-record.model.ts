@@ -3,6 +3,8 @@ import { Schema, models, model } from "mongoose";
 const MedicalRecordSchema = new Schema(
   {
     patient_id: { type: Schema.Types.ObjectId, ref: "Patient" },
+    // NEW: specific pet within the owner's pets array
+    pet_id: { type: Schema.Types.ObjectId },
     phone: { type: String, required: true },
     type: { type: String, enum: ["VACCINATION", "TEST", "MEDICATION"], required: true },
     item_name: { type: String, required: true },
@@ -17,4 +19,3 @@ const MedicalRecordSchema = new Schema(
 );
 
 export default models.MedicalRecord || model("MedicalRecord", MedicalRecordSchema);
-

@@ -5,9 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  upload,
-} from "@imagekit/next";
+import { upload } from "@imagekit/next";
 import {
   Form,
   FormField,
@@ -27,44 +25,70 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
+import { ArrowLeft, User, PawPrint, Upload, CheckCircle2, AlertCircle } from "lucide-react";
+import Link from "next/link";
 
-const patientSchema = z.object({
+// ── Schema ────────────────────────────────────────────────────────────────────
+
+const formSchema = z.object({
+  // Owner fields
   owner_name: z.string().optional(),
+  phone: z.string().optional(),
+  email: z.string().email("Invalid email").optional().or(z.literal("")),
+  is_active: z.boolean().optional(),
+  // Pet fields
   pet_name: z.string().optional(),
   pet_category: z.string().optional(),
   pet_type: z.string().optional(),
-  // type: z.enum(["PUP", "ADULT"]).optional(),
   breed: z.string().optional(),
   color: z.string().optional(),
   sex: z.enum(["MALE", "FEMALE"]).optional(),
   dob: z.string().optional(),
-  phone: z.string().optional(),
-  is_active: z.boolean().optional(),
-  email: z.string().email("Invalid email").optional().or(z.literal("")),
   picture: z.string().optional(),
-  select_date: z.string().optional(),
-  visit_date: z.string().optional(),
-  next_visit_date: z.string().optional(),
 });
 
-type FormData = z.infer<typeof patientSchema>;
+type FormData = z.infer<typeof formSchema>;
 
-export default function Page() {
+// ── Modes ─────────────────────────────────────────────────────────────────────
+type PageMode =
+  | "new"          // new owner + first pet
+  | "edit-owner"   // edit owner info only
+  | "edit-pet"     // edit specific pet
+  | "add-pet";     // add new pet to existing owner
+
+// ── Page ──────────────────────────────────────────────────────────────────────
+
+export default function PatientAddEditPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const editId = searchParams.get("edit");
 
-  const [pets, setPets] = useState<any[]>([]);
+  const editId = searchParams.get("edit");      // owner _id
+  const petId = searchParams.get("pet_id");     // specific pet _id
+  const ownerId = searchParams.get("owner_id"); // pre-link to existing owner (add-pet)
+
+  // Determine mode
+  const mode: PageMode =
+    editId && petId ? "edit-pet" :
+    editId && !petId ? "edit-owner" :
+    ownerId ? "add-pet" :
+    "new";
+
+  const [pets, setPets] = useState<any[]>([]); // pet categories from /api/pets
   const [availableTypes, setAvailableTypes] = useState<string[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [existingOwner, setExistingOwner] = useState<{ owner_name: string; email: string } | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [existingOwner, setExistingOwner] = useState<{ owner_name: string; email: string; _id?: string } | null>(null);
+  const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
+  const showToast = (type: "success" | "error", message: string) => {
+    setToast({ type, message });
+    setTimeout(() => setToast(null), 4000);
+  };
 
   const form = useForm<FormData>({
-    resolver: zodResolver(patientSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: {
-      // type: "PUP",
       is_active: true,
       owner_name: "",
       pet_name: "",
@@ -76,502 +100,639 @@ export default function Page() {
       email: "",
       picture: "",
       dob: "",
-      select_date: "",
-      visit_date: "",
-      next_visit_date: "",
     },
   });
 
+  // ── Load pet categories ───────────────────────────────────────────────────
   useEffect(() => {
     fetch("/api/pets/get")
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) setPets(data.data);
-      });
+      .then((res) => res.json())
+      .then((data) => { if (data.success) setPets(data.data); });
   }, []);
 
+  // ── Load existing owner data when editing ─────────────────────────────────
   useEffect(() => {
-    if (editId && pets.length > 0) {
-      fetch(`/api/patients/get?id=${editId}`)
-        .then(res => res.json())
-        .then(data => {
-          // The API now returns a single patient object if id is provided
-          const patient = data;
-          if (patient && !patient.error) {
+    if (!editId || pets.length === 0) return;
+
+    fetch(`/api/patients/get?id=${editId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.error) return;
+
+        if (mode === "edit-owner") {
+          // Only pre-fill owner fields
+          form.reset({
+            owner_name: data.owner_name || "",
+            phone: data.phone || "",
+            email: data.email || "",
+            is_active: data.is_active ?? true,
+          });
+        } else if (mode === "edit-pet" && petId) {
+          // Find specific pet in pets array
+          const pet = data.pets?.find((p: any) => p._id === petId);
+          if (pet) {
             form.reset({
-              ...patient,
-              email: patient.email || "",
+              // keep owner fields too for display
+              owner_name: data.owner_name || "",
+              phone: data.phone || "",
+              email: data.email || "",
+              is_active: pet.is_active ?? true,
+              pet_name: pet.pet_name || "",
+              pet_category: pet.pet_category || "",
+              pet_type: pet.pet_type || "",
+              breed: pet.breed || "",
+              color: pet.color || "",
+              sex: pet.sex as any,
+              dob: pet.dob || "",
+              picture: pet.picture || "",
             });
-            if (patient.pet_category) {
-              const selectedPet = pets.find(p => p.name === patient.pet_category);
-              if (selectedPet) setAvailableTypes(selectedPet.types);
+            if (pet.pet_category) {
+              const selectedPetCategory = pets.find((p) => p.name === pet.pet_category);
+              if (selectedPetCategory) setAvailableTypes(selectedPetCategory.types);
             }
           }
-        });
-    }
-  }, [editId, pets, form]);
+        }
+      });
+  }, [editId, petId, pets, mode]);
 
-  const watchedPhone = form.watch("phone");
-
+  // ── Load owner data when adding pet to existing owner ────────────────────
   useEffect(() => {
-    if (watchedPhone && watchedPhone.trim().length >= 10 && !editId) {
-      const controller = new AbortController();
-      fetch(`/api/patients/get?phone=${watchedPhone.trim()}`, { signal: controller.signal })
-        .then(res => res.json())
-        .then(data => {
-          if (data.found && data.patient) {
-            setExistingOwner({
-              owner_name: data.patient.owner_name || "",
-              email: data.patient.email || ""
-            });
-            form.setValue("owner_name", data.patient.owner_name || "");
-            form.setValue("email", data.patient.email || "");
-          } else {
-            setExistingOwner(null);
-          }
-        })
-        .catch(err => {
-          if (err.name !== 'AbortError') {
-            console.error("Lookup error:", err);
-          }
-        });
-      return () => controller.abort();
-    } else {
+    if (!ownerId || pets.length === 0) return;
+    fetch(`/api/patients/get?id=${ownerId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data?.error) {
+          setExistingOwner({
+            _id: data._id,
+            owner_name: data.owner_name || "",
+            email: data.email || "",
+          });
+          form.setValue("owner_name", data.owner_name || "");
+          form.setValue("phone", data.phone || "");
+          form.setValue("email", data.email || "");
+        }
+      });
+  }, [ownerId, pets]);
+
+  // ── Phone lookup for new patients ─────────────────────────────────────────
+  const watchedPhone = form.watch("phone");
+  useEffect(() => {
+    if (mode !== "new") return;
+    if (!watchedPhone || watchedPhone.trim().length < 10) {
       setExistingOwner(null);
+      return;
     }
-  }, [watchedPhone, form, editId]);
+    const controller = new AbortController();
+    fetch(`/api/patients/get?phone=${watchedPhone.trim()}`, { signal: controller.signal })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.found && data.patient) {
+          setExistingOwner({
+            _id: data.patient._id,
+            owner_name: data.patient.owner_name || "",
+            email: data.patient.email || "",
+          });
+          form.setValue("owner_name", data.patient.owner_name || "");
+          form.setValue("email", data.patient.email || "");
+        } else {
+          setExistingOwner(null);
+        }
+      })
+      .catch((err) => { if (err.name !== "AbortError") console.error(err); });
+    return () => controller.abort();
+  }, [watchedPhone, mode]);
 
-
+  // ── Category change ───────────────────────────────────────────────────────
   const onCategoryChange = (val: string) => {
     form.setValue("pet_category", val);
     form.setValue("pet_type", "");
-    const selectedPet = pets.find(p => p.name === val);
-    if (selectedPet) {
-      setAvailableTypes(selectedPet.types);
-    } else {
-      setAvailableTypes([]);
-    }
+    const selected = pets.find((p) => p.name === val);
+    setAvailableTypes(selected ? selected.types : []);
   };
 
-  const authenticator = async () => {
-    const res = await fetch("/api/upload-auth");
-    if (!res.ok) throw new Error("Auth failed");
-    return res.json();
-  };
-
+  // ── Image upload ──────────────────────────────────────────────────────────
   const handleUploadPicture = async () => {
-    if (!selectedFile) {
-      alert("Please select a file first");
-      return;
-    }
-
+    if (!selectedFile) return;
     setIsUploading(true);
     try {
-      const auth = await authenticator();
+      const authRes = await fetch("/api/upload-auth");
+      if (!authRes.ok) throw new Error("Auth failed");
+      const auth = await authRes.json();
       const ext = selectedFile.type.split("/")[1] || "jpg";
-
       const uploadRes = await upload({
         ...auth,
         file: selectedFile,
-        fileName: `patient_${Date.now()}.${ext}`,
+        fileName: `pet_${Date.now()}.${ext}`,
       });
-
-      if (!uploadRes.url) {
-        throw new Error("Image upload failed");
-      }
-
+      if (!uploadRes.url) throw new Error("Upload failed");
       form.setValue("picture", uploadRes.url);
-      alert("Picture uploaded successfully!");
+      showToast("success", "Picture uploaded successfully!");
     } catch (err) {
       console.error(err);
-      alert("Failed to upload picture");
+      showToast("error", "Failed to upload picture");
     } finally {
       setIsUploading(false);
     }
   };
 
+  // ── Submit ────────────────────────────────────────────────────────────────
   async function onSubmit(data: FormData) {
+    setIsSubmitting(true);
     try {
+      let body: Record<string, any> = {};
+
+      if (mode === "edit-owner") {
+        body = {
+          _id: editId,
+          owner_name: data.owner_name,
+          phone: data.phone,
+          email: data.email,
+          is_active: data.is_active,
+        };
+      } else if (mode === "edit-pet") {
+        body = {
+          _id: editId,
+          pet_id: petId,
+          pet_name: data.pet_name,
+          pet_category: data.pet_category,
+          pet_type: data.pet_type,
+          breed: data.breed,
+          color: data.color,
+          sex: data.sex,
+          dob: data.dob,
+          picture: data.picture,
+          is_active: data.is_active,
+        };
+      } else if (mode === "add-pet") {
+        body = {
+          _id: ownerId,
+          pet_name: data.pet_name,
+          pet_category: data.pet_category,
+          pet_type: data.pet_type,
+          breed: data.breed,
+          color: data.color,
+          sex: data.sex,
+          dob: data.dob,
+          picture: data.picture,
+        };
+      } else {
+        // new — if existing owner found, add pet to them
+        if (existingOwner?._id) {
+          body = {
+            _id: existingOwner._id,
+            pet_name: data.pet_name,
+            pet_category: data.pet_category,
+            pet_type: data.pet_type,
+            breed: data.breed,
+            color: data.color,
+            sex: data.sex,
+            dob: data.dob,
+            picture: data.picture,
+          };
+        } else {
+          body = { ...data };
+        }
+      }
+
       const res = await fetch("/api/patients/add", {
         method: "POST",
-        body: JSON.stringify({ ...data, _id: editId }),
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
       });
-
       const result = await res.json();
 
       if (res.ok) {
-        alert(editId ? "Patient updated successfully!" : "Patient saved successfully!");
-        if (!editId) form.reset();
-        router.push("/dashboard/patient/list");
+        const msg =
+          mode === "edit-owner" ? "Owner updated successfully!" :
+          mode === "edit-pet" ? "Pet updated successfully!" :
+          mode === "add-pet" ? "Pet added successfully!" :
+          "Patient saved successfully!";
+        showToast("success", msg);
+        setTimeout(() => router.push("/dashboard/patient/list"), 1200);
       } else {
-        alert(result.error || "Failed to save patient.");
+        showToast("error", result.error || "Failed to save.");
       }
     } catch (err) {
       console.error("Submit error:", err);
-      alert("Failed to save patient. Please check your connection.");
+      showToast("error", "Failed to save. Please check your connection.");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
-  return (
-    <div className="p-4 max-w-5xl min-h-screen mx-auto">
-      <div className="bg-white p-6 rounded-sm border">
-        <h1 className="text-sm font-semibold mb-6 bg-[#c7915b] text-white py-2 px-3 uppercase">
-          {editId ? "Edit Patient" : "Patient Entry"}
-        </h1>
+  // ── Title & subtitle ──────────────────────────────────────────────────────
+  const pageTitle =
+    mode === "edit-owner" ? "Edit Owner Details" :
+    mode === "edit-pet" ? "Edit Pet Details" :
+    mode === "add-pet" ? "Add New Pet" :
+    "New Patient";
 
+  const pageSubtitle =
+    mode === "edit-owner" ? "Update owner contact information" :
+    mode === "edit-pet" ? "Update this pet's information" :
+    mode === "add-pet" ? "Add another pet to existing owner" :
+    "Register a new owner with their first pet";
+
+  const showOwnerSection = mode === "new" || mode === "edit-owner";
+  const showPetSection = mode === "new" || mode === "edit-pet" || mode === "add-pet";
+
+  // ── Render ────────────────────────────────────────────────────────────────
+  return (
+    <div className="p-4 max-w-4xl mx-auto min-h-screen">
+
+      {/* Toast */}
+      {toast && (
+        <div
+          className={cn(
+            "fixed top-4 right-4 z-50 flex items-center gap-3 px-5 py-3.5 rounded-xl shadow-xl border text-sm font-medium animate-in slide-in-from-top-2 duration-300",
+            toast.type === "success"
+              ? "bg-green-50 border-green-200 text-green-800"
+              : "bg-red-50 border-red-200 text-red-800"
+          )}
+        >
+          {toast.type === "success" ? (
+            <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
+          ) : (
+            <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
+          )}
+          {toast.message}
+        </div>
+      )}
+
+      {/* Back button */}
+      <div className="flex items-center gap-3 mb-6">
+        <Link href="/dashboard/patient/list">
+          <Button variant="ghost" size="sm" className="gap-1.5 text-gray-600 hover:text-gray-900">
+            <ArrowLeft className="h-4 w-4" />
+            Back to List
+          </Button>
+        </Link>
+        <div>
+          <h1 className="text-xl font-bold text-gray-800">{pageTitle}</h1>
+          <p className="text-xs text-gray-500">{pageSubtitle}</p>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm">
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col gap-6 text-sm"
-          >
-            {existingOwner && (
-              <div className="md:col-span-2 p-4 bg-green-50 text-green-800 border border-green-200 rounded-lg flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-300">
-                <div>
-                  <p className="font-bold text-sm flex items-center gap-1.5">
-                    <span>✨</span> Existing Owner Details Found!
-                  </p>
-                  <p className="text-xs text-green-700 mt-0.5">
-                    This phone number is registered to <strong>{existingOwner.owner_name}</strong>. We've linked the owner details so you can directly add their new pet!
-                  </p>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-0 text-sm">
+
+            {/* ── Owner Section ────────────────────────────────────────────── */}
+            {showOwnerSection && (
+              <div className="p-6 border-b border-gray-100">
+                <h2 className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-5 uppercase tracking-wider">
+                  <div className="p-1.5 bg-blue-100 rounded-md">
+                    <User className="h-3.5 w-3.5 text-blue-600" />
+                  </div>
+                  Owner Information
+                </h2>
+
+                {/* Existing owner banner */}
+                {existingOwner && mode === "new" && (
+                  <div className="mb-5 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div>
+                      <p className="font-bold text-sm text-green-800 flex items-center gap-1.5">
+                        <span>✨</span> Existing Owner Found!
+                      </p>
+                      <p className="text-xs text-green-700 mt-0.5">
+                        Phone is registered to <strong>{existingOwner.owner_name}</strong>.
+                        We'll add this pet to their account.
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 text-xs text-green-800 hover:bg-green-100 font-bold rounded-full"
+                      onClick={() => {
+                        form.setValue("phone", "");
+                        setExistingOwner(null);
+                      }}
+                    >
+                      Clear
+                    </Button>
+                  </div>
+                )}
+
+                {/* Add-pet mode — show owner name as read-only */}
+                {(mode as string) === "add-pet" && existingOwner && (
+                  <div className="mb-5 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-xs font-bold text-blue-800 uppercase tracking-wider mb-1">
+                      Adding pet for owner
+                    </p>
+                    <p className="font-semibold text-blue-900">{existingOwner.owner_name}</p>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <FormField
+                    control={form.control}
+                    name="owner_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Owner Name *</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter owner name"
+                            {...field}
+                            disabled={!!(existingOwner && mode === "new")}
+                            className={cn(existingOwner && mode === "new" && "bg-gray-50 text-gray-500")}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone Number *</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Enter phone number"
+                            {...field}
+                            disabled={mode === "edit-owner" ? false : !!(existingOwner && mode === "new")}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email Address</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="Enter email address"
+                            {...field}
+                            disabled={!!(existingOwner && mode === "new")}
+                            className={cn(existingOwner && mode === "new" && "bg-gray-50 text-gray-500")}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="is_active"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center gap-3 space-y-0 mt-6">
+                        <FormControl>
+                          <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                        </FormControl>
+                        <FormLabel className="font-normal">Active</FormLabel>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 text-xs text-green-800 hover:text-green-955 hover:bg-green-100/50 font-black rounded-full"
-                  onClick={() => {
-                    form.setValue("phone", "");
-                    setExistingOwner(null);
-                  }}
-                >
-                  Clear Phone
-                </Button>
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-              {/* Owner Name */}
-              <FormField
-                control={form.control}
-                name="owner_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Owner Name *</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter owner name"
-                        {...field}
-                        disabled={!!existingOwner}
-                        className={cn(existingOwner && "bg-gray-50 border-gray-200 text-gray-500 cursor-not-allowed")}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-
-              {/* Pet Name */}
-              <FormField
-                control={form.control}
-                name="pet_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Pet Name *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter pet name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Pet Category (Added) */}
-              <FormField
-                control={form.control}
-                name="pet_category"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Pet Category</FormLabel>
-                    <Select onValueChange={onCategoryChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Category" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {pets.map((p) => (
-                          <SelectItem key={p._id} value={p.name}>
-                            {p.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Pet Type (Added) */}
-              <FormField
-                control={form.control}
-                name="pet_type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Pet Type / Breed</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger disabled={!form.watch("pet_category")}>
-                          <SelectValue placeholder="Select Type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {availableTypes.map((t) => (
-                          <SelectItem key={t} value={t}>
-                            {t}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Pet Type (PUP/ADULT) */}
-              {/* <FormField
-                control={form.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Age Group</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="PUP">Pup</SelectItem>
-                        <SelectItem value="ADULT">Adult</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              /> */}
-
-              {/* Breed (Keeping it but naming it specific breed if needed) */}
-              <FormField
-                control={form.control}
-                name="breed"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Other Breed Details (Optional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter breed" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Color */}
-              <FormField
-                control={form.control}
-                name="color"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Color</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter color" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Gender */}
-              <FormField
-                control={form.control}
-                name="sex"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Gender</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select gender" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="MALE">Male</SelectItem>
-                        <SelectItem value="FEMALE">Female</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Date of Birth */}
-              <FormField
-                control={form.control}
-                name="dob"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Date Of Birth</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Select Date */}
-              <FormField
-                control={form.control}
-                name="select_date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Select Date</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Visit Date */}
-              <FormField
-                control={form.control}
-                name="visit_date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Visit Date</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Next Visit Date */}
-              <FormField
-                control={form.control}
-                name="next_visit_date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Next Visit Date</FormLabel>
-                    <FormControl>
-                      <Input type="date" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Phone */}
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter phone number" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Email */}
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email Id</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="Enter email address"
-                        {...field}
-                        disabled={!!existingOwner}
-                        className={cn(existingOwner && "bg-gray-50 border-gray-200 text-gray-500 cursor-not-allowed")}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-
-              {/* Picture Upload */}
-              <div className="space-y-2">
-                <FormLabel className="text-sm font-medium">Upload Picture</FormLabel>
-                <div className="flex items-center gap-4">
-                  {form.watch("picture") && (
-                    <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-primary/20">
-                      <img
-                        src={form.watch("picture")}
-                        alt="Patient preview"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
+            {/* ── Pet Section ──────────────────────────────────────────────── */}
+            {showPetSection && (
+              <div className="p-6">
+                <h2 className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-5 uppercase tracking-wider">
+                  <div className="p-1.5 bg-green-100 rounded-md">
+                    <PawPrint className="h-3.5 w-3.5 text-green-600" />
+                  </div>
+                  Pet Details
+                  {mode === "add-pet" && (
+                    <span className="text-xs font-normal text-gray-500 ml-2 normal-case tracking-normal">
+                      — New pet for existing owner
+                    </span>
                   )}
-                  <div className="flex flex-col gap-2 flex-1">
-                    <div className="flex items-center gap-2">
-                      <Input
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) setSelectedFile(file);
-                        }}
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={handleUploadPicture}
-                        disabled={!selectedFile || isUploading}
-                      >
-                        {isUploading ? "Uploading..." : "Upload"}
-                      </Button>
+                </h2>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                  {/* Pet Name */}
+                  <FormField
+                    control={form.control}
+                    name="pet_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Pet Name *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter pet name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Pet Category */}
+                  <FormField
+                    control={form.control}
+                    name="pet_category"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Pet Category</FormLabel>
+                        <Select onValueChange={onCategoryChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Category" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {pets.map((p) => (
+                              <SelectItem key={p._id} value={p.name}>{p.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Pet Type */}
+                  <FormField
+                    control={form.control}
+                    name="pet_type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Pet Type / Breed</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger disabled={!form.watch("pet_category")}>
+                              <SelectValue placeholder="Select Type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {availableTypes.map((t) => (
+                              <SelectItem key={t} value={t}>{t}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Breed */}
+                  <FormField
+                    control={form.control}
+                    name="breed"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Other Breed Details (Optional)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter breed" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Color */}
+                  <FormField
+                    control={form.control}
+                    name="color"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Color</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter color" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Gender */}
+                  <FormField
+                    control={form.control}
+                    name="sex"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Gender</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select gender" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="MALE">Male</SelectItem>
+                            <SelectItem value="FEMALE">Female</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* DOB */}
+                  <FormField
+                    control={form.control}
+                    name="dob"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Date Of Birth</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Pet Active (only for edit-pet) */}
+                  {mode === "edit-pet" && (
+                    <FormField
+                      control={form.control}
+                      name="is_active"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center gap-3 space-y-0 mt-6">
+                          <FormControl>
+                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                          <FormLabel className="font-normal">Pet Active</FormLabel>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+
+                  {/* Picture Upload */}
+                  <div className="space-y-2 md:col-span-2">
+                    <FormLabel className="text-sm font-medium">Upload Pet Picture</FormLabel>
+                    <div className="flex items-center gap-4">
+                      {form.watch("picture") && (
+                        <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-primary/20 flex-shrink-0">
+                          <img
+                            src={form.watch("picture")}
+                            alt="Pet preview"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2 flex-1">
+                        <Input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          className="flex-1"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) setSelectedFile(file);
+                          }}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={handleUploadPicture}
+                          disabled={!selectedFile || isUploading}
+                          className="gap-1.5 flex-shrink-0"
+                        >
+                          <Upload className="h-4 w-4" />
+                          {isUploading ? "Uploading..." : "Upload"}
+                        </Button>
+                      </div>
                     </div>
                     {form.watch("picture") && (
-                      <p className="text-xs text-green-600 font-medium">Picture uploaded successfully!</p>
+                      <p className="text-xs text-green-600 font-medium">✓ Picture uploaded</p>
                     )}
                   </div>
                 </div>
               </div>
+            )}
 
-              {/* Is Active */}
-              <FormField
-                control={form.control}
-                name="is_active"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center gap-3 space-y-0 mt-8">
-                    <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                    </FormControl>
-                    <FormLabel className="font-normal">Active (Y/N)</FormLabel>
-                    <FormMessage />
-                  </FormItem>
+            {/* ── Submit ───────────────────────────────────────────────────── */}
+            <div className="flex justify-end gap-3 px-6 py-4 bg-gray-50/50 border-t border-gray-100">
+              <Link href="/dashboard/patient/list">
+                <Button type="button" variant="outline" className="border-gray-200">
+                  Cancel
+                </Button>
+              </Link>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="shadow-none text-black hover:bg-[#4fe09a] bg-[#72e3ad] border border-[#16b674bf] min-w-[120px]"
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                    Saving...
+                  </span>
+                ) : (
+                  mode === "edit-owner" ? "Update Owner" :
+                  mode === "edit-pet" ? "Update Pet" :
+                  mode === "add-pet" ? "Add Pet" :
+                  "Save Patient"
                 )}
-              />
-            </div>
-
-            <div className="flex justify-end mt-4">
-              <Button type="submit" className="shadow-none text-black text-xs hover:bg-[#4fe09a] bg-[#72e3ad] border border-[#16b674bf] cursor-pointer">
-                Submit
               </Button>
             </div>
+
           </form>
         </Form>
       </div>
