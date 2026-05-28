@@ -240,7 +240,7 @@ export default function PatientList() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="p-6 max-w-[1600px] mx-auto">
+    <div className="p-6 w-full mx-auto">
       <Card className="shadow-none border-none bg-transparent">
 
         {/* ── Header ────────────────────────────────────────────────────────── */}
@@ -305,7 +305,7 @@ export default function PatientList() {
                 {/* Chevron spacer */}
                 <div style={{ width: 36, flexShrink: 0 }} />
                 {/* Owner */}
-                <div style={{ width: 210, padding: "9px 10px", flexShrink: 0 }}>Owner / Pet</div>
+                <div style={{ flex: 1, minWidth: 200, padding: "9px 10px" }}>Owner / Pet</div>
                 {/* Category */}
                 <div style={{ width: 110, padding: "9px 10px", flexShrink: 0 }}>Category</div>
                 {/* Status */}
@@ -361,7 +361,7 @@ export default function PatientList() {
                         </div>
 
                         {/* Owner info */}
-                        <div style={{ width: 210, padding: "12px 10px", flexShrink: 0 }}>
+                        <div style={{ flex: 1, minWidth: 200, padding: "12px 10px" }}>
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center flex-shrink-0 border border-primary/10">
                               <User className="h-3.5 w-3.5 text-primary" />
@@ -457,7 +457,7 @@ export default function PatientList() {
                               </div>
 
                               {/* Pet name */}
-                              <div style={{ width: 210, padding: "8px 10px", flexShrink: 0 }}>
+                              <div style={{ flex: 1, minWidth: 200, padding: "8px 10px" }}>
                                 <div className="flex items-center gap-1.5">
                                   <PetAvatar pet={pet} />
                                   <div>

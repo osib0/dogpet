@@ -521,7 +521,7 @@ export default function PatientProfile() {
                         )}
                       </div>
                     </div>
-                    {!legacy && (
+                    {!activePet.isLegacy && (
                       <Link href={`/dashboard/patient/add?edit=${owner._id}&pet_id=${activePet._id}`}>
                         <Button size="sm" className="bg-white/20 backdrop-blur-sm text-white border border-white/30 hover:bg-white/30 text-xs">
                           Edit Pet
@@ -794,13 +794,11 @@ export default function PatientProfile() {
             <div className="bg-white rounded-2xl border border-gray-100 p-12 text-center">
               <PawPrint className="w-12 h-12 text-gray-200 mx-auto mb-3" />
               <p className="text-gray-400 font-medium">No pets registered for this owner.</p>
-              {!legacy && (
-                <Link href={`/dashboard/patient/add?owner_id=${owner._id}`}>
-                  <Button className="mt-4 bg-[#72e3ad] hover:bg-[#4fe09a] text-black font-bold border border-[#16b674bf]">
-                    <Plus className="w-4 h-4 mr-2" /> Add First Pet
-                  </Button>
-                </Link>
-              )}
+              <Link href={`/dashboard/patient/add?owner_id=${owner._id}`}>
+                <Button className="mt-4 bg-[#72e3ad] hover:bg-[#4fe09a] text-black font-bold border border-[#16b674bf]">
+                  <Plus className="w-4 h-4 mr-2" /> Add First Pet
+                </Button>
+              </Link>
             </div>
           )}
         </div>
