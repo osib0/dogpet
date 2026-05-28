@@ -2,14 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,7 +17,6 @@ import {
 import { PatientHistory } from "./_components/patient-history";
 import {
   History,
-  ChevronDown,
   ChevronRight,
   Plus,
   PawPrint,
@@ -58,10 +50,15 @@ interface Owner {
   email: string;
   is_active: boolean;
   pets: EmbeddedPet[];
-  // legacy flat fields (old records)
+  // legacy flat fields
   pet_name?: string;
   pet_category?: string;
   pet_type?: string;
+  breed?: string;
+  color?: string;
+  sex?: string;
+  dob?: string;
+  picture?: string;
   createdAt: string;
 }
 
@@ -71,11 +68,11 @@ function isLegacyRecord(owner: Owner): boolean {
   return (!owner.pets || owner.pets.length === 0) && !!owner.pet_name;
 }
 
-function getLegacyPetAsList(owner: Owner): EmbeddedPet[] {
-  if (!isLegacyRecord(owner)) return [];
+function getLegacyPetAsList(owner: Owner): (EmbeddedPet & { isLegacy?: boolean })[] {
+  if (!owner.pet_name) return [];
   return [
     {
-      _id: owner._id, // use owner id as fake pet id for legacy
+      _id: owner._id,
       pet_name: owner.pet_name || "",
       pet_category: owner.pet_category || "",
       pet_type: owner.pet_type || "",
@@ -85,20 +82,27 @@ function getLegacyPetAsList(owner: Owner): EmbeddedPet[] {
       dob: (owner as any).dob || "",
       picture: (owner as any).picture || "",
       is_active: owner.is_active,
+      isLegacy: true,
     },
   ];
 }
 
-function getEffectivePets(owner: Owner): EmbeddedPet[] {
-  if (owner.pets && owner.pets.length > 0) return owner.pets;
-  return getLegacyPetAsList(owner);
+function getEffectivePets(owner: Owner): (EmbeddedPet & { isLegacy?: boolean })[] {
+  const allPets = [];
+  if (owner.pet_name) {
+    allPets.push(...getLegacyPetAsList(owner));
+  }
+  if (owner.pets && owner.pets.length > 0) {
+    allPets.push(...owner.pets);
+  }
+  return allPets;
 }
 
-// ── Sub-components ────────────────────────────────────────────────────────────
+// ── Pet Avatar ────────────────────────────────────────────────────────────────
 
 function PetAvatar({ pet }: { pet: EmbeddedPet }) {
   return (
-    <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200">
+    <div className="w-7 h-7 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200">
       {pet.picture ? (
         <img src={pet.picture} alt={pet.pet_name} className="w-full h-full object-cover" />
       ) : (
@@ -110,151 +114,26 @@ function PetAvatar({ pet }: { pet: EmbeddedPet }) {
   );
 }
 
-// ── Expanded Pet Rows ─────────────────────────────────────────────────────────
+// ── Column styles (animated show/hide) ───────────────────────────────────────
 
-function ExpandedPetRows({
-  owner,
-  onOpenHistory,
-  onDeletePet,
-}: {
-  owner: Owner;
-  onOpenHistory: (owner: Owner, pet: EmbeddedPet) => void;
-  onDeletePet: (ownerId: string, petId: string, petName: string) => void;
-}) {
-  const pets = getEffectivePets(owner);
-  const legacy = isLegacyRecord(owner);
-
-  if (pets.length === 0) {
-    return (
-      <TableRow className="bg-gray-50/60">
-        <TableCell colSpan={6} className="text-center py-4 text-xs text-gray-400 italic">
-          No pets registered yet.{" "}
-          <Link href={`/dashboard/patient/add?owner_id=${owner._id}`} className="text-primary underline font-semibold">
-            Add a pet
-          </Link>
-        </TableCell>
-      </TableRow>
-    );
-  }
-
-  return (
-    <>
-      {pets.map((pet, idx) => (
-        <TableRow
-          key={pet._id}
-          className="bg-green-50/30 hover:bg-green-50/60 transition-colors border-b border-gray-100"
-        >
-          {/* indent */}
-          <TableCell className="pl-10 py-3">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full border-2 border-gray-300 flex-shrink-0" />
-              <div className="flex items-center gap-2">
-                <PetAvatar pet={pet} />
-                <div className="flex flex-col">
-                  <span className="font-semibold text-sm text-primary">{pet.pet_name || "—"}</span>
-                  {legacy && (
-                    <span className="text-[9px] text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded font-bold uppercase tracking-wide w-fit">
-                      legacy
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </TableCell>
-          <TableCell>
-            <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-600 rounded">
-              {pet.pet_category || "—"}
-            </span>
-          </TableCell>
-          <TableCell>
-            <div className="flex flex-col">
-              <span className="text-xs text-gray-700">{pet.pet_type || "—"}</span>
-              {pet.breed && <span className="text-[10px] text-gray-400 italic">{pet.breed}</span>}
-            </div>
-          </TableCell>
-          <TableCell>
-            <span className={`text-xs font-semibold ${pet.sex === "MALE" ? "text-blue-600" : "text-pink-600"}`}>
-              {pet.sex || "—"}
-            </span>
-          </TableCell>
-          <TableCell className="text-xs text-gray-500">{pet.dob || "—"}</TableCell>
-          <TableCell className="text-right">
-            <div className="flex justify-end gap-1">
-              {/* History */}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 p-0 text-gray-400 hover:text-primary hover:bg-primary/5"
-                title="View History"
-                onClick={() => onOpenHistory(owner, pet)}
-              >
-                <History className="h-3.5 w-3.5" />
-              </Button>
-              {/* Edit pet */}
-              {!legacy && (
-                <Link href={`/dashboard/patient/add?edit=${owner._id}&pet_id=${pet._id}`}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 w-7 p-0 text-gray-400 hover:text-blue-600 hover:bg-blue-50"
-                    title="Edit Pet"
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                  </Button>
-                </Link>
-              )}
-              {legacy && (
-                <Link href={`/dashboard/patient/add?edit=${owner._id}`}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 w-7 p-0 text-gray-400 hover:text-blue-600 hover:bg-blue-50"
-                    title="Edit (Legacy)"
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                  </Button>
-                </Link>
-              )}
-              {/* Delete pet — only for new-format pets */}
-              {!legacy && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 w-7 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50"
-                  title="Delete Pet"
-                  onClick={() => onDeletePet(owner._id, pet._id, pet.pet_name)}
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
-              )}
-            </div>
-          </TableCell>
-        </TableRow>
-      ))}
-      {/* Add pet row — only for new format owners */}
-      {!legacy && (
-        <TableRow className="bg-gray-50/30 border-b border-gray-100">
-          <TableCell colSpan={6} className="py-2 pl-10">
-            <Link href={`/dashboard/patient/add?owner_id=${owner._id}`}>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 text-xs text-green-700 hover:text-green-800 hover:bg-green-50 gap-1.5 font-semibold"
-              >
-                <Plus className="h-3.5 w-3.5" />
-                Add Another Pet
-              </Button>
-            </Link>
-          </TableCell>
-        </TableRow>
-      )}
-    </>
-  );
+function getAnimatedColStyle(visible: boolean, width = "100px") {
+  return {
+    width: visible ? width : "0",
+    overflow: "hidden" as const,
+    whiteSpace: "nowrap" as const,
+    padding: visible ? "0 10px" : "0",
+    opacity: visible ? 1 : 0,
+    transition: "width 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease, padding 0.3s ease",
+    borderRight: "none",
+    flexShrink: 0,
+  };
 }
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function PatientList() {
+  const router = useRouter();
+
   const [owners, setOwners] = useState<Owner[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -265,13 +144,15 @@ export default function PatientList() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
 
-  // expanded rows — set of owner _ids
+  // which owner rows are expanded
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   // history dialog
   const [historyOwner, setHistoryOwner] = useState<Owner | null>(null);
   const [historyPet, setHistoryPet] = useState<EmbeddedPet | null>(null);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+
+  const hasAnyExpanded = expandedRows.size > 0;
 
   // ── Debounce ──────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -287,14 +168,14 @@ export default function PatientList() {
   }, [page, limit, debouncedSearch]);
 
   // ── Fetch ─────────────────────────────────────────────────────────────────
-  const fetchOwners = useCallback(async (currentPage = 1, currentLimit = 10, search = "") => {
+  const fetchOwners = useCallback(async (p = 1, l = 10, s = "") => {
     setIsLoading(true);
     setError(null);
     try {
       const res = await fetch(
-        `/api/patients/get?page=${currentPage}&limit=${currentLimit}&search=${encodeURIComponent(search)}`
+        `/api/patients/get?page=${p}&limit=${l}&search=${encodeURIComponent(s)}`
       );
-      if (!res.ok) throw new Error(`API returned ${res.status}`);
+      if (!res.ok) throw new Error(`API ${res.status}`);
       const data = await res.json();
       if (data?.error) throw new Error(data.error);
       setOwners(data.patients ?? []);
@@ -302,8 +183,7 @@ export default function PatientList() {
       setTotalPages(data.pagination.totalPages);
       setTotal(data.pagination.total);
     } catch (err) {
-      console.error("Failed to fetch patients:", err);
-      setError("Failed to load patient list. Please refresh.");
+      setError("Failed to load. Please refresh.");
       setOwners([]);
     } finally {
       setIsLoading(false);
@@ -313,59 +193,62 @@ export default function PatientList() {
   const handleRefresh = () => fetchOwners(page, limit, debouncedSearch);
 
   // ── Toggle expand ─────────────────────────────────────────────────────────
-  const toggleExpand = (ownerId: string) => {
+  const toggleExpand = (ownerId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
     setExpandedRows((prev) => {
       const next = new Set(prev);
-      if (next.has(ownerId)) next.delete(ownerId);
-      else next.add(ownerId);
+      next.has(ownerId) ? next.delete(ownerId) : next.add(ownerId);
       return next;
     });
   };
 
-  // ── Delete owner ──────────────────────────────────────────────────────────
-  const handleDeleteOwner = async (id: string, name: string) => {
-    if (!confirm(`Delete owner "${name}" and ALL their pets + history? This cannot be undone.`)) return;
-    try {
-      const res = await fetch(`/api/patients/delete?id=${id}`, { method: "DELETE" });
-      if (res.ok) fetchOwners(page, limit, debouncedSearch);
-      else alert("Failed to delete owner.");
-    } catch {
-      alert("Error deleting owner.");
-    }
+  // ── Navigate ──────────────────────────────────────────────────────────────
+  const goToProfile = (ownerId: string, petId?: string) => {
+    const url = petId
+      ? `/dashboard/patient/profile/${ownerId}?pet_id=${petId}`
+      : `/dashboard/patient/profile/${ownerId}`;
+    router.push(url);
   };
 
-  // ── Delete specific pet ───────────────────────────────────────────────────
-  const handleDeletePet = async (ownerId: string, petId: string, petName: string) => {
-    if (!confirm(`Delete pet "${petName}"? Their medical history will also be deleted.`)) return;
-    try {
-      const res = await fetch(`/api/patients/delete?id=${ownerId}&pet_id=${petId}`, {
-        method: "DELETE",
-      });
-      if (res.ok) fetchOwners(page, limit, debouncedSearch);
-      else alert("Failed to delete pet.");
-    } catch {
-      alert("Error deleting pet.");
-    }
+  // ── Delete ────────────────────────────────────────────────────────────────
+  const handleDeleteOwner = async (e: React.MouseEvent, id: string, name: string) => {
+    e.stopPropagation();
+    if (!confirm(`Delete owner "${name}" and ALL their pets + history?`)) return;
+    const res = await fetch(`/api/patients/delete?id=${id}`, { method: "DELETE" });
+    if (res.ok) fetchOwners(page, limit, debouncedSearch);
+    else alert("Failed to delete.");
   };
 
-  // ── History ───────────────────────────────────────────────────────────────
-  const handleOpenHistory = (owner: Owner, pet: EmbeddedPet) => {
+  const handleDeletePet = async (e: React.MouseEvent, ownerId: string, petId: string, petName: string) => {
+    e.stopPropagation();
+    if (!confirm(`Delete pet "${petName}" and their medical history?`)) return;
+    const res = await fetch(`/api/patients/delete?id=${ownerId}&pet_id=${petId}`, { method: "DELETE" });
+    if (res.ok) fetchOwners(page, limit, debouncedSearch);
+    else alert("Failed to delete.");
+  };
+
+  const handleOpenHistory = (e: React.MouseEvent, owner: Owner, pet: EmbeddedPet) => {
+    e.stopPropagation();
     setHistoryOwner(owner);
     setHistoryPet(pet);
     setIsHistoryOpen(true);
   };
 
+  // ── Animated col styles ───────────────────────────────────────────────────
+  const genderStyle = getAnimatedColStyle(hasAnyExpanded, "90px");
+  const dobStyle = getAnimatedColStyle(hasAnyExpanded, "110px");
+
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div className="p-6 max-w-[1600px] mx-auto">
       <Card className="shadow-none border-none bg-transparent">
-        {/* ── Header ──────────────────────────────────────────────────────── */}
+
+        {/* ── Header ────────────────────────────────────────────────────────── */}
         <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 px-0">
           <div>
             <CardTitle className="text-2xl font-bold text-gray-800">Patients Registry</CardTitle>
             <p className="text-sm text-gray-500 mt-1">
-              Total Owners:{" "}
-              <span className="font-bold text-primary">{total}</span>
+              Total Owners: <span className="font-bold text-primary">{total}</span>
             </p>
           </div>
 
@@ -374,216 +257,294 @@ export default function PatientList() {
               placeholder="Search owner, pet, phone..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-3 max-w-80 w-64 text-sm shadow-sm border-gray-200 bg-white border shadow-none"
+              className="pl-3 w-64 text-sm bg-white border border-gray-200 shadow-none"
             />
 
             <div className="flex items-center gap-2 border px-2 rounded-md bg-white">
               <span className="text-xs font-medium text-gray-500">Rows</span>
-              <Select
-                value={limit.toString()}
-                onValueChange={(val) => {
-                  setLimit(parseInt(val));
-                  setPage(1);
-                }}
-              >
+              <Select value={limit.toString()} onValueChange={(v) => { setLimit(parseInt(v)); setPage(1); }}>
                 <SelectTrigger className="border-none shadow-none focus:ring-0 p-0 text-sm font-semibold">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {[10, 20, 30, 50, 100].map((val) => (
-                    <SelectItem key={val} value={val.toString()}>
-                      {val}
-                    </SelectItem>
+                  {[10, 20, 30, 50, 100].map((v) => (
+                    <SelectItem key={v} value={v.toString()}>{v}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
 
             <Link href="/dashboard/patient/add">
-              <Button className="shadow-none text-black text-xs hover:bg-[#4fe09a] bg-[#72e3ad] border border-[#16b674bf] cursor-pointer gap-1.5">
-                <Plus className="h-4 w-4" />
-                New Patient
+              <Button className="shadow-none text-black text-xs hover:bg-[#4fe09a] bg-[#72e3ad] border border-[#16b674bf] gap-1.5">
+                <Plus className="h-4 w-4" /> New Patient
               </Button>
             </Link>
 
-            <Button
-              variant="outline"
-              className="h-9 text-sm border-gray-200 hover:bg-gray-50"
-              onClick={handleRefresh}
-            >
+            <Button variant="outline" className="h-9 border-gray-200 hover:bg-gray-50" onClick={handleRefresh}>
               <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
             </Button>
           </div>
         </CardHeader>
 
-        {/* ── Table ───────────────────────────────────────────────────────── */}
+        {/* ── Table ─────────────────────────────────────────────────────────── */}
         <CardContent className="px-0">
           {error && (
-            <div className="mb-4 p-3 bg-red-50 text-red-700 border border-red-200 rounded-lg text-sm">
-              {error}
-            </div>
+            <div className="mb-4 p-3 bg-red-50 text-red-700 border border-red-200 rounded-lg text-sm">{error}</div>
           )}
 
-          <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+          <div
+            className="bg-white rounded-xl border border-gray-100 overflow-hidden"
+            style={{ transition: "all 0.35s cubic-bezier(0.4,0,0.2,1)" }}
+          >
+            {/* ── Custom table using divs for smooth column transitions ────── */}
             <div className="overflow-x-auto">
-              <Table>
-                <TableHeader className="bg-gray-50/50">
-                  <TableRow className="hover:bg-transparent border-b border-gray-100">
-                    <TableHead className="font-semibold text-gray-600 w-[240px]">
-                      Owner / Pet
-                    </TableHead>
-                    <TableHead className="font-semibold text-gray-600">Category</TableHead>
-                    <TableHead className="font-semibold text-gray-600">Type / Breed</TableHead>
-                    <TableHead className="font-semibold text-gray-600">Gender</TableHead>
-                    <TableHead className="font-semibold text-gray-600">DOB</TableHead>
-                    <TableHead className="font-semibold text-gray-600 text-right">
-                      Actions
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
 
-                <TableBody>
-                  {isLoading ? (
-                    <TableRow>
-                      <TableCell colSpan={6} className="h-64 text-center">
-                        <div className="flex flex-col items-center justify-center gap-2">
-                          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-                          <span className="text-sm text-gray-500 font-medium">
-                            Loading patients...
-                          </span>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ) : owners.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={6} className="h-64 text-center py-8 text-gray-500">
-                        <div className="flex flex-col items-center justify-center gap-2">
-                          <PawPrint className="h-12 w-12 text-gray-200" />
-                          <span className="text-base font-medium text-gray-400">
-                            No patients found
-                          </span>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    owners.map((owner) => {
-                      const isExpanded = expandedRows.has(owner._id);
-                      const pets = getEffectivePets(owner);
-                      const petCount = pets.length;
+              {/* Header */}
+              <div className="flex items-center bg-gray-50/70 border-b border-gray-100 text-[10px] font-bold text-gray-400 uppercase tracking-wider select-none"
+                style={{ transition: "all 0.35s ease" }}>
+                {/* Chevron spacer */}
+                <div style={{ width: 36, flexShrink: 0 }} />
+                {/* Owner */}
+                <div style={{ width: 210, padding: "9px 10px", flexShrink: 0 }}>Owner / Pet</div>
+                {/* Category */}
+                <div style={{ width: 110, padding: "9px 10px", flexShrink: 0 }}>Category</div>
+                {/* Status */}
+                <div style={{ width: 120, padding: "9px 10px", flexShrink: 0 }}>Status</div>
+                {/* Gender — animated */}
+                <div style={{ ...genderStyle, display: "flex", alignItems: "center", height: 36 }}>Gender</div>
+                {/* DOB — animated */}
+                <div style={{ ...dobStyle, display: "flex", alignItems: "center", height: 36 }}>DOB</div>
+                {/* Actions */}
+                <div style={{ width: 116, padding: "9px 10px", flexShrink: 0, textAlign: "right" }}>Actions</div>
+              </div>
 
-                      return (
-                        <>
-                          {/* ── Owner Row ──────────────────────────────── */}
-                          <TableRow
-                            key={owner._id}
-                            className="group hover:bg-gray-50/50 transition-colors border-b border-gray-50 cursor-pointer"
-                            onClick={() => toggleExpand(owner._id)}
+              {/* Rows */}
+              {isLoading ? (
+                <div className="flex flex-col items-center justify-center py-20 gap-3">
+                  <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+                  <span className="text-sm text-gray-500 font-medium">Loading patients...</span>
+                </div>
+              ) : owners.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 gap-2">
+                  <PawPrint className="h-12 w-12 text-gray-200" />
+                  <span className="text-base font-medium text-gray-400">No patients found</span>
+                </div>
+              ) : (
+                owners.map((owner) => {
+                  const isExpanded = expandedRows.has(owner._id);
+                  const pets = getEffectivePets(owner);
+                  const petCount = pets.length;
+
+                  return (
+                    <div key={owner._id}>
+
+                      {/* ── Owner Row ──────────────────────────────────────── */}
+                      <div
+                        className="flex items-center border-b border-gray-50 hover:bg-gray-50/60 cursor-pointer group"
+                        style={{ transition: "background 0.15s ease" }}
+                        onClick={() => goToProfile(owner._id)}
+                      >
+                        {/* Arrow toggle */}
+                        <div
+                          style={{ width: 36, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", padding: "12px 0" }}
+                          onClick={(e) => toggleExpand(owner._id, e)}
+                        >
+                          <div
+                            className="w-5 h-5 rounded flex items-center justify-center text-gray-400 hover:bg-gray-200 hover:text-gray-700 transition-colors"
+                            style={{
+                              transform: isExpanded ? "rotate(90deg)" : "rotate(0deg)",
+                              transition: "transform 0.3s cubic-bezier(0.4,0,0.2,1)",
+                            }}
                           >
-                            {/* Owner info cell */}
-                            <TableCell className="py-4">
-                              <div className="flex items-center gap-2">
-                                <div
-                                  className={`transition-transform duration-200 text-gray-400 ${
-                                    isExpanded ? "rotate-90" : ""
-                                  }`}
-                                >
-                                  <ChevronRight className="h-4 w-4" />
-                                </div>
-                                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center flex-shrink-0 border border-primary/10">
-                                  <User className="h-4 w-4 text-primary" />
-                                </div>
-                                <div className="flex flex-col">
-                                  <span className="font-bold text-gray-900">{owner.owner_name}</span>
-                                  <div className="flex items-center gap-3 mt-0.5">
-                                    <span className="text-xs text-gray-500 flex items-center gap-1">
-                                      <Phone className="h-2.5 w-2.5" />
-                                      {owner.phone || "—"}
-                                    </span>
-                                    {owner.email && (
-                                      <span className="text-xs text-gray-400 flex items-center gap-1">
-                                        <Mail className="h-2.5 w-2.5" />
-                                        {owner.email}
-                                      </span>
+                            <ChevronRight className="h-3.5 w-3.5" />
+                          </div>
+                        </div>
+
+                        {/* Owner info */}
+                        <div style={{ width: 210, padding: "12px 10px", flexShrink: 0 }}>
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center flex-shrink-0 border border-primary/10">
+                              <User className="h-3.5 w-3.5 text-primary" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="font-bold text-gray-900 text-sm leading-tight truncate">{owner.owner_name}</p>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <span className="text-[10px] text-gray-400 flex items-center gap-1">
+                                  <Phone className="h-2.5 w-2.5" />{owner.phone || "—"}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Pets count */}
+                        <div style={{ width: 110, padding: "12px 10px", flexShrink: 0 }}>
+                          <div className="flex items-center gap-1">
+                            <PawPrint className="h-3 w-3 text-gray-400" />
+                            <Badge variant="secondary" className="bg-primary/10 text-primary border-none text-[10px] font-bold px-1.5 py-0">
+                              {petCount} pet{petCount !== 1 ? "s" : ""}
+                            </Badge>
+                          </div>
+                        </div>
+
+                        {/* Status */}
+                        <div style={{ width: 120, padding: "12px 10px", flexShrink: 0 }}>
+                          {owner.is_active ? (
+                            <div className="flex items-center gap-1.5">
+                              <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                              <span className="text-xs font-semibold text-green-700">Active</span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-1.5">
+                              <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
+                              <span className="text-xs font-semibold text-red-500">Inactive</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Gender spacer (animated) */}
+                        <div style={genderStyle} />
+                        {/* DOB spacer (animated) */}
+                        <div style={dobStyle} />
+
+                        {/* Actions */}
+                        <div
+                          style={{ width: 116, padding: "12px 10px", flexShrink: 0, display: "flex", justifyContent: "flex-end", gap: 2 }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Link href={`/dashboard/patient/add?owner_id=${owner._id}`}>
+                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-gray-400 hover:text-green-600 hover:bg-green-50" title="Add Pet">
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </Link>
+                          <Link href={`/dashboard/patient/add?edit=${owner._id}`}>
+                            <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-gray-400 hover:text-blue-600 hover:bg-blue-50" title="Edit Owner">
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                          </Link>
+                          <Button
+                            variant="ghost" size="sm"
+                            className="h-7 w-7 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50"
+                            title="Delete Owner"
+                            onClick={(e) => handleDeleteOwner(e, owner._id, owner.owner_name)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* ── Expanded Pet Rows (animated max-height) ─────────── */}
+                      <div
+                        style={{
+                          maxHeight: isExpanded ? `${pets.length * 56 + 50}px` : "0px",
+                          overflow: "hidden",
+                          transition: "max-height 0.38s cubic-bezier(0.4,0,0.2,1)",
+                        }}
+                      >
+                        <div className="bg-gray-50/40 border-b border-gray-100">
+                          {pets.map((pet) => {
+                            const isLegacyPet = (pet as any).isLegacy;
+                            return (
+                            <div
+                              key={pet._id + (isLegacyPet ? "-legacy" : "")}
+                              className="flex items-center border-b border-gray-100/80 last:border-b-0 hover:bg-green-50/40 cursor-pointer group/pet"
+                              style={{ transition: "background 0.15s ease" }}
+                              onClick={() => goToProfile(owner._id, pet._id)}
+                            >
+                              {/* Indent */}
+                              <div style={{ width: 36, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                                <div className="w-1.5 h-1.5 rounded-full border border-gray-300" />
+                              </div>
+
+                              {/* Pet name */}
+                              <div style={{ width: 210, padding: "8px 10px", flexShrink: 0 }}>
+                                <div className="flex items-center gap-1.5">
+                                  <PetAvatar pet={pet} />
+                                  <div>
+                                    <span className="font-semibold text-xs text-primary group-hover/pet:underline">{pet.pet_name || "—"}</span>
+                                    {isLegacyPet && (
+                                      <span className="ml-1.5 text-[9px] text-amber-600 bg-amber-50 px-1 py-0.5 rounded font-bold uppercase">legacy</span>
                                     )}
                                   </div>
                                 </div>
                               </div>
-                            </TableCell>
 
-                            {/* Pets badge */}
-                            <TableCell>
-                              <div className="flex items-center gap-1.5">
-                                <PawPrint className="h-3.5 w-3.5 text-gray-400" />
-                                <Badge
-                                  variant="secondary"
-                                  className="bg-primary/10 text-primary border-none text-xs font-bold"
-                                >
-                                  {petCount} pet{petCount !== 1 ? "s" : ""}
-                                </Badge>
+                              {/* Category */}
+                              <div style={{ width: 110, padding: "8px 10px", flexShrink: 0 }}>
+                                <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-gray-100 text-gray-600 rounded">
+                                  {pet.pet_category || "—"}
+                                </span>
                               </div>
-                            </TableCell>
 
-                            {/* Status */}
-                            <TableCell>
-                              {owner.is_active ? (
-                                <div className="flex items-center gap-1.5">
-                                  <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                                  <span className="text-xs font-semibold text-green-700">Active</span>
-                                </div>
-                              ) : (
-                                <div className="flex items-center gap-1.5">
-                                  <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
-                                  <span className="text-xs font-semibold text-red-500">Inactive</span>
-                                </div>
-                              )}
-                            </TableCell>
+                              {/* Type/Breed */}
+                              <div style={{ width: 120, padding: "8px 10px", flexShrink: 0 }}>
+                                <span className="text-xs text-gray-700">{pet.pet_type || "—"}</span>
+                                {pet.breed && <span className="block text-[10px] text-gray-400 italic">{pet.breed}</span>}
+                              </div>
 
-                            <TableCell />
-                            <TableCell />
+                              {/* Gender — animated */}
+                              <div style={{ ...genderStyle, fontSize: 12, fontWeight: 600 }}
+                                className={pet.sex === "MALE" ? "text-blue-600" : "text-pink-600"}>
+                                {pet.sex || "—"}
+                              </div>
 
-                            {/* Owner actions */}
-                            <TableCell className="text-right">
-                              <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
-                                <Link href={`/dashboard/patient/add?edit=${owner._id}`}>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-8 w-8 p-0 text-gray-400 hover:text-blue-600 hover:bg-blue-50"
-                                    title="Edit Owner"
-                                  >
-                                    <Pencil className="h-4 w-4" />
-                                  </Button>
-                                </Link>
+                              {/* DOB — animated */}
+                              <div style={{ ...dobStyle, fontSize: 12, color: "#6b7280" }}>
+                                {pet.dob || "—"}
+                              </div>
+
+                              {/* Pet actions */}
+                              <div
+                                style={{ width: 116, padding: "8px 10px", flexShrink: 0, display: "flex", justifyContent: "flex-end", gap: 2 }}
+                                onClick={(e) => e.stopPropagation()}
+                              >
                                 <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-8 w-8 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50"
-                                  title="Delete Owner"
-                                  onClick={() => handleDeleteOwner(owner._id, owner.owner_name)}
+                                  variant="ghost" size="sm"
+                                  className="h-6 w-6 p-0 text-gray-400 hover:text-primary hover:bg-primary/5"
+                                  title="View History"
+                                  onClick={(e) => handleOpenHistory(e, owner, pet)}
                                 >
-                                  <Trash2 className="h-4 w-4" />
+                                  <History className="h-3 w-3" />
                                 </Button>
+                                {!isLegacyPet && (
+                                  <Link href={`/dashboard/patient/add?edit=${owner._id}&pet_id=${pet._id}`}>
+                                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-gray-400 hover:text-blue-600 hover:bg-blue-50" title="Edit Pet">
+                                      <Pencil className="h-3 w-3" />
+                                    </Button>
+                                  </Link>
+                                )}
+                                {!isLegacyPet && (
+                                  <Button
+                                    variant="ghost" size="sm"
+                                    className="h-6 w-6 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50"
+                                    title="Delete Pet"
+                                    onClick={(e) => handleDeletePet(e, owner._id, pet._id, pet.pet_name)}
+                                  >
+                                    <Trash2 className="h-3 w-3" />
+                                  </Button>
+                                )}
                               </div>
-                            </TableCell>
-                          </TableRow>
+                            </div>
+                          )})}
 
-                          {/* ── Expanded pet rows ───────────────────────── */}
-                          {isExpanded && (
-                            <ExpandedPetRows
-                              owner={owner}
-                              onOpenHistory={handleOpenHistory}
-                              onDeletePet={handleDeletePet}
-                            />
-                          )}
-                        </>
-                      );
-                    })
-                  )}
-                </TableBody>
-              </Table>
+                          {/* Add another pet */}
+                          <div className="flex items-center" style={{ padding: "5px 36px" }}>
+                            <Link href={`/dashboard/patient/add?owner_id=${owner._id}`}>
+                              <Button variant="ghost" size="sm" className="h-6 text-[11px] text-green-700 hover:bg-green-50 gap-1 font-semibold">
+                                <Plus className="h-3 w-3" /> Add Another Pet
+                              </Button>
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  );
+                })
+              )}
             </div>
 
-            {/* Pagination */}
+            {/* ── Pagination ─────────────────────────────────────────────── */}
             <div className="px-6 py-4 bg-gray-50/50 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
               <p className="text-xs text-gray-500 font-medium">
                 Showing <span className="text-gray-900">{owners.length}</span> of{" "}
@@ -592,50 +553,37 @@ export default function PatientList() {
 
               <div className="flex items-center gap-1.5">
                 <Button
-                  variant="outline"
-                  size="sm"
+                  variant="outline" size="sm"
                   className="h-8 px-3 text-xs font-medium border-gray-200 bg-white"
                   onClick={() => setPage(Math.max(1, page - 1))}
                   disabled={page === 1 || isLoading}
-                >
-                  Previous
-                </Button>
+                >Previous</Button>
 
                 <div className="flex items-center gap-1 mx-2">
                   {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    let pageNum: number;
-                    if (totalPages <= 5) pageNum = i + 1;
-                    else if (page <= 3) pageNum = i + 1;
-                    else if (page >= totalPages - 2) pageNum = totalPages - 4 + i;
-                    else pageNum = page - 2 + i;
+                    let pn: number;
+                    if (totalPages <= 5) pn = i + 1;
+                    else if (page <= 3) pn = i + 1;
+                    else if (page >= totalPages - 2) pn = totalPages - 4 + i;
+                    else pn = page - 2 + i;
                     return (
                       <Button
-                        key={pageNum}
-                        variant={pageNum === page ? "default" : "outline"}
-                        size="sm"
-                        className={`h-8 w-8 p-0 text-xs font-bold ${
-                          pageNum === page
-                            ? "bg-primary text-white border-primary"
-                            : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
-                        }`}
-                        onClick={() => setPage(pageNum)}
+                        key={pn}
+                        variant={pn === page ? "default" : "outline"} size="sm"
+                        className={`h-8 w-8 p-0 text-xs font-bold ${pn === page ? "bg-primary text-white border-primary" : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50"}`}
+                        onClick={() => setPage(pn)}
                         disabled={isLoading}
-                      >
-                        {pageNum}
-                      </Button>
+                      >{pn}</Button>
                     );
                   })}
                 </div>
 
                 <Button
-                  variant="outline"
-                  size="sm"
+                  variant="outline" size="sm"
                   className="h-8 px-3 text-xs font-medium border-gray-200 bg-white"
                   onClick={() => setPage(Math.min(totalPages, page + 1))}
                   disabled={page === totalPages || isLoading}
-                >
-                  Next
-                </Button>
+                >Next</Button>
               </div>
             </div>
           </div>

@@ -135,7 +135,7 @@ function isLegacyOwner(owner: Owner): boolean {
   return (!owner.pets || owner.pets.length === 0) && !!owner.pet_name;
 }
 
-function getLegacyAsPet(owner: Owner): EmbeddedPet {
+function getLegacyAsPet(owner: Owner): (EmbeddedPet & { isLegacy?: boolean }) {
   return {
     _id: owner._id,
     pet_name: owner.pet_name || "",
@@ -147,13 +147,19 @@ function getLegacyAsPet(owner: Owner): EmbeddedPet {
     dob: owner.dob || "",
     picture: owner.picture || "",
     is_active: owner.is_active,
+    isLegacy: true,
   };
 }
 
-function getEffectivePets(owner: Owner): EmbeddedPet[] {
-  if (owner.pets && owner.pets.length > 0) return owner.pets;
-  if (isLegacyOwner(owner)) return [getLegacyAsPet(owner)];
-  return [];
+function getEffectivePets(owner: Owner): (EmbeddedPet & { isLegacy?: boolean })[] {
+  const allPets = [];
+  if (owner.pet_name) {
+    allPets.push(getLegacyAsPet(owner));
+  }
+  if (owner.pets && owner.pets.length > 0) {
+    allPets.push(...owner.pets);
+  }
+  return allPets;
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
@@ -198,7 +204,7 @@ export default function PatientProfile() {
       if (res.ok && !data.error) {
         setOwner(data);
         // set active pet: use URL param, else first pet
-        const pets = data.pets && data.pets.length > 0 ? data.pets : isLegacyOwner(data) ? [getLegacyAsPet(data)] : [];
+        const pets = getEffectivePets(data);
         if (!activePetId && pets.length > 0) {
           setActivePetId(pets[0]._id);
         }
@@ -336,7 +342,6 @@ export default function PatientProfile() {
 
   const allPets = getEffectivePets(owner);
   const activePet = allPets.find((p) => p._id === activePetId) || allPets[0] || null;
-  const legacy = isLegacyOwner(owner);
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -420,13 +425,11 @@ export default function PatientProfile() {
                 <PawPrint className="w-4 h-4 text-primary" />
                 Pets ({allPets.length})
               </h3>
-              {!legacy && (
-                <Link href={`/dashboard/patient/add?owner_id=${owner._id}`}>
-                  <Button variant="ghost" size="sm" className="h-7 text-xs text-primary hover:bg-primary/5 gap-1">
-                    <Plus className="w-3.5 h-3.5" /> Add Pet
-                  </Button>
-                </Link>
-              )}
+              <Link href={`/dashboard/patient/add?owner_id=${owner._id}`}>
+                <Button variant="ghost" size="sm" className="h-7 text-xs text-primary hover:bg-primary/5 gap-1">
+                  <Plus className="w-3.5 h-3.5" /> Add Pet
+                </Button>
+              </Link>
             </div>
 
             {allPets.length === 0 ? (
