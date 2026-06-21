@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboard, Users, ChevronDown, Package, Lock } from "lucide-react";
+import { LayoutDashboard, Users, ChevronDown, Package, Lock, Activity } from "lucide-react";
 
 import {
   Sidebar,
@@ -89,6 +89,11 @@ export const menu = [
     title: "Permissions",
     url: "/dashboard/user/permissions",
     icon: Users,
+  },
+  {
+    title: "Work",
+    url: "/dashboard/work",
+    icon: Activity,
   },
 ];
 
