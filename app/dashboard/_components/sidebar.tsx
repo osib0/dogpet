@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboard, Users, ChevronDown, Package, Lock, Activity, ClipboardList, Shield } from "lucide-react";
+import { LayoutDashboard, Users, ChevronDown, Package, Lock, Activity, ClipboardList, Shield, PawPrint, Pill } from "lucide-react";
 
 import {
   Sidebar,
@@ -43,7 +43,7 @@ export const menu = [
       },
       {
         title: "Pets",
-        icon: Package,
+        icon: PawPrint,
         submenu: [
           { title: "Add Pet", url: "/dashboard/pets/add" },
           { title: "Pet List", url: "/dashboard/pets/list" },
@@ -51,7 +51,7 @@ export const menu = [
       },
       {
         title: "Medications",
-        icon: Package,
+        icon: Pill,
         submenu: [
           { title: "Add Medication", url: "/dashboard/medication/add" },
           { title: "Medication List", url: "/dashboard/medication/list" },
