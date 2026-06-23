@@ -1,15 +1,9 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import { Roboto } from "next/font/google";
 import Header from "@/shared/components/header/header";
 import Footer from "@/shared/components/footer";
 import { Toaster } from "react-hot-toast";
 import Script from "next/script";
-
-const Sorafont = Roboto({
-  variable: "--font-roboto",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: {
@@ -76,7 +70,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${Sorafont.variable} ${Sorafont.className} antialiased`}
+        className={`antialiased`}
       >
         <Toaster position="top-center" reverseOrder={false} />
         <Header />
