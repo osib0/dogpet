@@ -405,7 +405,12 @@ export default function PatientProfile() {
               )}
               <div className="flex items-center gap-2 text-sm text-gray-400">
                 <Calendar className="w-4 h-4" />
-                <span>Joined {format(new Date(owner.createdAt), "dd MMM yyyy")}</span>
+                <span>
+                  Joined{" "}
+                  {owner.createdAt && !isNaN(new Date(owner.createdAt).getTime())
+                    ? format(new Date(owner.createdAt), "dd MMM yyyy")
+                    : "—"}
+                </span>
               </div>
 
               <div className="pt-2">
