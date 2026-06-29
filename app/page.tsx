@@ -14,22 +14,16 @@ import HowItWorksSection from "./_components/work";
 export default function Home() {
   return (
     <div className="z-0">
-      <section className=" py-5">
-        <Hero />
-      </section>
-      <section className="py-20 bg-[#f6fefb]">
-        <TrustSection />
-      </section>
-     <AboutSection />
-     <ServicesSection/>
-     <HowItWorksSection/>
-     <DoctorsSection/>
-     <SmartFeaturesSection/>
-     <WhyChooseUsSection/>
-     <TestimonialsSection/>
-     <EmergencyCTASection/>
-     <FAQSection/>
-     <ContactSection/>
+      <Hero />
+      <TrustSection />
+      <AboutSection />
+      <ServicesSection />
+      <HowItWorksSection />
+      <DoctorsSection />
+      <TestimonialsSection />
+      <EmergencyCTASection />
+      <FAQSection />
+      <ContactSection />
     </div>
   )
 }
