@@ -622,7 +622,7 @@ export default function PatientProfile() {
 
                       {/* Select Date */}
                       <div className="space-y-1.5 flex flex-col">
-                        <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1 mb-1">Select Date</label>
+                        <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1 mb-1">Visit Date</label>
                         <Popover>
                           <PopoverTrigger asChild>
                             <Button variant="outline" className={cn("w-full justify-start text-left font-normal bg-white border-gray-200", !newRecord.date && "text-muted-foreground")}>
@@ -643,7 +643,7 @@ export default function PatientProfile() {
 
                       {/* Quick Select */}
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1">Quick Select (From Master)</label>
+                        <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1">Medication</label>
                         <Select onValueChange={(val) => { const med = medications.find(m => m._id === val); if (med) setNewRecord({ ...newRecord, item_name: med.medicine_name, disease: med.disease, disease_type: med.disease_type, description: med.description || "" }); }}>
                           <SelectTrigger className="bg-white border-gray-200">
                             <SelectValue placeholder="Search master data..." />
@@ -670,7 +670,7 @@ export default function PatientProfile() {
 
                       {/* Visit Date */}
                       <div className="space-y-1.5 flex flex-col">
-                        <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1 mb-1">Visit Date</label>
+                        <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1 mb-1">Medication Due Date</label>
                         <Popover>
                           <PopoverTrigger asChild>
                             <Button variant="outline" className={cn("w-full justify-start text-left font-normal bg-white border-gray-200", !newRecord.visit_date && "text-muted-foreground")}>

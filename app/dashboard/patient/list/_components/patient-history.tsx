@@ -400,7 +400,7 @@ export function PatientHistory({
                 {/* Select Date */}
                 <div className="space-y-1.5 flex flex-col">
                   <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1 mb-1">
-                    Select Date
+                    Visit Date
                   </label>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -440,7 +440,7 @@ export function PatientHistory({
                 {/* Quick Select from Master */}
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1">
-                    Quick Select (From Master)
+                    Medication
                   </label>
                   <Select onValueChange={onSelectMedication}>
                     <SelectTrigger className="bg-gray-50 border-gray-200">
@@ -489,7 +489,7 @@ export function PatientHistory({
                 {/* Visit Date */}
                 <div className="space-y-1.5 flex flex-col">
                   <label className="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1 mb-1">
-                    Visit Date
+                    Medication Due Date
                   </label>
                   <Popover>
                     <PopoverTrigger asChild>
