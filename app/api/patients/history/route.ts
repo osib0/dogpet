@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import MedicalRecord from "@/models/medical-record.model";
+import Patient from "@/models/patient.model";
 
 export async function GET(req: Request) {
   try {
@@ -17,8 +18,38 @@ export async function GET(req: Request) {
     let query: Record<string, unknown> = {};
 
     if (pet_id) {
-      // Fetch history for a specific pet — most precise filter
-      query = { pet_id };
+      // Determine if this is a legacy pet (pet_id === patient_id) or the first/primary pet of the owner
+      let isPrimaryOrLegacy = false;
+      if (pet_id === patient_id) {
+        isPrimaryOrLegacy = true;
+      } else {
+        const ownerQuery = patient_id ? { _id: patient_id } : { phone };
+        const owner = await Patient.findOne(ownerQuery);
+        if (owner) {
+          const firstPetId = owner.pets?.[0]?._id?.toString();
+          if (!owner.pets || owner.pets.length === 0 || firstPetId === pet_id) {
+            isPrimaryOrLegacy = true;
+          }
+        }
+      }
+
+      if (isPrimaryOrLegacy) {
+        // Fetch records matching pet_id, OR legacy records with no pet_id belonging to this owner
+        query = {
+          $or: [
+            { pet_id },
+            {
+              pet_id: { $in: [null, undefined] },
+              $or: [
+                { patient_id },
+                { phone, patient_id: { $exists: false } },
+              ],
+            },
+          ],
+        };
+      } else {
+        query = { pet_id };
+      }
     } else if (patient_id) {
       // Fetch all history for an owner (legacy / fallback)
       query = {
