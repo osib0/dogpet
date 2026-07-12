@@ -27,9 +27,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import {
   ArrowLeft, User, PawPrint, Upload, CheckCircle2,
-  AlertCircle, Plus, X, Trash2
+  AlertCircle, Plus, X, Trash2, CalendarIcon
 } from "lucide-react";
 import Link from "next/link";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
 
 // ── Schemas ───────────────────────────────────────────────────────────────────
 
@@ -72,6 +75,12 @@ const emptyPet = () => ({
   pet_name: "", pet_category: "", pet_type: "",
   breed: "", color: "", sex: undefined as any, dob: "", picture: "",
 });
+
+const getDateObj = (val: string | undefined | null) => {
+  if (!val) return undefined;
+  const d = new Date(val + "T00:00:00");
+  return isNaN(d.getTime()) ? undefined : d;
+};
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
@@ -407,9 +416,35 @@ export default function PatientAddEditPage() {
 
           {/* DOB */}
           <FormField control={form.control} name={`pets.${idx}.dob`} render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-xs">Date of Birth</FormLabel>
-              <FormControl><Input type="date" {...field} className="text-sm" /></FormControl>
+            <FormItem className="flex flex-col">
+              <FormLabel className="text-xs mb-1">Date of Birth</FormLabel>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal text-sm bg-white border-gray-200",
+                        !field.value && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4 text-gray-500" />
+                      {field.value && getDateObj(field.value)
+                        ? format(getDateObj(field.value)!, "PPP")
+                        : <span>Pick a date</span>}
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={field.value ? getDateObj(field.value) : undefined}
+                    onSelect={(date) => field.onChange(date ? format(date, "yyyy-MM-dd") : "")}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              <FormMessage />
             </FormItem>
           )} />
 
@@ -681,9 +716,35 @@ export default function PatientAddEditPage() {
                   </FormItem>
 
                   <FormField control={form.control} name="dob" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs">Date of Birth</FormLabel>
-                      <FormControl><Input type="date" {...field} className="text-sm" /></FormControl>
+                    <FormItem className="flex flex-col">
+                      <FormLabel className="text-xs mb-1">Date of Birth</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                "w-full justify-start text-left font-normal text-sm bg-white border-gray-200",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4 text-gray-500" />
+                              {field.value && getDateObj(field.value)
+                                ? format(getDateObj(field.value)!, "PPP")
+                                : <span>Pick a date</span>}
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value ? getDateObj(field.value) : undefined}
+                            onSelect={(date) => field.onChange(date ? format(date, "yyyy-MM-dd") : "")}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
                     </FormItem>
                   )} />
 

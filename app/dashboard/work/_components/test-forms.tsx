@@ -1,3 +1,6 @@
+"use client";
+
+import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -5,12 +8,19 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface TestFormProps {
   title: string;
 }
 
 export function TestFormLayout({ title, children }: { title: string, children: React.ReactNode }) {
+  const [date, setDate] = React.useState<Date | undefined>(new Date());
+
   return (
     <Card className="w-full max-w-5xl mx-auto shadow-md">
       <CardHeader className="bg-primary/5 border-b">
@@ -42,9 +52,30 @@ export function TestFormLayout({ title, children }: { title: string, children: R
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-1">
+          <div className="space-y-1 flex flex-col">
             <Label>Date</Label>
-            <Input type="date" />
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal text-sm bg-white border-gray-200 h-9",
+                    !date && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4 text-gray-500" />
+                  {date ? format(date, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={setDate}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
           </div>
           <div className="space-y-1 lg:col-span-2 xl:col-span-3">
             <Label>Ref. Dr.</Label>
