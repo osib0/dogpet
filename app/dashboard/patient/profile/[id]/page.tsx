@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import {
   User, Phone, Mail, Calendar, Activity, Info,
   Plus, History, RefreshCcw, Loader2, ArrowLeft, CalendarIcon,
-  PawPrint, ChevronRight, Trash2,
+  PawPrint, ChevronRight, Trash2, Edit,
 } from "lucide-react";
 import { format, addDays } from "date-fns";
 import {
@@ -191,6 +191,7 @@ export default function PatientProfile() {
     next_visit_date: format(addDays(new Date(), 30), "yyyy-MM-dd"),
   });
   const [newRecord, setNewRecord] = useState(emptyRecord());
+  const [editingRecordId, setEditingRecordId] = useState<string | null>(null);
 
   // ── Fetch owner ───────────────────────────────────────────────────────────
   useEffect(() => {
@@ -221,6 +222,7 @@ export default function PatientProfile() {
     if (owner && activePetId) {
       fetchHistory();
       fetchMedicationMaster();
+      setEditingRecordId(null);
     }
   }, [owner, activePetId]);
 
@@ -258,21 +260,29 @@ export default function PatientProfile() {
     if (!owner || !newRecord.item_name || !activePetId) return;
     setIsSaving(true);
     try {
-      const res = await fetch("/api/patients/history", {
-        method: "POST",
+      const isEdit = !!editingRecordId;
+      const url = "/api/patients/history";
+      const method = isEdit ? "PUT" : "POST";
+      const payload = isEdit
+        ? { record_id: editingRecordId, ...newRecord }
+        : {
+            patient_id: owner._id,
+            pet_id: activePetId,
+            phone: owner.phone,
+            ...newRecord,
+          };
+
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          patient_id: owner._id,
-          pet_id: activePetId,
-          phone: owner.phone,
-          ...newRecord,
-        }),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (data.success) {
         fetchHistory();
         setShowAddForm(false);
         setNewRecord(emptyRecord());
+        setEditingRecordId(null);
       }
     } catch (err) {
       console.error("Failed to save record:", err);
@@ -303,6 +313,37 @@ export default function PatientProfile() {
       visit_date: format(new Date(), "yyyy-MM-dd"),
       next_visit_date: format(addDays(new Date(), 30), "yyyy-MM-dd"),
     });
+    setEditingRecordId(null);
+    setShowAddForm(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleEdit = (record: MedicalRecord) => {
+    const getCleanDate = (val?: string) => {
+      if (!val) return "";
+      if (typeof val === "string") {
+        if (val.includes("T")) return val.split("T")[0];
+        const match = val.match(/^\d{4}-\d{2}-\d{2}$/);
+        if (match) return val;
+      }
+      const d = new Date(val);
+      if (!isNaN(d.getTime())) {
+        return format(d, "yyyy-MM-dd");
+      }
+      return "";
+    };
+
+    setNewRecord({
+      type: record.type,
+      item_name: record.item_name,
+      disease: record.disease || "",
+      disease_type: record.disease_type || "",
+      description: record.description || "",
+      date: getCleanDate(record.date),
+      visit_date: getCleanDate(record.visit_date),
+      next_visit_date: getCleanDate(record.next_visit_date),
+    });
+    setEditingRecordId(record._id);
     setShowAddForm(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -597,9 +638,26 @@ export default function PatientProfile() {
                   <div className="mb-8 p-5 bg-gray-50/80 rounded-2xl border border-primary/20 space-y-4 animate-in fade-in zoom-in-95 duration-200">
                     <div className="flex justify-between items-center pb-2 border-b border-gray-200">
                       <h4 className="font-bold text-primary flex items-center gap-2">
-                        <Plus className="w-4 h-4" /> Add New Assignment for {activePet.pet_name}
+                        {editingRecordId ? (
+                          <>
+                            <Edit className="w-4 h-4" /> Edit Assignment for {activePet.pet_name}
+                          </>
+                        ) : (
+                          <>
+                            <Plus className="w-4 h-4" /> Add New Assignment for {activePet.pet_name}
+                          </>
+                        )}
                       </h4>
-                      <Button variant="ghost" size="sm" onClick={() => setShowAddForm(false)} className="h-8 text-gray-400 hover:text-red-500">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setShowAddForm(false);
+                          setEditingRecordId(null);
+                          setNewRecord(emptyRecord());
+                        }}
+                        className="h-8 text-gray-400 hover:text-red-500"
+                      >
                         Cancel
                       </Button>
                     </div>
@@ -722,8 +780,14 @@ export default function PatientProfile() {
 
                     <div className="flex justify-end pt-4 border-t border-gray-200 mt-4">
                       <Button onClick={handleSaveRecord} disabled={isSaving || !newRecord.item_name} className="bg-primary text-white shadow-md font-bold px-6">
-                        {isSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
-                        Confirm Assignment
+                        {isSaving ? (
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        ) : editingRecordId ? (
+                          <Edit className="w-4 h-4 mr-2" />
+                        ) : (
+                          <Plus className="w-4 h-4 mr-2" />
+                        )}
+                        {editingRecordId ? "Update Assignment" : "Confirm Assignment"}
                       </Button>
                     </div>
                   </div>
@@ -779,6 +843,9 @@ export default function PatientProfile() {
                             <TableCell className="text-sm text-gray-600 font-medium whitespace-nowrap">{formatRecordDate(record, "next_visit_date")}</TableCell>
                             <TableCell className="text-right">
                               <div className="flex justify-end gap-1">
+                                <Button variant="ghost" size="sm" className="h-8 px-3 text-xs text-primary hover:bg-primary/10 font-black rounded-full" onClick={() => handleEdit(record)}>
+                                  <Edit className="w-3.5 h-3.5 mr-1.5" /> EDIT
+                                </Button>
                                 <Button variant="ghost" size="sm" className="h-8 px-3 text-xs text-primary hover:bg-primary/10 font-black rounded-full" onClick={() => handleReassign(record)}>
                                   <RefreshCcw className="w-3.5 h-3.5 mr-1.5" /> RE-ASSIGN
                                 </Button>

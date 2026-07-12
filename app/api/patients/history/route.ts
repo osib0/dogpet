@@ -133,3 +133,49 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ error: "Failed to delete record" }, { status: 500 });
   }
 }
+
+export async function PUT(req: Request) {
+  try {
+    await connectDB();
+    const body = await req.json();
+    const {
+      record_id,
+      type,
+      item_name,
+      disease,
+      disease_type,
+      description,
+      date,
+      visit_date,
+      next_visit_date,
+    } = body;
+
+    if (!record_id) {
+      return NextResponse.json({ error: "Record ID is required" }, { status: 400 });
+    }
+
+    const updatedRecord = await MedicalRecord.findByIdAndUpdate(
+      record_id,
+      {
+        type,
+        item_name,
+        disease,
+        disease_type,
+        description,
+        date: date || new Date(),
+        visit_date: visit_date || new Date(),
+        next_visit_date: next_visit_date || null,
+      },
+      { new: true }
+    );
+
+    if (!updatedRecord) {
+      return NextResponse.json({ error: "Medical record not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, data: updatedRecord });
+  } catch (error) {
+    console.error("Error updating medical record:", error);
+    return NextResponse.json({ error: "Failed to update medical record" }, { status: 500 });
+  }
+}
