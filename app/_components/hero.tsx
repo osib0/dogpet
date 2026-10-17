@@ -18,13 +18,13 @@ const Hero = () => {
 
       {/* Paw print decorations */}
       <div className="paw-decoration paw-1">
-        <PawPrint className="w-8 h-8 text-[#72e3ad]/30" />
+        <PawPrint className="w-8 h-8 text-[#34d399]/30" />
       </div>
       <div className="paw-decoration paw-2">
         <PawPrint className="w-6 h-6 text-[#f4a261]/20" />
       </div>
       <div className="paw-decoration paw-3">
-        <PawPrint className="w-10 h-10 text-[#72e3ad]/20" />
+        <PawPrint className="w-10 h-10 text-[#34d399]/20" />
       </div>
 
       <div className="container mx-auto px-6 relative z-10">
@@ -115,7 +115,7 @@ const Hero = () => {
               <div className="hero-float-badge hero-float-bottom-left">
                 <div className="float-badge-avatars">
                   {[1,2,3,4].map((n) => (
-                    <div key={n} className="float-avatar" style={{ backgroundColor: ['#72e3ad','#f4a261','#4ecdc4','#ff6b9d'][n-1] }}>
+                    <div key={n} className="float-avatar" style={{ backgroundColor: ['#34d399','#f4a261','#4ecdc4','#ff6b9d'][n-1] }}>
                       {['A','B','C','D'][n-1]}
                     </div>
                   ))}
@@ -131,7 +131,7 @@ const Hero = () => {
               {/* Floating Badge - Right */}
               <div className="hero-float-badge hero-float-right">
                 <div className="float-badge-icon float-badge-icon-green">
-                  <Shield className="w-4 h-4 text-[#72e3ad]" />
+                  <Shield className="w-4 h-4 text-[#34d399]" />
                 </div>
                 <div>
                   <p className="float-badge-title">Certified Vets</p>

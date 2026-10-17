@@ -11,6 +11,11 @@ import TrustSection from "./_components/trust";
 import WhyChooseUsSection from "./_components/whychoose";
 import HowItWorksSection from "./_components/work";
 
+export const metadata = {
+  description:
+    "DogPet Clinic — Premium veterinary care for your beloved pets. Expert doctors, modern facilities, and compassionate service.",
+};
+
 export default function Home() {
   return (
     <div className="z-0">
@@ -25,5 +30,5 @@ export default function Home() {
       <FAQSection />
       <ContactSection />
     </div>
-  )
+  );
 }

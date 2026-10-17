@@ -42,14 +42,14 @@ const AnimatedLine = ({ pathId, pathD }: any) => {
         >
             <path
                 d={pathD}
-                stroke="#72e3ad"
+                stroke="#34d399"
                 strokeOpacity="0.4"
                 strokeWidth="1.2"
-                className="drop-shadow-[0_0_6px_#72e3ad]"
+                className="drop-shadow-[0_0_6px_#34d399]"
             />
             <rect
                 transform="translate(-10, -0.5)"
-                fill="#72e3ad"
+                fill="#34d399"
                 width="10"
                 height="2"
                 rx="1"
@@ -63,10 +63,10 @@ const Hexagon = () => (
         <svg viewBox="0 0 170 188" className="absolute inset-0">
             <path
                 d="M97.3728 4.15852C89.7925 -0.217983 80.4531 -0.217983 72.8728 4.15852L13.6449 38.3538C6.0646 42.7303 1.39493 50.8184 1.39493 59.5714V127.962C1.39493 136.715 6.0646 144.803 13.6449 149.179L72.8728 183.375C80.4531 187.751 89.7925 187.751 97.3728 183.375L156.601 149.179C164.181 144.803 168.851 136.715 168.851 127.962V59.5714C168.851 50.8184 164.181 42.7303 156.601 38.3538L97.3728 4.15852Z"
-                stroke="#72e3ad"
+                stroke="#34d399"
                 strokeWidth="2"
                 fill="transparent"
-                className="drop-shadow-[0_0_8px_#72e3ad]"
+                className="drop-shadow-[0_0_8px_#34d399]"
             />
         </svg>
     </div>
@@ -78,7 +78,7 @@ export default function TrustSection() {
             <div className="max-w-6xl mx-auto text-center mb-12">
                 <h2 className="text-2xl lg:text-4xl font-semibold text-gray-900">
                     Why Pet Parents Trust{" "}
-                    <span className="text-[#72e3ad]">DogPet Clinic</span>
+                    <span className="text-[#34d399]">DogPet Clinic</span>
                 </h2>
 
                 <p className="text-sm text-gray-600 mt-3 max-w-2xl mx-auto">

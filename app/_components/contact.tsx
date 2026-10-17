@@ -7,15 +7,15 @@ import { Textarea } from "@/components/ui/textarea";
 
 export default function ContactSection() {
     return (
-        <section className="py-28 bg-[#f6fefb]">
+        <section className="py-28 bg-[#f0fdf4]">
             <div className="container mx-auto px-6">
                 {/* Heading */}
                 <div className="text-center mb-16 max-w-3xl mx-auto">
-                    <span className="inline-block mb-3 text-xs font-semibold tracking-wider uppercase text-[#72e3ad]">
+                    <span className="inline-block mb-3 text-xs font-semibold tracking-wider uppercase text-[#34d399]">
                         Contact Us
                     </span>
                     <h2 className="text-3xl lg:text-4xl font-semibold text-gray-900 mb-4">
-                        Get in Touch with <span className="text-[#72e3ad]">DogPet Clinic</span>
+                        Get in Touch with <span className="text-[#34d399]">DogPet Clinic</span>
                     </h2>
                     <p className="text-sm text-gray-600">
                         Have questions or need urgent help for your pet? We’re always here
@@ -57,7 +57,7 @@ export default function ContactSection() {
                                     className="flex items-start gap-4 rounded-2xl
                   border border-gray-200 bg-white px-5 py-4"
                                 >
-                                    <Icon className="w-6 h-6 text-[#72e3ad] mt-1" />
+                                    <Icon className="w-6 h-6 text-[#34d399] mt-1" />
                                     <div>
                                         <h4 className="text-sm font-semibold text-gray-900 mb-0.5">
                                             {item.title}
@@ -65,7 +65,7 @@ export default function ContactSection() {
                                         {item.href ? (
                                             <a
                                                 href={item.href}
-                                                className="text-sm text-[#72e3ad] font-medium"
+                                                className="text-sm text-[#34d399] font-medium"
                                             >
                                                 {item.value}
                                             </a>
@@ -87,25 +87,24 @@ export default function ContactSection() {
                         <form className="space-y-4">
                             <Input
                                 placeholder="Your Name"
-                                className="border-gray-300 focus:border-[#72e3ad] focus:ring-[#72e3ad]"
+                                className="border-gray-300 focus:border-[#34d399] focus:ring-[#34d399]"
                             />
                             <Input
                                 type="email"
                                 placeholder="Email Address"
-                                className="border-gray-300 focus:border-[#72e3ad] focus:ring-[#72e3ad]"
+                                className="border-gray-300 focus:border-[#34d399] focus:ring-[#34d399]"
                             />
                             <Input
                                 placeholder="Phone Number"
-                                className="border-gray-300 focus:border-[#72e3ad] focus:ring-[#72e3ad]"
+                                className="border-gray-300 focus:border-[#34d399] focus:ring-[#34d399]"
                             />
                             <Textarea
                                 placeholder="How can we help your pet?"
                                 rows={4}
-                                className="border-gray-300 focus:border-[#72e3ad] focus:ring-[#72e3ad]"
+                                className="border-gray-300 focus:border-[#34d399] focus:ring-[#34d399]"
                             />
 
-                            <Button variant={'outline'} size={'sm'} className="shadow-none text-xs hover:bg-[#4fe09a] bg-[#72e3ad] border border-[#16b674bf] cursor-pointer">
-
+                            <Button size={'sm'} className="bg-gray-900 hover:bg-gray-700 text-white border-none shadow-sm rounded-full px-6 text-sm font-medium cursor-pointer">
                                 Submit Message
                             </Button>
                         </form>

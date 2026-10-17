@@ -29,16 +29,16 @@ const DOCTORS = [
 
 export default function DoctorsSection() {
   return (
-    <section className="py-24 bg-[#f6fefb]">
+    <section className="py-24 bg-[#f0fdf4]">
       <div className="container mx-auto px-6">
         {/* Heading */}
         <div className="max-w-4xl mx-auto text-center mb-14">
-          <span className="inline-block mb-3 text-xs font-semibold tracking-wider uppercase text-[#72e3ad]">
+          <span className="inline-block mb-3 text-xs font-semibold tracking-wider uppercase text-[#34d399]">
             Our Veterinary Experts
           </span>
 
           <h2 className="text-3xl lg:text-4xl font-semibold text-gray-900 mb-4">
-            Meet Our <span className="text-[#72e3ad]">Experienced Vets</span>
+            Meet Our <span className="text-[#34d399]">Experienced Vets</span>
           </h2>
 
           <p className="text-sm text-gray-600 max-w-2xl mx-auto">
@@ -69,17 +69,17 @@ export default function DoctorsSection() {
                 <h3 className="text-lg font-semibold text-gray-900">
                   {doc.name}
                 </h3>
-                <p className="text-sm text-[#72e3ad] font-medium">
+                <p className="text-sm text-[#34d399] font-medium">
                   {doc.role}
                 </p>
 
                 <div className="mt-4 flex flex-col gap-2 text-sm text-gray-600">
                   <div className="flex items-center justify-center gap-2">
-                    <Award className="w-4 h-4 text-[#72e3ad]" />
+                    <Award className="w-4 h-4 text-[#34d399]" />
                     {doc.experience}
                   </div>
                   <div className="flex items-center justify-center gap-2">
-                    <Stethoscope className="w-4 h-4 text-[#72e3ad]" />
+                    <Stethoscope className="w-4 h-4 text-[#34d399]" />
                     {doc.specialization}
                   </div>
                 </div>

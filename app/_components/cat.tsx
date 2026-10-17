@@ -14,7 +14,7 @@ export default function EmergencyCTASection() {
                 Immediate care when your pet needs it the most.
             </p>
             <Link href="tel:+911234567890">
-                <Button variant={'outline'} size={'sm'} className="shadow-none text-xs hover:bg-[#4fe09a] bg-[#72e3ad] border border-[#16b674bf] cursor-pointer">
+                <Button size={'sm'} className="bg-gray-900 hover:bg-gray-700 text-white border-none shadow-sm rounded-full px-6 text-sm font-medium cursor-pointer">
                     <PhoneCall className="w-4 h-4" /> Call Now
                 </Button>
             </Link>

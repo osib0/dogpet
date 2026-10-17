@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Clock, Heart, PawPrint, ShieldCheck, Stethoscope } from "lucide-react";
-import { set } from "mongoose";
+
 
 
 const STATS = [
@@ -38,13 +38,13 @@ export default function AboutSection() {
 
           {/* Left Content */}
           <div>
-            <span className="inline-block mb-4 text-xs font-semibold tracking-wider uppercase text-[#72e3ad]">
+            <span className="inline-block mb-4 text-xs font-semibold tracking-wider uppercase text-[#34d399]">
               About DogPet Clinic
             </span>
 
             <h2 className="text-3xl lg:text-4xl font-semibold text-gray-900 mb-6 leading-tight">
               Caring for Pets Like Family —{" "}
-              <span className="text-[#72e3ad]">Every Single Day</span>
+              <span className="text-[#34d399]">Every Single Day</span>
             </h2>
 
             <p className="text-gray-600 leading-relaxed mb-4">
@@ -101,7 +101,7 @@ export default function AboutSection() {
           {/* Right Visual / Stats */}
           <div className="relative">
             {/* Soft background glow */}
-            <div className="absolute inset-0 bg-[#72e3ad]/10 blur-3xl rounded-full -z-10" />
+            <div className="absolute inset-0 bg-[#34d399]/10 blur-3xl rounded-full -z-10" />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-center">
               {STATS.map((item, index) => {
@@ -111,19 +111,19 @@ export default function AboutSection() {
                     key={index}
                     className={`group bg-white rounded-2xl p-6 shadow
               border
-              hover:border-[#72e3ad]
+              hover:border-[#34d399]
               hover:shadow-none
-              transition-all duration-300 h-full ${hoveredIndex === index ? 'shadow-none border-[#72e3ad]' : ''}`}
+              transition-all duration-300 h-full ${hoveredIndex === index ? 'shadow-none border-[#34d399]' : ''}`}
                     onMouseOver={() => setHoveredIndex(index)}
                   >
                     {/* Icon */}
                     <div className="flex justify-center mb-4">
-                      <div className="w-12 h-12 rounded-full bg-[#e9fbf3] flex items-center justify-center">
-                        <Icon className="w-6 h-6 text-[#72e3ad]" />
+                      <div className="w-12 h-12 rounded-full bg-[#d1fae5] flex items-center justify-center">
+                        <Icon className="w-6 h-6 text-[#34d399]" />
                       </div>
                     </div>
                     {/* Value */}
-                    <h3 className="text-3xl font-semibold text-[#72e3ad]">
+                    <h3 className="text-3xl font-semibold text-[#34d399]">
                       {item.value}
                     </h3>
 
@@ -133,7 +133,7 @@ export default function AboutSection() {
                     </p>
 
                     {/* Accent line */}
-                    <div className={`${hoveredIndex === index ? 'w-14' : 'w-8'} mt-4 h-0.5 w-8 bg-[#72e3ad] mx-auto rounded-full opacity-60 group-hover:w-14 transition-all duration-300`} />
+                    <div className={`${hoveredIndex === index ? 'w-14' : 'w-8'} mt-4 h-0.5 w-8 bg-[#34d399] mx-auto rounded-full opacity-60 group-hover:w-14 transition-all duration-300`} />
                   </div>
                 );
               })}

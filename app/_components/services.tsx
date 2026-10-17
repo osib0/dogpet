@@ -58,17 +58,17 @@ const SERVICES = [
 
 export default function ServicesSection() {
   return (
-    <section className="py-28 bg-linear-to-b from-[#f6fefb] to-white">
+    <section className="py-28 bg-linear-to-b from-[#f0fdf4] to-white">
       <div className="container mx-auto px-6">
         {/* Heading */}
         <div className="max-w-4xl mx-auto text-center mb-16">
-          <span className="inline-flex items-center gap-2 mb-3 px-4 py-1 text-xs font-semibold rounded-full bg-[#e9fbf3] text-[#2fbf8f]">
+          <span className="inline-flex items-center gap-2 mb-3 px-4 py-1 text-xs font-semibold rounded-full bg-[#d1fae5] text-[#2fbf8f]">
             Our Services
           </span>
 
           <h2 className="text-3xl lg:text-4xl font-semibold text-gray-900 mb-4">
             Complete Veterinary Care for{" "}
-            <span className="text-[#72e3ad]">Every Pet</span>
+            <span className="text-[#34d399]">Every Pet</span>
           </h2>
 
           <p className="text-sm text-gray-600 max-w-2xl mx-auto">
@@ -86,8 +86,8 @@ export default function ServicesSection() {
               <div
                 key={index}
                 className="group relative overflow-hidden rounded-2xl p-px
-                bg-linear-to-br from-[#72e3ad]/40 to-transparent
-                hover:from-[#72e3ad] transition-all duration-300"
+                bg-linear-to-br from-[#34d399]/40 to-transparent
+                hover:from-[#34d399] transition-all duration-300"
               >
                 <div
                   className="h-full bg-white rounded-2xl p-6
@@ -98,16 +98,16 @@ export default function ServicesSection() {
                   {/* Icon */}
                   <div className="relative mb-5">
                     <div
-                      className="w-14 h-14 rounded-xl bg-[#e9fbf3]
+                      className="w-14 h-14 rounded-xl bg-[#d1fae5]
                       flex items-center justify-center
                       transition-all duration-300
-                      group-hover:bg-[#72e3ad]"
+                      group-hover:bg-[#34d399]"
                     >
-                      <Icon className="w-7 h-7 text-[#72e3ad] group-hover:text-white transition-colors" />
+                      <Icon className="w-7 h-7 text-[#34d399] group-hover:text-white transition-colors" />
                     </div>
 
                     {/* glow */}
-                    <div className="absolute inset-0 rounded-xl blur-xl bg-[#72e3ad]/20 opacity-0 group-hover:opacity-100 transition" />
+                    <div className="absolute inset-0 rounded-xl blur-xl bg-[#34d399]/20 opacity-0 group-hover:opacity-100 transition" />
                   </div>
 
                   {/* Title */}
@@ -120,7 +120,7 @@ export default function ServicesSection() {
                     {service.desc}
                   </p>
 
-                  {/* <div className="flex items-center gap-2 text-xs font-medium text-[#72e3ad]">
+                  {/* <div className="flex items-center gap-2 text-xs font-medium text-[#34d399]">
                     Learn more
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </div> */}

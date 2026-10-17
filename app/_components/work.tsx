@@ -36,13 +36,13 @@ export default function HowItWorksSection() {
       <div className="container mx-auto px-6">
         {/* Heading */}
         <div className="max-w-4xl mx-auto text-center mb-16">
-          <span className="inline-block mb-3 text-xs font-semibold tracking-wider uppercase text-[#72e3ad]">
+          <span className="inline-block mb-3 text-xs font-semibold tracking-wider uppercase text-[#34d399]">
             How It Works
           </span>
 
           <h2 className="text-3xl lg:text-4xl font-semibold text-gray-900 mb-4">
             Simple Steps to Get the{" "}
-            <span className="text-[#72e3ad]">Best Care</span> for Your Pet
+            <span className="text-[#34d399]">Best Care</span> for Your Pet
           </h2>
 
           <p className="text-sm text-gray-600 max-w-2xl mx-auto">
@@ -58,18 +58,18 @@ export default function HowItWorksSection() {
             return (
               <div
                 key={index}
-                className="relative bg-[#f6fefb] rounded-2xl p-6 text-center
-                border border-transparent hover:border-[#72e3ad]
+                className="relative bg-[#f0fdf4] rounded-2xl p-6 text-center
+                border border-transparent hover:border-[#34d399]
                 transition-all duration-300"
               >
                 {/* Step Number */}
-                <div className="absolute -top-4 left-6 bg-[#72e3ad] text-white text-xs font-semibold px-3 py-1 rounded-full">
+                <div className="absolute -top-4 left-6 bg-[#34d399] text-white text-xs font-semibold px-3 py-1 rounded-full">
                   {item.step}
                 </div>
 
                 {/* Icon */}
                 <div className="w-14 h-14 mx-auto rounded-full bg-white shadow flex items-center justify-center mb-4">
-                  <Icon className="w-7 h-7 text-[#72e3ad]" />
+                  <Icon className="w-7 h-7 text-[#34d399]" />
                 </div>
 
                 {/* Title */}

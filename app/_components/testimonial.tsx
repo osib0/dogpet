@@ -28,7 +28,7 @@ export default function TestimonialsSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {TESTIMONIALS.map((t, i) => (
-            <div key={i} className="bg-[#f6fefb] p-6 rounded-2xl">
+            <div key={i} className="bg-[#f0fdf4] p-6 rounded-2xl">
               <p className="text-sm text-gray-600 mb-4">“{t.review}”</p>
               <p className="font-semibold">{t.name}</p>
               <p className="text-xs text-gray-500">{t.pet}</p>

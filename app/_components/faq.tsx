@@ -32,15 +32,15 @@ const FAQS = [
 
 export default function FAQSection() {
   return (
-    <section className="py-28 bg-linear-to-b from-white to-[#f6fefb]">
+    <section className="py-28 bg-linear-to-b from-white to-[#f0fdf4]">
       <div className="container mx-auto px-6 max-w-3xl">
         {/* Heading */}
         <div className="text-center mb-14">
-          <span className="inline-block mb-3 text-xs font-semibold tracking-wider uppercase text-[#72e3ad]">
+          <span className="inline-block mb-3 text-xs font-semibold tracking-wider uppercase text-[#34d399]">
             FAQs
           </span>
           <h2 className="text-3xl lg:text-4xl font-semibold text-gray-900 mb-3">
-            Frequently Asked <span className="text-[#72e3ad]">Questions</span>
+            Frequently Asked <span className="text-[#34d399]">Questions</span>
           </h2>
           <p className="text-sm text-gray-600">
             Everything you need to know before visiting DogPet Clinic.
