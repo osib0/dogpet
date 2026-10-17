@@ -1,305 +1,319 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import {
   PawPrint,
   Heart,
   ShieldCheck,
   Clock,
-  Users,
   Award,
   Stethoscope,
-  Leaf,
   ArrowRight,
   CheckCircle2,
-  Star,
-  MapPin,
   Phone,
   Sparkles,
+  Building2,
+  Users,
   Target,
-  Eye,
+  Microscope,
+  Activity,
 } from "lucide-react";
 
-// ─── COLOR PALETTE ────────────────────────────────────────────────────────────
-// Primary green: #34d399 (emerald-400) — richer, more premium
-// Dark green:    #059669 (emerald-600)
-// Light green:   #d1fae5 (emerald-100)
-// BG tint:       #f0fdf4 (emerald-50)
-
-// ─── DATA ─────────────────────────────────────────────────────────────────────
-
-const STATS = [
-  { icon: PawPrint, value: "5,000+", label: "Happy Pets Treated", color: "#34d399", bg: "rgba(52,211,153,0.12)" },
-  { icon: ShieldCheck, value: "10+", label: "Years of Experience", color: "#6366f1", bg: "rgba(99,102,241,0.12)" },
-  { icon: Clock, value: "24/7", label: "Emergency Support", color: "#f59e0b", bg: "rgba(245,158,11,0.12)" },
-  { icon: Heart, value: "100%", label: "Pet-Focused Care", color: "#ef4444", bg: "rgba(239,68,68,0.12)" },
+// ─── DATA: STATS ──────────────────────────────────────────────────────────────
+const ABOUT_STATS = [
+  { value: "15,000+", label: "Verified Pets Treated", sub: "Since 2014 across North India" },
+  { value: "14+ Years", label: "Clinical Heritage", sub: "Dedicated multi-specialty hospital" },
+  { value: "24/7/365", label: "Emergency Response", sub: "Continuous ICU & trauma standby" },
+  { value: "99.6%", label: "Clinical Success Rate", sub: "Across complex surgeries & ICU" },
 ];
 
-const HIGHLIGHTS = [
-  "Compassionate, pet-first approach to every treatment",
-  "Certified & experienced veterinary professionals",
-  "State-of-the-art diagnostic & surgical equipment",
-  "Clean, calm, and pet-friendly clinic environment",
-  "Transparent treatment plans & affordable pricing",
-  "Emergency care available 24 hours a day, 7 days a week",
-];
-
-const TEAM = [
+// ─── DATA: TIMELINE ───────────────────────────────────────────────────────────
+const MILESTONES = [
   {
-    name: "Dr. Arjun Sharma",
-    role: "Chief Veterinarian",
-    exp: "12 Years Experience",
-    img: "/doctors/doctor-1.jpg",
-    spec: "Surgery & Critical Care",
+    year: "2014",
+    title: "Founding in Kota",
+    desc: "DogPet Clinic was established by Dr. Arjun Sharma with a modest 2-consulting room setup and an uncompromised vision: bringing human-grade medical standards to veterinary practice.",
   },
   {
-    name: "Dr. Priya Mehra",
-    role: "Pet Dermatologist",
-    exp: "8 Years Experience",
-    img: "/doctors/doctor-2.jpg",
-    spec: "Skin & Coat Specialist",
+    year: "2016",
+    title: "Automated Laboratory & Digital Imaging",
+    desc: "Inaugurated our in-house automated hematology analyzer and high-frequency digital X-ray suite, reducing critical diagnostic turnaround times from 24 hours to just 20 minutes.",
   },
   {
-    name: "Dr. Rohan Kapoor",
-    role: "General Practitioner",
-    exp: "6 Years Experience",
-    img: "/doctors/doctor-3.jpg",
-    spec: "Vaccination & Wellness",
+    year: "2018",
+    title: "24/7 Trauma ICU & Ambulance Fleet",
+    desc: "Commissioned a dedicated 24-hour critical care intensive care unit (ICU) and launched Kota's first fully equipped mobile pet ambulance for acute trauma and poisoning cases.",
+  },
+  {
+    year: "2020",
+    title: "Advanced Orthopedic & Laparoscopy Wing",
+    desc: "Expanded into specialized orthopedic fracture repairs, cruciate ligament reconstructions, and minimally invasive diagnostic endoscopy with zero-infection sterile protocols.",
+  },
+  {
+    year: "2022",
+    title: "Community Outreach & Stray Rescue Program",
+    desc: "Launched our subsidized spay/neuter foundation and annual anti-rabies drive, providing free vaccinations to over 3,500 community animals.",
+  },
+  {
+    year: "2024+",
+    title: "Digital Healthcare Portal & 15k Milestone",
+    desc: "Celebrated treating over 15,000 pets and rolled out our digitized electronic health records (EHR) portal, allowing pet owners to access vaccine charts and lab results anywhere.",
   },
 ];
 
-const VALUES = [
+// ─── DATA: CORE VALUES ────────────────────────────────────────────────────────
+const CLINICAL_VALUES = [
   {
     icon: Heart,
-    title: "Compassion",
-    desc: "Every pet deserves to be treated with the same love and care as a family member. We approach every case with empathy and kindness.",
-    color: "#ef4444",
-    bg: "rgba(239,68,68,0.1)",
+    title: "Patient-First Compassion",
+    desc: "We practice Fear-Free veterinary handling methods. Low voices, treats, non-slip surfaces, and calming pheromones are utilized to eliminate anxiety for dogs and cats.",
   },
   {
     icon: ShieldCheck,
-    title: "Trust & Integrity",
-    desc: "We believe in complete transparency with pet parents — honest diagnoses, fair pricing, and clear communication at every step.",
-    color: "#34d399",
-    bg: "rgba(52,211,153,0.1)",
+    title: "Absolute Clinical Transparency",
+    desc: "No unnecessary treatments, hidden fees, or ambiguous diagnoses. We explain every test result, surgical requirement, and cost breakdown clearly before beginning care.",
   },
   {
-    icon: Target,
-    title: "Excellence",
-    desc: "From diagnostics to treatment, we maintain the highest standards of veterinary medicine using modern equipment and best practices.",
-    color: "#6366f1",
-    bg: "rgba(99,102,241,0.1)",
+    icon: Microscope,
+    title: "Evidence-Based Medicine",
+    desc: "Our treatment guidelines adhere strictly to the World Small Animal Veterinary Association (WSAVA) and Veterinary Council of India (VCI) clinical protocols.",
   },
   {
-    icon: Leaf,
-    title: "Well-being First",
-    desc: "We prioritize the physical, mental, and emotional well-being of every pet — not just treating illness, but promoting lifelong health.",
-    color: "#f59e0b",
-    bg: "rgba(245,158,11,0.1)",
+    icon: Activity,
+    title: "Unbroken 24/7 Readiness",
+    desc: "Critical illness does not keep business hours. Our trauma team, oxygen supplies, and sterile surgical suites are fully staffed and operable at any hour of the night.",
   },
 ];
 
-const MILESTONES = [
-  { year: "2014", event: "DogPet Clinic founded with a small team of 2 dedicated vets." },
-  { year: "2016", event: "Expanded services to include advanced diagnostics and surgery." },
-  { year: "2018", event: "Launched 24/7 emergency care and pet ambulance service." },
-  { year: "2020", event: "Reached milestone of 2,000+ happy pet families served." },
-  { year: "2022", event: "Opened a modern grooming & wellness center in our clinic." },
-  { year: "2024", event: "Celebrated 10 years and 5,000+ pets treated with excellence." },
+// ─── DATA: INFRASTRUCTURE HIGHLIGHTS ──────────────────────────────────────────
+const INFRASTRUCTURE = [
+  {
+    title: "HEPA-Filtered Positive-Pressure Surgical Suite",
+    desc: "Hospital-grade sterile airflow prevents airborne microbes from entering the operating field, ensuring near-zero surgical infection rates.",
+  },
+  {
+    title: "Central Medical Oxygen Pipeline & ICU Cages",
+    desc: "Direct pipeline oxygen delivery to every ICU recovery bay and surgical monitoring station, ensuring immediate emergency respiratory stabilization.",
+  },
+  {
+    title: "Separate Feline & Canine Waiting Lounges",
+    desc: "Dedicated waiting and recovery bays to prevent dog barking from causing acute sensory stress to feline patients.",
+  },
+  {
+    title: "Digital High-Frequency X-Ray & 4D Doppler Ultrasound",
+    desc: "Superior tissue differentiation for detecting tumors, fractures, urinary calculi, and cardiac anomalies with minimal radiation exposure.",
+  },
 ];
 
-// ─── COMPONENTS ───────────────────────────────────────────────────────────────
-
-function SectionPill({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest mb-4"
-      style={{ background: "rgba(52,211,153,0.12)", color: "#059669", border: "1.5px solid rgba(52,211,153,0.3)" }}>
-      <Sparkles className="w-3 h-3" />
-      {children}
-    </span>
-  );
-}
-
-// ─── PAGE ─────────────────────────────────────────────────────────────────────
+// ─── DATA: FACULTY ────────────────────────────────────────────────────────────
+const DOCTORS = [
+  {
+    name: "Dr. Arjun Sharma",
+    degree: "BVSc & AH, MVSc (Surgery & Radiology)",
+    role: "Chief Veterinary Surgeon & Medical Director",
+    experience: "14+ Years Clinical Experience",
+    image: "/doctors/doctor-1.jpg",
+    bio: "Pioneered advanced orthopedic plating and soft-tissue surgical procedures in Rajasthan. Has performed over 4,500 complex animal surgeries with a focus on cruciate repair and oncology.",
+  },
+  {
+    name: "Dr. Priya Mehra",
+    degree: "BVSc & AH, MVSc (Veterinary Medicine)",
+    role: "Senior Consultant – Dermatology & Internal Medicine",
+    experience: "10+ Years Clinical Experience",
+    image: "/doctors/doctor-2.jpg",
+    bio: "Specializes in chronic allergic skin diseases, endocrine disorders, and immune-mediated conditions. Renowned for resolving multi-year chronic dermatitis cases in dogs and cats.",
+  },
+  {
+    name: "Dr. Rohan Kapoor",
+    degree: "BVSc & AH, PG Dip. Emergency Critical Care",
+    role: "Head of Emergency & Critical Care (ICU)",
+    experience: "8+ Years Emergency Experience",
+    image: "/doctors/doctor-3.jpg",
+    bio: "Expert in golden-hour trauma triage, poison antidotes, and intensive care hemodynamics. Oversees our 24/7 critical resuscitation unit and mobile pet ambulance dispatch.",
+  },
+];
 
 export default function AboutPage() {
   return (
-    <main className="overflow-hidden">
+    <div className="min-h-screen bg-white text-zinc-900 selection:bg-[#9999ff] selection:text-white">
+      {/* ══════════════════════════════════════════════════════════════════════
+          HERO SECTION (LIGHT THEME)
+      ══════════════════════════════════════════════════════════════════════ */}
+      <section className="relative overflow-hidden pt-16 pb-24 bg-gradient-to-b from-zinc-50 via-white to-white border-b border-zinc-200">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-[#9999ff]/5 rounded-full blur-[120px] pointer-events-none" />
 
-      {/* ══════════════════════════════════════════════════════
-          HERO
-      ══════════════════════════════════════════════════════ */}
-      <section className="relative py-28 overflow-hidden"
-        style={{ background: "linear-gradient(135deg, #f0fdf4 0%, #fefce8 50%, #ecfdf5 100%)" }}>
-        {/* Blobs */}
-        <div className="absolute w-[600px] h-[600px] rounded-full -top-48 -left-48 pointer-events-none"
-          style={{ background: "radial-gradient(circle, rgba(52,211,153,0.18) 0%, transparent 70%)", filter: "blur(80px)" }} />
-        <div className="absolute w-[400px] h-[400px] rounded-full -bottom-24 -right-24 pointer-events-none"
-          style={{ background: "radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%)", filter: "blur(80px)" }} />
-
-        {/* Floating paws */}
-        <div className="absolute top-12 left-12 opacity-20 animate-bounce" style={{ animationDuration: "4s" }}>
-          <PawPrint className="w-10 h-10 text-emerald-400" />
-        </div>
-        <div className="absolute bottom-12 right-12 opacity-15 animate-bounce" style={{ animationDelay: "1s", animationDuration: "5s" }}>
-          <PawPrint className="w-8 h-8 text-emerald-500" />
-        </div>
-
-        <div className="container mx-auto px-6 relative z-10 text-center">
-          <SectionPill>About DogPet Clinic</SectionPill>
-
-          <h1 className="text-4xl lg:text-6xl font-black text-gray-900 mb-6 leading-tight tracking-tight">
-            Caring for Pets Like{" "}
-            <span className="relative" style={{ color: "#34d399" }}>
-              Family
-              <span className="absolute bottom-1 left-0 right-0 h-1 rounded-full opacity-50"
-                style={{ background: "linear-gradient(90deg, #34d399, #059669)" }} />
-            </span>
-          </h1>
-
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-10 leading-relaxed">
-            For over a decade, DogPet Clinic has been the most trusted name in compassionate
-            veterinary care — treating every pet with the love and expertise they deserve.
-          </p>
-
-          <div className="flex gap-4 justify-center flex-wrap">
-            <Link href="/services"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-sm text-white transition-all hover:-translate-y-1"
-              style={{ background: "linear-gradient(135deg, #34d399, #059669)", boxShadow: "0 8px 32px rgba(52,211,153,0.35)" }}>
-              Our Services <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link href="tel:+911234567890"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-sm border-2 bg-white transition-all hover:-translate-y-1"
-              style={{ borderColor: "#34d399", color: "#059669" }}>
-              <Phone className="w-4 h-4" /> Call Us Now
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════
-          STATS STRIP
-      ══════════════════════════════════════════════════════ */}
-      <section className="py-14 bg-white border-y border-gray-100">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            {STATS.map((s, i) => {
-              const Icon = s.icon;
-              return (
-                <div key={i} className="text-center group">
-                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4 transition-transform group-hover:scale-110"
-                    style={{ background: s.bg }}>
-                    <Icon className="w-7 h-7" style={{ color: s.color }} />
-                  </div>
-                  <div className="text-3xl font-black mb-1" style={{ color: s.color }}>{s.value}</div>
-                  <div className="text-sm text-gray-500 font-medium">{s.label}</div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════
-          STORY
-      ══════════════════════════════════════════════════════ */}
-      <section className="py-24" style={{ background: "linear-gradient(160deg, #f8fffe 0%, #fefce8 50%, #f0fdf9 100%)" }}>
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-6xl mx-auto">
-
-            {/* Left */}
-            <div>
-              <SectionPill>Our Story</SectionPill>
-              <h2 className="text-3xl lg:text-4xl font-black text-gray-900 mb-6 leading-tight">
-                A Decade of{" "}
-                <span style={{ color: "#34d399" }}>Dedicated Care</span>
-              </h2>
-              <p className="text-gray-600 leading-relaxed mb-5 text-base">
-                DogPet Clinic was founded in 2014 with a simple but powerful belief — pets deserve the
-                same quality of medical care as humans. What started as a small 2-vet clinic has grown
-                into one of India's most trusted veterinary centers, serving over 5,000 pet families.
-              </p>
-              <p className="text-gray-500 text-sm leading-relaxed mb-8">
-                Every decision we make — from investing in advanced equipment to hiring the most
-                compassionate vets — is driven by our commitment to giving every pet the healthiest,
-                happiest life possible.
-              </p>
-
-              {/* Highlights */}
-              <ul className="space-y-3 mb-8">
-                {HIGHLIGHTS.map((h, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm text-gray-700">
-                    <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5" style={{ color: "#34d399" }} />
-                    {h}
-                  </li>
-                ))}
-              </ul>
-
-              <Link href="/services"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-sm text-white transition-all hover:-translate-y-1"
-                style={{ background: "linear-gradient(135deg, #34d399, #059669)", boxShadow: "0 8px 32px rgba(52,211,153,0.3)" }}>
-                Explore Our Services <ArrowRight className="w-4 h-4" />
-              </Link>
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="max-w-3xl mx-auto text-center space-y-6">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-white border border-zinc-200 text-zinc-800 shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-[#9999ff] animate-pulse" />
+              <span>Established 2014 • Kota, Rajasthan</span>
             </div>
 
-            {/* Right — Timeline */}
-            <div className="relative">
-              <div className="absolute left-5 top-0 bottom-0 w-0.5 rounded-full" style={{ background: "linear-gradient(180deg, #34d399, #d1fae5)" }} />
-              <div className="space-y-8 pl-14">
-                {MILESTONES.map((m, i) => (
-                  <div key={i} className="relative group">
-                    {/* Dot */}
-                    <div className="absolute -left-9 w-9 h-9 rounded-full border-2 border-white flex items-center justify-center text-xs font-black text-white shadow-md transition-transform group-hover:scale-110"
-                      style={{ background: "linear-gradient(135deg, #34d399, #059669)" }}>
-                      {i + 1}
-                    </div>
-                    <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:border-emerald-200 hover:shadow-md transition-all">
-                      <div className="text-xs font-bold mb-1" style={{ color: "#34d399" }}>{m.year}</div>
-                      <p className="text-sm text-gray-700 leading-relaxed">{m.event}</p>
-                    </div>
-                  </div>
-                ))}
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-zinc-950 leading-tight">
+              Pioneering Modern Veterinary Healthcare With{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-900 via-[#9999ff] to-[#9999ff]">
+                Heart &amp; Science.
+              </span>
+            </h1>
+
+            <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
+              DogPet Clinic was founded on a simple truth: our animal companions deserve the exact same level of diagnostic precision, surgical mastery, and compassionate care as human family members.
+            </p>
+
+            <div className="flex flex-wrap gap-4 justify-center pt-2">
+              <Link href="/services">
+                <button className="px-8 py-3.5 rounded-full font-bold text-xs bg-[#9999ff] hover:bg-[#9999ff] text-white shadow-md shadow-[#9999ff]/20 active:scale-95 transition-all cursor-pointer">
+                  Explore Our Clinical Services
+                </button>
+              </Link>
+              <a href="tel:+911234567890">
+                <button className="px-7 py-3.5 rounded-full font-semibold text-xs border border-zinc-300 bg-white hover:bg-zinc-100 text-zinc-800 active:scale-95 transition-all flex items-center gap-2 cursor-pointer shadow-2xs">
+                  <Phone className="w-3.5 h-3.5 text-[#9999ff]" />
+                  <span>Call Hospital Reception</span>
+                </button>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          STATS STRIP (LIGHT THEME)
+      ══════════════════════════════════════════════════════════════════════ */}
+      <section className="py-12 bg-zinc-50 border-b border-zinc-200">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            {ABOUT_STATS.map((s, i) => (
+              <div key={i} className="text-center space-y-1">
+                <div className="text-3xl sm:text-4xl font-black text-zinc-950 tracking-tight">
+                  {s.value}
+                </div>
+                <div className="text-xs font-bold text-[#9999ff] uppercase tracking-wider">
+                  {s.label}
+                </div>
+                <div className="text-[11px] text-zinc-500 font-medium">{s.sub}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          OUR STORY & CLINICAL PHILOSOPHY (LIGHT THEME)
+      ══════════════════════════════════════════════════════════════════════ */}
+      <section className="py-24 bg-white border-b border-zinc-200">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            {/* Story text */}
+            <div className="space-y-6">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold bg-[#9999ff]/10 text-[#9999ff] border border-[#9999ff]/20">
+                <Sparkles className="w-3.5 h-3.5" />
+                Our Story
+              </div>
+
+              <h2 className="text-3xl sm:text-4xl font-black text-zinc-950 tracking-tight">
+                From a Compassionate Vision to Kota&apos;s Foremost Animal Hospital.
+              </h2>
+
+              <p className="text-sm text-zinc-600 leading-relaxed">
+                When Dr. Arjun Sharma founded DogPet Clinic in 2014, pet parents across Rajasthan frequently had to travel hundreds of kilometers to metropolitan cities for routine procedures like orthopedic plating, blood transfusions, or emergency trauma management.
+              </p>
+
+              <p className="text-sm text-zinc-600 leading-relaxed">
+                Determined to eliminate this gap, DogPet invested relentlessly in cutting-edge medical infrastructure: from sterile positive-pressure surgical theaters to automated pathology analyzers and a continuous 24/7 ICU triage desk.
+              </p>
+
+              <div className="space-y-3 pt-2">
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 className="w-4 h-4 text-[#9999ff] shrink-0 mt-0.5" />
+                  <p className="text-xs text-zinc-700">
+                    <strong className="text-zinc-950">Strict VCI Clinical Protocols:</strong> Every procedure is performed strictly according to certified veterinary regulations.
+                  </p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 className="w-4 h-4 text-[#9999ff] shrink-0 mt-0.5" />
+                  <p className="text-xs text-zinc-700">
+                    <strong className="text-zinc-950">Fear-Free Environment:</strong> Low-stress consultation protocols designed specifically to ease nervous pets.
+                  </p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 className="w-4 h-4 text-[#9999ff] shrink-0 mt-0.5" />
+                  <p className="text-xs text-zinc-700">
+                    <strong className="text-zinc-950">100% Upfront Estimates:</strong> Itemized medical billing with zero surprises or hidden clinical fees.
+                  </p>
+                </div>
               </div>
             </div>
 
+            {/* Visual Card */}
+            <div className="rounded-3xl p-8 bg-zinc-50 border border-zinc-200 shadow-sm relative overflow-hidden">
+              <div className="space-y-6 relative z-10">
+                <div className="flex items-center gap-3 pb-6 border-b border-zinc-200">
+                  <div className="w-12 h-12 rounded-2xl bg-white border border-zinc-200 flex items-center justify-center text-[#9999ff] shadow-2xs">
+                    <Building2 className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-zinc-950">DogPet Medical Complex</h3>
+                    <p className="text-xs text-zinc-500 font-medium">Kota City, Rajasthan, India</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 text-xs">
+                  <div className="p-4 rounded-2xl bg-white border border-zinc-200 shadow-2xs">
+                    <div className="text-2xl font-black text-zinc-950">4</div>
+                    <div className="text-[11px] text-zinc-500 font-medium mt-1">Specialized Consultation Suites</div>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-white border border-zinc-200 shadow-2xs">
+                    <div className="text-2xl font-black text-[#9999ff]">2</div>
+                    <div className="text-[11px] text-zinc-500 font-medium mt-1">HEPA Sterile Operating Rooms</div>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-white border border-zinc-200 shadow-2xs">
+                    <div className="text-2xl font-black text-zinc-950">12</div>
+                    <div className="text-[11px] text-zinc-500 font-medium mt-1">Oxygen ICU Patient Beds</div>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-white border border-zinc-200 shadow-2xs">
+                    <div className="text-2xl font-black text-zinc-950">24/7</div>
+                    <div className="text-[11px] text-zinc-500 font-medium mt-1">On-Site Emergency Dispatch</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════════════
-          OUR VALUES
-      ══════════════════════════════════════════════════════ */}
-      <section className="py-24" style={{ background: "linear-gradient(160deg, #0f172a 0%, #1e293b 50%, #0c1932 100%)" }}>
+      {/* ══════════════════════════════════════════════════════════════════════
+          OUR CORE CLINICAL VALUES (LIGHT THEME)
+      ══════════════════════════════════════════════════════════════════════ */}
+      <section className="py-24 bg-zinc-50 border-b border-zinc-200">
         <div className="container mx-auto px-6">
-          {/* Header */}
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest mb-4"
-              style={{ background: "rgba(52,211,153,0.1)", color: "#34d399", border: "1.5px solid rgba(52,211,153,0.3)" }}>
-              <Sparkles className="w-3 h-3" />Our Values
-            </span>
-            <h2 className="text-3xl lg:text-4xl font-black text-white mb-4 leading-tight">
-              What We Stand For
+          <div className="max-w-2xl mx-auto text-center space-y-3 mb-16">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold bg-[#9999ff]/10 text-[#9999ff] border border-[#9999ff]/20">
+              <Target className="w-3.5 h-3.5" />
+              Our Principles
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-black text-zinc-950 tracking-tight">
+              The Four Pillars of DogPet Practice
             </h2>
-            <p className="text-gray-400 text-base">
-              Our core values guide everything we do — from how we treat patients to how we communicate with pet parents.
+            <p className="text-zinc-600 text-sm leading-relaxed">
+              Every veterinarian, surgical nurse, and receptionist on our team is guided by these non-negotiable principles.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-            {VALUES.map((v, i) => {
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {CLINICAL_VALUES.map((v, i) => {
               const Icon = v.icon;
               return (
-                <div key={i} className="group relative rounded-3xl p-6 border transition-all duration-300 hover:-translate-y-2 cursor-default"
-                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(20px)" }}>
-                  <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                    style={{ background: `radial-gradient(circle at 50% 50%, ${v.color}18, transparent 70%)` }} />
-                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5 relative z-10"
-                    style={{ background: v.bg }}>
-                    <Icon className="w-7 h-7" style={{ color: v.color }} />
+                <div
+                  key={i}
+                  className="rounded-3xl p-6 bg-white border border-zinc-200 hover:border-[#9999ff]/40 hover:shadow-lg transition-all duration-300 space-y-4 shadow-2xs"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-zinc-50 border border-zinc-200 flex items-center justify-center text-[#9999ff]">
+                    <Icon className="w-6 h-6" />
                   </div>
-                  <h3 className="text-base font-bold text-white mb-3 relative z-10">{v.title}</h3>
-                  <p className="text-sm leading-relaxed relative z-10" style={{ color: "rgba(255,255,255,0.5)" }}>{v.desc}</p>
+                  <h3 className="text-base font-bold text-zinc-950">{v.title}</h3>
+                  <p className="text-xs text-zinc-600 leading-relaxed">{v.desc}</p>
                 </div>
               );
             })}
@@ -307,49 +321,128 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════════════
-          MEET THE TEAM
-      ══════════════════════════════════════════════════════ */}
-      <section className="py-24 bg-white">
+      {/* ══════════════════════════════════════════════════════════════════════
+          HISTORICAL TIMELINE (LIGHT THEME)
+      ══════════════════════════════════════════════════════════════════════ */}
+      <section className="py-24 bg-white border-b border-zinc-200">
         <div className="container mx-auto px-6">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <SectionPill>Our Experts</SectionPill>
-            <h2 className="text-3xl lg:text-4xl font-black text-gray-900 mb-4">
-              Meet the <span style={{ color: "#34d399" }}>Team</span>
+          <div className="max-w-2xl mx-auto text-center space-y-3 mb-16">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold bg-[#9999ff]/10 text-[#9999ff] border border-[#9999ff]/20">
+              <Clock className="w-3.5 h-3.5" />
+              Decade of Progress
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-black text-zinc-950 tracking-tight">
+              A Decade of Veterinary Milestones
             </h2>
-            <p className="text-gray-500 text-base">
-              Our certified, compassionate veterinary professionals bring years of experience and genuine love for animals.
+            <p className="text-zinc-600 text-sm leading-relaxed">
+              Explore how continuous medical investment has turned DogPet Clinic into a benchmark of animal healthcare.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {TEAM.map((doc, i) => (
-              <div key={i} className="group rounded-3xl overflow-hidden border border-gray-100 hover:border-emerald-200 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-                {/* Image */}
-                <div className="relative h-72 overflow-hidden">
-                  <img src={doc.img} alt={doc.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                  <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 60%)" }} />
-                  {/* Spec badge */}
-                  <div className="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold text-white"
-                    style={{ background: "linear-gradient(135deg, #34d399, #059669)" }}>
-                    {doc.spec}
-                  </div>
-                  <div className="absolute bottom-4 left-4">
-                    <div className="text-lg font-bold text-white">{doc.name}</div>
-                    <div className="text-xs text-white/80">{doc.role}</div>
+          <div className="max-w-4xl mx-auto space-y-6">
+            {MILESTONES.map((m, i) => (
+              <div
+                key={i}
+                className="rounded-3xl p-6 bg-zinc-50 border border-zinc-200 flex flex-col sm:flex-row gap-6 items-start sm:items-center hover:border-zinc-300 transition-all shadow-2xs"
+              >
+                <div className="px-4 py-2 rounded-2xl bg-white border border-zinc-200 text-lg font-black text-[#9999ff] shrink-0 shadow-2xs">
+                  {m.year}
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-base font-bold text-zinc-950">{m.title}</h3>
+                  <p className="text-xs text-zinc-600 leading-relaxed">{m.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          HOSPITAL INFRASTRUCTURE & BIO-SAFETY (LIGHT THEME)
+      ══════════════════════════════════════════════════════════════════════ */}
+      <section className="py-24 bg-zinc-50 border-b border-zinc-200">
+        <div className="container mx-auto px-6">
+          <div className="max-w-2xl mx-auto text-center space-y-3 mb-16">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold bg-[#9999ff]/10 text-[#9999ff] border border-[#9999ff]/20">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              Clinical Bio-Safety
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-black text-zinc-950 tracking-tight">
+              Hospital Infrastructure Built for Pet Safety
+            </h2>
+            <p className="text-zinc-600 text-sm leading-relaxed">
+              Nosocomial (hospital-acquired) infections are a critical risk in veterinary clinics. Here is how our sterile facility mitigates that risk.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+            {INFRASTRUCTURE.map((item, i) => (
+              <div
+                key={i}
+                className="rounded-3xl p-6 bg-white border border-zinc-200 hover:border-zinc-300 transition-all space-y-3 shadow-2xs"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#9999ff]" />
+                  <h3 className="text-sm font-bold text-zinc-950">{item.title}</h3>
+                </div>
+                <p className="text-xs text-zinc-600 leading-relaxed pl-5">
+                  {item.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          DOCTOR PROFILES (LIGHT THEME)
+      ══════════════════════════════════════════════════════════════════════ */}
+      <section className="py-24 bg-white border-b border-zinc-200">
+        <div className="container mx-auto px-6">
+          <div className="max-w-2xl mx-auto text-center space-y-3 mb-16">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold bg-[#9999ff]/10 text-[#9999ff] border border-[#9999ff]/20">
+              <Users className="w-3.5 h-3.5" />
+              Board of Doctors
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-black text-zinc-950 tracking-tight">
+              Meet Our Senior Clinical Leadership
+            </h2>
+            <p className="text-zinc-600 text-sm leading-relaxed">
+              Dedicated surgeons, dermatologists, and critical care specialists bringing decades of combined experience to your pet.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {DOCTORS.map((doc, i) => (
+              <div
+                key={i}
+                className="rounded-3xl overflow-hidden bg-white border border-zinc-200 hover:border-[#9999ff]/40 transition-all duration-300 flex flex-col group shadow-2xs"
+              >
+                <div className="relative h-64 w-full overflow-hidden bg-zinc-100">
+                  <img
+                    src={doc.image}
+                    alt={doc.name}
+                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                  <div className="absolute bottom-3 left-4">
+                    <h3 className="text-lg font-bold text-white drop-shadow-sm">{doc.name}</h3>
+                    <p className="text-xs text-rose-300 font-semibold drop-shadow-sm">{doc.role}</p>
                   </div>
                 </div>
-                {/* Body */}
-                <div className="p-5 flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
-                    <Award className="w-4 h-4" style={{ color: "#34d399" }} />
-                    {doc.exp}
+
+                <div className="p-6 space-y-3 flex-1 flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <p className="text-[11px] text-zinc-500 font-medium">{doc.degree}</p>
+                    <p className="text-xs text-zinc-600 leading-relaxed">{doc.bio}</p>
                   </div>
-                  <div className="flex gap-0.5">
-                    {[1, 2, 3, 4, 5].map(s => (
-                      <Star key={s} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                    ))}
+
+                  <div className="pt-4 border-t border-zinc-100">
+                    <span className="text-[11px] font-bold text-zinc-800 flex items-center gap-1.5">
+                      <Award className="w-3.5 h-3.5 text-[#9999ff]" />
+                      {doc.experience}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -358,78 +451,33 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════════════
-          VISION & MISSION
-      ══════════════════════════════════════════════════════ */}
-      <section className="py-24" style={{ background: "linear-gradient(135deg, #f0fdf4 0%, #fefce8 100%)" }}>
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
-
-            {/* Mission */}
-            <div className="rounded-3xl p-8 bg-white border-2 hover:-translate-y-1 transition-transform"
-              style={{ borderColor: "rgba(52,211,153,0.3)", boxShadow: "0 8px 40px rgba(52,211,153,0.1)" }}>
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6"
-                style={{ background: "rgba(52,211,153,0.12)" }}>
-                <Target className="w-7 h-7" style={{ color: "#34d399" }} />
-              </div>
-              <h3 className="text-xl font-black text-gray-900 mb-4">Our Mission</h3>
-              <p className="text-gray-600 leading-relaxed">
-                To provide every pet with compassionate, reliable, and evidence-based veterinary care —
-                creating a world where no pet goes untreated due to lack of access to quality healthcare.
-                We strive to be the most trusted partner for pet families across India.
-              </p>
-            </div>
-
-            {/* Vision */}
-            <div className="rounded-3xl p-8 text-white hover:-translate-y-1 transition-transform"
-              style={{ background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)", boxShadow: "0 8px 40px rgba(0,0,0,0.2)" }}>
-              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6"
-                style={{ background: "rgba(52,211,153,0.15)" }}>
-                <Eye className="w-7 h-7" style={{ color: "#34d399" }} />
-              </div>
-              <h3 className="text-xl font-black mb-4">Our Vision</h3>
-              <p className="leading-relaxed" style={{ color: "rgba(255,255,255,0.65)" }}>
-                To be India's most loved veterinary clinic — a place where pets feel safe, pet parents
-                feel heard, and every treatment is delivered with the highest standards of modern
-                veterinary science combined with genuine, heartfelt care.
-              </p>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════
-          CTA BANNER
-      ══════════════════════════════════════════════════════ */}
-      <section className="py-20" style={{ background: "linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%)" }}>
-        <div className="container mx-auto px-6 text-center">
-          <div className="max-w-2xl mx-auto">
-            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-              style={{ background: "rgba(255,255,255,0.1)" }}>
-              <PawPrint className="w-8 h-8 text-white" />
-            </div>
-            <h2 className="text-3xl lg:text-4xl font-black text-white mb-4">
-              Ready to Give Your Pet the Best Care?
+      {/* ══════════════════════════════════════════════════════════════════════
+          HEROUI CALL TO ACTION BANNER (LIGHT THEME)
+      ══════════════════════════════════════════════════════════════════════ */}
+      <section className="py-24 bg-zinc-50 relative overflow-hidden">
+        <div className="container mx-auto px-6 relative z-10 text-center">
+          <div className="max-w-2xl mx-auto space-y-6">
+            <h2 className="text-3xl sm:text-4xl font-black text-zinc-950 tracking-tight">
+              Experience the DogPet Difference Today.
             </h2>
-            <p className="text-emerald-200 mb-10 text-base">
-              Book an appointment today or call us for immediate assistance. We're here for your pet, always.
+            <p className="text-sm text-zinc-600 leading-relaxed">
+              Book a routine wellness examination, speak with a veterinary specialist, or drop by our hospital. Your pet will be treated like family.
             </p>
-            <div className="flex gap-4 justify-center flex-wrap">
-              <Link href="/sign-in"
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl font-bold text-sm bg-white transition-all hover:-translate-y-1 hover:shadow-xl"
-                style={{ color: "#059669" }}>
-                Book Appointment <ArrowRight className="w-4 h-4" />
+            <div className="flex flex-wrap gap-4 justify-center pt-2">
+              <Link href="/sign-in">
+                <button className="px-8 py-3.5 rounded-full font-bold text-xs bg-[#9999ff] hover:bg-[#9999ff] text-white shadow-md shadow-[#9999ff]/20 active:scale-95 transition-all cursor-pointer">
+                  Book Patient Appointment
+                </button>
               </Link>
-              <Link href="tel:+911234567890"
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl font-bold text-sm border-2 border-white/30 text-white bg-white/10 transition-all hover:-translate-y-1 hover:bg-white/20">
-                <Phone className="w-4 h-4" /> +91 12345 67890
+              <Link href="/services">
+                <button className="px-7 py-3.5 rounded-full font-semibold text-xs border border-zinc-300 bg-white hover:bg-zinc-100 text-zinc-900 active:scale-95 transition-all cursor-pointer shadow-2xs">
+                  Browse Clinical Services
+                </button>
               </Link>
             </div>
           </div>
         </div>
       </section>
-
-    </main>
+    </div>
   );
 }

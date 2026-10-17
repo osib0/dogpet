@@ -5,510 +5,583 @@ import Link from "next/link";
 import {
   Stethoscope,
   Syringe,
-  Ambulance,
+  Activity,
   Scissors,
-  Bone,
   Microscope,
-  HeartPulse,
-  PawPrint,
+  Phone,
   ArrowRight,
   CheckCircle2,
   Clock,
-  Phone,
-  MapPin,
-  Star,
   Sparkles,
-  Zap,
-  Shield,
-  Heart,
+  ShieldCheck,
+  AlertCircle,
+  ChevronDown,
+  Flame,
+  BadgeAlert,
 } from "lucide-react";
 
-// ─── COLOR PALETTE ────────────────────────────────────────────────────────────
-// Primary: #34d399 (emerald-400)   Dark: #059669   Light bg: #d1fae5 / #f0fdf4
-
-// ─── SERVICES DATA ────────────────────────────────────────────────────────────
-
-const SERVICES = [
+// ─── SERVICES DIRECTORY DATA ──────────────────────────────────────────────────
+const ALL_SERVICES = [
   {
-    icon: Stethoscope,
-    title: "General Health Checkups",
-    desc: "Comprehensive physical examinations to monitor your pet's overall health, detect problems early, and keep them in peak condition.",
-    color: "#34d399",
-    bg: "rgba(52,211,153,0.12)",
-    features: ["Full body examination", "Weight & vitals check", "Health score report", "Follow-up care plan"],
-    price: "Starting ₹299",
+    id: "wellness",
+    category: "Preventative & OPD",
+    title: "General Wellness Consultation & Physical Triage",
+    tag: "Everyday Care",
+    desc: "A thorough nose-to-tail physical assessment conducted by licensed veterinary doctors. Designed to catch subclinical illness before symptoms emerge.",
+    details: [
+      "Cardiopulmonary auscultation (heart & lung sounds)",
+      "Ophthalmic, otic & oral cavity examination",
+      "Abdominal palpation & lymph node check",
+      "Body condition score & customized weight guidance",
+      "Digital immunization & deworming audit",
+    ],
+    preparation: "Bring your pet’s past medical records, vaccination card, and note any recent appetite or behavior changes.",
+    duration: "25 - 35 Minutes",
+    price: "₹399",
+  },
+  {
+    id: "vaccines",
+    category: "Preventative & OPD",
+    title: "Core & Non-Core Vaccinations with Parasite Control",
+    tag: "Essential Protocol",
+    desc: "Immunization program following WSAVA global standards. 100% cold-chain stored biologics administered after a mandatory physical temperature and vitals check.",
+    details: [
+      "Canine: DHPPiL (Distemper, Hepatitis, Parvo, Parainfluenza, Lepto) & Rabies",
+      "Feline: FPV, FHV, FCV (Tricat Trio) & Anti-Rabies",
+      "Kennel Cough (Bordetella) & Canine Corona protection",
+      "Targeted broad-spectrum deworming tablet administration",
+      "Free digitized vaccination certificate in Patient Portal",
+    ],
+    preparation: "Ensure pet is active, fever-free, and has normal appetite on the day of vaccination.",
+    duration: "15 - 20 Minutes",
+    price: "From ₹249",
+  },
+  {
+    id: "emergency",
+    category: "Critical Care & ICU",
+    title: "24/7 Critical Trauma, Resuscitation & Intensive Care",
+    tag: "Life Support",
+    desc: "Immediate life-saving emergency medical attention for hit-by-run accidents, acute intoxication, gastric dilation (GDV), snake bites, and severe breathing distress.",
+    details: [
+      "Zero-wait immediate triage response by ICU nurses",
+      "Central pipeline oxygen cages & mechanical ventilation",
+      "Emergency blood transfusion & whole blood cross-matching",
+      "Continuous multiparameter monitoring (ECG, SpO2, NIBP)",
+      "Intravenous fluid therapy pumps & antidote administration",
+    ],
+    preparation: "Call our emergency hotline (+91 12345 67890) while en route so the triage resuscitation bay is prepared.",
+    duration: "Immediate Triage",
+    price: "Emergency Protocol",
+  },
+  {
+    id: "surgery",
+    category: "Surgery & Ortho",
+    title: "Advanced Soft-Tissue & Laparoscopic Surgery",
+    tag: "Sterile Theater",
+    desc: "General and elective surgeries conducted in a HEPA-filtered positive-pressure operating room with precision isoflurane inhalation anesthesia.",
+    details: [
+      "Elective spaying (ovariohysterectomy) & neutering (castration)",
+      "Tumor, cyst, and foreign body gastrointestinal excision",
+      "Bladder cystotomy (urinary stone removal)",
+      "Caesarean section & emergency obstetric intervention",
+      "Heated post-anesthesia recovery warming bays",
+    ],
+    preparation: "Mandatory 8–10 hour pre-op food fast; pre-surgical complete blood count and kidney profile clearance.",
+    duration: "1 - 3 Hours + Day Recovery",
+    price: "Consultation First",
+  },
+  {
+    id: "ortho",
+    category: "Surgery & Ortho",
+    title: "Orthopedic Surgery & Cruciate Ligament Repair",
+    tag: "Specialized Plating",
+    desc: "Complex bone fracture fixation, joint stabilization, and cruciate ligament repair using titanium and stainless-steel veterinary implant plates.",
+    details: [
+      "Internal dynamic compression bone plating & pinning",
+      "Cruciate ligament (ACL) repair & patellar luxation correction",
+      "Femoral head ostectomy (FHO) for severe hip dysplasia",
+      "Intraoperative fluoroscopy guidance and post-op digital X-ray",
+      "Comprehensive postoperative pain management regimen",
+    ],
+    preparation: "High-resolution multi-view digital radiographs required prior to surgical slot booking.",
+    duration: "2 - 4 Hours + Monitored Hospitalization",
+    price: "Specialist Consultation",
+  },
+  {
+    id: "pathology",
+    category: "Diagnostics & Lab",
+    title: "Automated In-House Pathology & Hematology",
+    desc: "On-site laboratory equipped with 5-part differential blood analyzers, automated wet biochemistry, and microbiological culture stations.",
+    details: [
+      "Complete Blood Count (CBC, ESR, Platelets) in 15 mins",
+      "Liver (SGPT, SGOT, Alk Phos) & Kidney (BUN, Creatinine) panels",
+      "Blood parasite screening (Ehrlichia, Babesia, Anaplasma)",
+      "Urinalysis, urine sediment & stone chemical analysis",
+      "Fungal DTM culture & microscopic skin scrape cytology",
+    ],
+    preparation: "For fasting biochemistry profiles, water is permitted but hold food for 6–8 hours.",
+    duration: "15 - 30 Minutes",
+    price: "From ₹499",
+  },
+  {
+    id: "imaging",
+    category: "Diagnostics & Lab",
+    title: "Digital High-Frequency X-Ray & 4D Doppler Ultrasound",
+    desc: "Low-radiation high-frequency radiography and ultrasound imaging to accurately visualize skeletal, thoracic, and abdominal internal organs.",
+    details: [
+      "High-contrast skeletal radiographs for fracture assessment",
+      "Thoracic digital views for cardiac & pulmonary evaluation",
+      "High-resolution abdominal organ ultrasound scanning",
+      "Pregnancy confirmation & fetal viability scans",
+      "Instant digital PACS export to your patient portal",
+    ],
+    preparation: "Abdominal ultrasound requires fasting for 8 hours and a moderately full urinary bladder.",
+    duration: "20 - 40 Minutes",
+    price: "From ₹699",
+  },
+  {
+    id: "dermatology",
+    category: "Skin & Hygiene",
+    title: "Clinical Dermatology & Medicated Spa Therapy",
+    desc: "Diagnostic skin cytology and targeted dermatological therapy for chronic atopic dermatitis, severe mange, yeast infections, and ectoparasites.",
+    details: [
+      "Wood's lamp examination & skin scrape cytology",
+      "Food elimination allergy counseling and serum allergy testing",
+      "Veterinary medicated bath (Chlorhexidine/Ketoconazole/Benzoyl)",
+      "Deep ear canal flushing for resistant Otitis Externa",
+      "Hygienic coat trim, sanitary cut & clinical nail trimming",
+    ],
+    preparation: "Avoid bathing your pet for 48 hours prior to diagnostic skin scraping.",
+    duration: "45 - 60 Minutes",
+    price: "From ₹449",
+  },
+  {
+    id: "dental",
+    category: "Preventative & OPD",
+    title: "Ultrasonic Dental Scaling & Oral Surgery",
+    tag: "Oral Care",
+    desc: "Professional ultrasonic supra- and subgingival tartar removal, tooth polishing, and surgical dental extractions under monitored anesthesia.",
+    details: [
+      "Piezoelectric ultrasonic plaque and calculus debridement",
+      "Subgingival periodontal pocket curettage",
+      "Fine fluoride polishing paste application to inhibit plaque",
+      "Surgical tooth extraction for loose, fractured, or infected teeth",
+      "Prevention of secondary cardiac and renal bacterial seeding",
+    ],
+    preparation: "Overnight food fast required; pre-anesthetic blood screening recommended for senior pets.",
+    duration: "45 - 60 Minutes",
+    price: "From ₹899",
+  },
+];
+
+// ─── DATA: PREVENTATIVE CARE PACKAGES ─────────────────────────────────────────
+const CARE_PACKAGES = [
+  {
+    name: "Puppy & Kitten First-Year Protection",
+    tag: "Essential Growth",
+    price: "₹1,999",
+    coverage: [
+      "3x Core Vaccinations (DHPPiL / Tricat)",
+      "2x Anti-Rabies Vaccinations with certification",
+      "Full course of monthly broad-spectrum deworming",
+      "3x Full Physical Vital Checkups & Growth Audits",
+      "Personalized Diet & Behavioral Consultation",
+    ],
+  },
+  {
+    name: "Annual Complete Health MOT",
     tag: "Most Popular",
-    tagColor: "#34d399",
+    price: "₹2,499",
+    coverage: [
+      "Full Head-to-Tail Clinical Examination",
+      "Annual Booster Vaccination + Anti-Rabies",
+      "Complete Blood Count (CBC 24-parameters)",
+      "Kidney (Creatinine/BUN) & Liver (SGPT) Panel",
+      "Routine Urine Analysis & Stool Parasite Screen",
+    ],
   },
   {
-    icon: Syringe,
-    title: "Vaccination & Preventive Care",
-    desc: "Complete vaccination schedules and preventive treatments to protect your pet from serious and life-threatening diseases.",
-    color: "#6366f1",
-    bg: "rgba(99,102,241,0.12)",
-    features: ["Core & non-core vaccines", "Deworming treatment", "Flea & tick prevention", "Vaccination card issued"],
-    price: "Starting ₹199",
-    tag: "Essential",
-    tagColor: "#6366f1",
-  },
-  {
-    icon: HeartPulse,
-    title: "Emergency & Critical Care",
-    desc: "Immediate expert medical attention for accidents, sudden illness, poisoning, and all life-threatening conditions — available 24/7.",
-    color: "#ef4444",
-    bg: "rgba(239,68,68,0.12)",
-    features: ["24/7 availability", "Intensive care unit", "Trauma & injury care", "Poison & toxin treatment"],
-    price: "On-call pricing",
-    tag: "24/7",
-    tagColor: "#ef4444",
-  },
-  {
-    icon: Bone,
-    title: "Surgery & Treatment",
-    desc: "Safe, modern surgical procedures performed by our experienced veterinary surgeons using the latest medical equipment.",
-    color: "#f59e0b",
-    bg: "rgba(245,158,11,0.12)",
-    features: ["Soft tissue surgery", "Orthopaedic procedures", "Dental surgery", "Post-op recovery care"],
-    price: "Consultation first",
-    tag: "Expert Care",
-    tagColor: "#f59e0b",
-  },
-  {
-    icon: Scissors,
-    title: "Grooming & Hygiene",
-    desc: "Professional grooming services to keep your pet clean, comfortable, healthy, and looking their absolute best.",
-    color: "#ec4899",
-    bg: "rgba(236,72,153,0.12)",
-    features: ["Bath & blow-dry", "Nail trimming", "Ear cleaning", "Breed-specific styling"],
-    price: "Starting ₹399",
-    tag: "Pamper Time",
-    tagColor: "#ec4899",
-  },
-  {
-    icon: Microscope,
-    title: "Diagnostics & Lab Tests",
-    desc: "Advanced diagnostic services including blood panels, urine analysis, X-rays, ultrasound, and comprehensive health screenings.",
-    color: "#0ea5e9",
-    bg: "rgba(14,165,233,0.12)",
-    features: ["Blood & urine tests", "Digital X-ray", "Ultrasound imaging", "Biopsy & culture"],
-    price: "Starting ₹499",
-    tag: "Precision",
-    tagColor: "#0ea5e9",
-  },
-  {
-    icon: PawPrint,
-    title: "Nutrition & Diet Consultation",
-    desc: "Personalized diet plans and expert nutritional guidance based on your pet's specific breed, age, weight, and health status.",
-    color: "#10b981",
-    bg: "rgba(16,185,129,0.12)",
-    features: ["Custom meal plans", "Supplement guidance", "Weight management", "Allergy diet plans"],
-    price: "Starting ₹149",
-    tag: "Wellness",
-    tagColor: "#10b981",
-  },
-  {
-    icon: Ambulance,
-    title: "Pet Ambulance",
-    desc: "Prompt and safe pet transport for emergencies and routine hospital visits — equipped with basic life support on board.",
-    color: "#8b5cf6",
-    bg: "rgba(139,92,246,0.12)",
-    features: ["GPS-tracked vehicles", "Trained handlers", "Basic life support", "City-wide coverage"],
-    price: "Starting ₹299",
-    tag: "Door-to-Door",
-    tagColor: "#8b5cf6",
+    name: "Senior Pet Geriatric Care Panel (7+ Yrs)",
+    tag: "Golden Years",
+    price: "₹3,999",
+    coverage: [
+      "Senior Physical, Joint & Orthopedic Mobility Audit",
+      "Comprehensive 18-parameter Biochemistry Blood Profile",
+      "Digital Thoracic X-Ray (Heart & Lungs)",
+      "Abdominal Diagnostic Ultrasound Screen",
+      "Blood Pressure (NIBP) & Cardiac Arrhythmia Screen",
+    ],
   },
 ];
 
-const WHY_FEATURES = [
-  { icon: Shield, title: "Certified Veterinarians", desc: "All our doctors are licensed by the Veterinary Council of India with years of hands-on experience." },
-  { icon: Zap, title: "Fast & Accurate Diagnosis", desc: "Modern lab equipment ensures quick, accurate results so treatment can begin without delay." },
-  { icon: Heart, title: "Stress-Free Environment", desc: "Our clinic is designed to be calm, clean, and welcoming — minimizing anxiety for your pet." },
-  { icon: Clock, title: "On-Time, Every Time", desc: "We respect your time. Scheduled appointments always start on time with no long waits." },
-];
-
-const FAQS = [
+// ─── DATA: EMERGENCY CHECKLIST ────────────────────────────────────────────────
+const EMERGENCY_TIPS = [
   {
-    q: "Do I need an appointment for a checkup?",
-    a: "Walk-ins are welcome for minor consultations, but we recommend booking an appointment in advance for comprehensive checkups to ensure minimal waiting time.",
+    condition: "Heat Stroke / Hyperthermia",
+    action: "Move pet to shaded cool area immediately. Apply cool (not ice cold) tap water to paws, groin, and neck. Turn on AC and rush to our ICU.",
   },
   {
-    q: "What vaccines does my dog/cat need?",
-    a: "Core vaccines for dogs include Distemper, Parvovirus, Hepatitis, and Rabies. For cats: Feline Viral Rhinotracheitis, Calicivirus, Panleukopenia, and Rabies. Our vets will guide you based on your pet's age and lifestyle.",
+    condition: "Suspected Poison / Toxin Ingestion",
+    action: "Do NOT induce vomiting without consulting a vet. Take a photo of the chemical/chocolate/plant packaging and bring it with you immediately.",
   },
   {
-    q: "Is your clinic open on weekends?",
-    a: "Yes! We are open 7 days a week from 9 AM to 9 PM. Our emergency line is available 24/7 for urgent cases.",
+    condition: "Motor Vehicle Accident / Trauma",
+    action: "Minimize spine movement. Gently place pet on a firm blanket or board. Cover open wounds with clean cloth. Apply gentle direct pressure to bleeders.",
   },
   {
-    q: "How do I prepare my pet for surgery?",
-    a: "Your vet will provide specific pre-surgery instructions. Typically, pets should fast for 8–12 hours before the procedure. We'll walk you through everything beforehand.",
-  },
-  {
-    q: "Do you offer home visits?",
-    a: "Yes, we offer home visits for select services including post-surgery follow-ups, elderly pets, and stress-sensitive animals. Call us to check availability.",
+    condition: "Bloat / Gastric Dilation (GDV)",
+    action: "If dog attempts to vomit with no food coming up, has a hard distended abdomen, or displays severe pacing — this is a fatal surgical emergency. Call us immediately.",
   },
 ];
 
-// ─── SECTION PILL ──────────────────────────────────────────────────────────────
+// ─── DATA: SERVICES FAQS ──────────────────────────────────────────────────────
+const SERVICES_FAQS = [
+  {
+    q: "Why does my pet need to fast before anesthesia or surgery?",
+    a: "Anesthetic medications relax normal swallowing reflexes. If a pet has food in their stomach, they may vomit during induction or recovery and inhale (aspirate) food particles into their lungs, causing life-threatening aspiration pneumonia. A mandatory 8–10 hour food fast prevents this risk.",
+  },
+  {
+    q: "How frequently should my adult dog or cat be vaccinated?",
+    a: "After completing initial puppy/kitten vaccination series, core booster vaccines and anti-rabies immunizations are administered annually under Indian veterinary regulations to ensure protective antibody titers remain strong.",
+  },
+  {
+    q: "What is ultrasonic dental scaling and why can't it be done awake?",
+    a: "Ultrasonic scaling removes calcified tartar below the gumline where harmful periodontal bacteria live. Pets cannot remain perfectly still with sharp vibrating instruments near delicate oral tissue. Monitored general anesthesia ensures safe, pain-free, and complete dental prophylaxis.",
+  },
+  {
+    q: "Can I receive lab test results on my mobile phone?",
+    a: "Yes. All blood reports, digital radiographs, ultrasound scans, and prescriptions are uploaded directly to the DogPet Patient Portal, accessible anytime with your registered phone number.",
+  },
+];
 
-function SectionPill({ children, dark = false }: { children: React.ReactNode; dark?: boolean }) {
-  return (
-    <span
-      className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest mb-4"
-      style={
-        dark
-          ? { background: "rgba(52,211,153,0.1)", color: "#34d399", border: "1.5px solid rgba(52,211,153,0.3)" }
-          : { background: "rgba(52,211,153,0.12)", color: "#059669", border: "1.5px solid rgba(52,211,153,0.3)" }
-      }
-    >
-      <Sparkles className="w-3 h-3" />
-      {children}
-    </span>
-  );
-}
-
-// ─── FAQ ITEM ─────────────────────────────────────────────────────────────────
-
-function FAQItem({ q, a }: { q: string; a: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div
-      className="rounded-2xl border overflow-hidden transition-all cursor-pointer"
-      style={{ borderColor: open ? "rgba(52,211,153,0.4)" : "#e5e7eb" }}
-      onClick={() => setOpen(!open)}
-    >
-      <div className="flex items-center justify-between px-6 py-4 bg-white">
-        <p className="font-semibold text-gray-900 text-sm pr-4">{q}</p>
-        <div
-          className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all text-white text-sm font-black"
-          style={{ background: open ? "#34d399" : "#e5e7eb", color: open ? "white" : "#9ca3af" }}
-        >
-          {open ? "−" : "+"}
-        </div>
-      </div>
-      {open && (
-        <div className="px-6 pb-5 bg-white">
-          <p className="text-sm text-gray-500 leading-relaxed">{a}</p>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── PAGE ─────────────────────────────────────────────────────────────────────
-
+// ─── SERVICES PAGE COMPONENT (LIGHT THEME) ────────────────────────────────────
 export default function ServicesPage() {
+  const [activeTab, setActiveTab] = useState("All");
+
+  const categories = [
+    "All",
+    "Preventative & OPD",
+    "Surgery & Ortho",
+    "Critical Care & ICU",
+    "Diagnostics & Lab",
+    "Skin & Hygiene",
+  ];
+
+  const filteredServices =
+    activeTab === "All"
+      ? ALL_SERVICES
+      : ALL_SERVICES.filter((s) => s.category === activeTab);
+
   return (
-    <main className="overflow-hidden">
+    <div className="min-h-screen bg-white text-zinc-900 selection:bg-[#9999ff] selection:text-white">
+      {/* ══════════════════════════════════════════════════════════════════════
+          HERO SECTION (LIGHT THEME)
+      ══════════════════════════════════════════════════════════════════════ */}
+      <section className="relative overflow-hidden pt-16 pb-24 bg-gradient-to-b from-zinc-50 via-white to-white border-b border-zinc-200">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-[#9999ff]/5 rounded-full blur-[120px] pointer-events-none" />
 
-      {/* ══════════════════════════════════════════════════════
-          HERO
-      ══════════════════════════════════════════════════════ */}
-      <section
-        className="relative py-28 overflow-hidden"
-        style={{ background: "linear-gradient(135deg, #f0fdf4 0%, #fefce8 50%, #ecfdf5 100%)" }}
-      >
-        {/* Blobs */}
-        <div className="absolute w-[700px] h-[700px] rounded-full -top-64 -right-64 pointer-events-none"
-          style={{ background: "radial-gradient(circle, rgba(52,211,153,0.15) 0%, transparent 70%)", filter: "blur(100px)" }} />
-        <div className="absolute w-[400px] h-[400px] rounded-full -bottom-32 -left-32 pointer-events-none"
-          style={{ background: "radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%)", filter: "blur(80px)" }} />
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="max-w-3xl mx-auto text-center space-y-6">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-white border border-zinc-200 text-zinc-800 shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-[#9999ff] animate-pulse" />
+              <span>Full Clinical Scope • Inpatient &amp; Outpatient</span>
+            </div>
 
-        <div className="container mx-auto px-6 relative z-10 text-center">
-          <SectionPill>What We Offer</SectionPill>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-zinc-950 leading-tight">
+              Specialized Veterinary Healthcare Designed for{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-900 via-[#9999ff] to-[#9999ff]">
+                Longevity &amp; Vitality.
+              </span>
+            </h1>
 
-          <h1 className="text-4xl lg:text-6xl font-black text-gray-900 mb-6 leading-tight tracking-tight">
-            Comprehensive Care for{" "}
-            <span className="relative inline-block" style={{ color: "#34d399" }}>
-              Every Pet
-              <span className="absolute bottom-1 left-0 right-0 h-1 rounded-full opacity-40"
-                style={{ background: "linear-gradient(90deg, #34d399, #059669)" }} />
-            </span>
-          </h1>
+            <p className="text-base sm:text-lg text-zinc-600 leading-relaxed">
+              From routine immunizations to delicate orthopedic fracture repairs and 24/7 ICU resuscitation, explore our comprehensive catalog of evidence-based veterinary treatments.
+            </p>
 
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-10 leading-relaxed">
-            From routine health checkups to advanced surgeries and 24/7 emergency care —
-            DogPet Clinic provides everything your pet needs to live a healthy, happy life.
-          </p>
+            <div className="flex flex-wrap gap-4 justify-center pt-2">
+              <Link href="/sign-in">
+                <button className="px-8 py-3.5 rounded-full font-bold text-xs bg-[#9999ff] hover:bg-[#9999ff] text-white shadow-md shadow-[#9999ff]/20 active:scale-95 transition-all cursor-pointer">
+                  Book a Consultation
+                </button>
+              </Link>
+              <a href="tel:+911234567890">
+                <button className="px-7 py-3.5 rounded-full font-semibold text-xs border border-zinc-300 bg-white hover:bg-zinc-100 text-zinc-800 active:scale-95 transition-all flex items-center gap-2 cursor-pointer shadow-2xs">
+                  <Phone className="w-3.5 h-3.5 text-[#9999ff]" />
+                  <span>24/7 Emergency Line</span>
+                </button>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
 
-          <div className="flex gap-4 justify-center flex-wrap">
-            <Link
-              href="/sign-in"
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl font-bold text-sm text-white transition-all hover:-translate-y-1"
-              style={{ background: "linear-gradient(135deg, #34d399, #059669)", boxShadow: "0 8px 32px rgba(52,211,153,0.35)" }}
-            >
-              Book Appointment <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link
-              href="tel:+911234567890"
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl font-bold text-sm border-2 bg-white transition-all hover:-translate-y-1"
-              style={{ borderColor: "#34d399", color: "#059669" }}
-            >
-              <Phone className="w-4 h-4" /> Emergency: 24/7
-            </Link>
+      {/* ══════════════════════════════════════════════════════════════════════
+          HEROUI PILL FILTER TABS & SERVICES DIRECTORY (LIGHT THEME)
+      ══════════════════════════════════════════════════════════════════════ */}
+      <section className="py-20 bg-zinc-50 border-b border-zinc-200">
+        <div className="container mx-auto px-6">
+          {/* Header */}
+          <div className="max-w-2xl mx-auto text-center space-y-3 mb-12">
+            <h2 className="text-3xl font-black text-zinc-950 tracking-tight">
+              Browse by Medical Department
+            </h2>
+            <p className="text-zinc-600 text-xs sm:text-sm">
+              Filter our services by specialization to review procedures, guidelines, and estimated fees.
+            </p>
+
+            {/* HeroUI Filter Pills */}
+            <div className="flex flex-wrap items-center justify-center gap-2 pt-4">
+              {categories.map((cat) => {
+                const active = activeTab === cat;
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveTab(cat)}
+                    className={`px-4 py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                      active
+                        ? "bg-[#9999ff] text-white shadow-md shadow-[#9999ff]/25"
+                        : "bg-white border border-zinc-200 text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100"
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          {/* Quick stats */}
-          <div className="flex items-center justify-center gap-8 mt-14 flex-wrap">
-            {[["8+", "Services"], ["5,000+", "Pets Treated"], ["24/7", "Emergency"], ["10+", "Yrs Experience"]].map(([val, lbl], i) => (
-              <div key={i} className="text-center">
-                <div className="text-2xl font-black" style={{ color: "#34d399" }}>{val}</div>
-                <div className="text-xs text-gray-500 font-medium">{lbl}</div>
+          {/* Detailed Service Cards Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {filteredServices.map((svc) => (
+              <div
+                key={svc.id}
+                className="rounded-3xl p-7 bg-white border border-zinc-200 hover:border-[#9999ff]/40 hover:shadow-xl hover:shadow-[#9999ff]/5 transition-all duration-300 flex flex-col justify-between space-y-6 shadow-2xs"
+              >
+                <div className="space-y-4">
+                  {/* Top row: Category, Tag, Fee */}
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-zinc-100 text-zinc-600 border border-zinc-200">
+                      {svc.category}
+                    </span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#9999ff]/10 text-[#9999ff] border border-[#9999ff]/20">
+                        {svc.tag}
+                      </span>
+                      <span className="text-sm font-bold text-zinc-950">{svc.price}</span>
+                    </div>
+                  </div>
+
+                  {/* Title & Description */}
+                  <div>
+                    <h3 className="text-xl font-bold text-zinc-950">{svc.title}</h3>
+                    <p className="text-xs text-zinc-600 leading-relaxed mt-2">{svc.desc}</p>
+                  </div>
+
+                  {/* Procedures Checklist */}
+                  <div className="space-y-2 pt-2 border-t border-zinc-100">
+                    <span className="text-[11px] font-bold uppercase text-zinc-500 block tracking-wider">
+                      Included Clinical Checks:
+                    </span>
+                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {svc.details.map((d, i) => (
+                        <li key={i} className="flex items-start gap-2 text-xs text-zinc-700">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#9999ff] shrink-0 mt-0.5" />
+                          <span>{d}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Preparation Guidelines */}
+                  <div className="p-3.5 rounded-2xl bg-zinc-50 border border-zinc-200 text-xs">
+                    <span className="font-semibold text-zinc-900 block mb-0.5">
+                      Parent Preparation Advice:
+                    </span>
+                    <span className="text-zinc-600 text-[11px] leading-relaxed">
+                      {svc.preparation}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Card Footer: Duration & HeroUI CTA */}
+                <div className="pt-4 border-t border-zinc-100 flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-xs text-zinc-500">
+                    <Clock className="w-3.5 h-3.5 text-[#9999ff]" />
+                    <span>Est. Time: {svc.duration}</span>
+                  </div>
+
+                  <Link href="/sign-in">
+                    <button className="px-5 py-2.5 rounded-full text-xs font-bold bg-[#9999ff] hover:bg-[#9999ff] text-white shadow-sm active:scale-95 transition-all">
+                      Book This Service
+                    </button>
+                  </Link>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════════════
-          SERVICES GRID
-      ══════════════════════════════════════════════════════ */}
-      <section
-        className="py-24"
-        style={{ background: "linear-gradient(160deg, #0f172a 0%, #1e293b 50%, #0c1932 100%)" }}
-      >
+      {/* ══════════════════════════════════════════════════════════════════════
+          PREVENTATIVE HEALTH PACKAGES (LIGHT THEME)
+      ══════════════════════════════════════════════════════════════════════ */}
+      <section className="py-24 bg-white border-b border-zinc-200">
         <div className="container mx-auto px-6">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <SectionPill dark>All Services</SectionPill>
-            <h2 className="text-3xl lg:text-4xl font-black text-white mb-4">
-              Everything Your Pet Needs
+          <div className="max-w-2xl mx-auto text-center space-y-3 mb-16">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold bg-[#9999ff]/10 text-[#9999ff] border border-[#9999ff]/20">
+              <Sparkles className="w-3.5 h-3.5" />
+              Bundled Value
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-black text-zinc-950 tracking-tight">
+              Comprehensive Health Care Packages
             </h2>
-            <p className="text-base" style={{ color: "rgba(255,255,255,0.5)" }}>
-              Explore our full range of veterinary services — each delivered with expertise, compassion, and care.
+            <p className="text-zinc-600 text-sm leading-relaxed">
+              Curated preventative care bundles that combine multi-organ blood profiling, digital imaging, and immunizations at discounted rates.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {SERVICES.map((svc, i) => {
-              const Icon = svc.icon;
-              return (
-                <div
-                  key={i}
-                  className="group relative rounded-3xl p-6 transition-all duration-300 hover:-translate-y-2 cursor-default"
-                  style={{
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    backdropFilter: "blur(20px)",
-                  }}
-                >
-                  {/* Glow on hover */}
-                  <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                    style={{ background: `radial-gradient(circle at 50% 50%, ${svc.color}18, transparent 70%)` }} />
-
-                  {/* Tag */}
-                  <div className="absolute top-4 right-4 px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white"
-                    style={{ background: svc.tagColor }}>
-                    {svc.tag}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {CARE_PACKAGES.map((pkg, i) => (
+              <div
+                key={i}
+                className="rounded-3xl p-7 bg-zinc-50 border border-zinc-200 hover:border-[#9999ff]/40 hover:shadow-xl transition-all flex flex-col justify-between space-y-6 shadow-2xs"
+              >
+                <div className="space-y-4">
+                  <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-white text-[#9999ff] border border-zinc-200 shadow-2xs">
+                    {pkg.tag}
+                  </span>
+                  <div>
+                    <h3 className="text-lg font-bold text-zinc-950">{pkg.name}</h3>
+                    <div className="text-3xl font-black text-zinc-950 mt-2">{pkg.price}</div>
+                    <span className="text-[11px] text-zinc-500">All inclusive package fee</span>
                   </div>
 
-                  {/* Icon */}
-                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5 relative z-10 transition-transform group-hover:scale-110 group-hover:rotate-[-6deg]"
-                    style={{ background: svc.bg }}>
-                    <Icon className="w-7 h-7" style={{ color: svc.color }} />
-                  </div>
-
-                  <h3 className="text-base font-bold text-white mb-3 relative z-10">{svc.title}</h3>
-                  <p className="text-xs leading-relaxed mb-4 relative z-10" style={{ color: "rgba(255,255,255,0.45)" }}>
-                    {svc.desc}
-                  </p>
-
-                  {/* Features */}
-                  <ul className="space-y-1.5 mb-5 relative z-10">
-                    {svc.features.map((f, j) => (
-                      <li key={j} className="flex items-center gap-2 text-xs" style={{ color: "rgba(255,255,255,0.55)" }}>
-                        <CheckCircle2 className="w-3.5 h-3.5 shrink-0" style={{ color: svc.color }} />
-                        {f}
+                  <ul className="space-y-2.5 pt-4 border-t border-zinc-200">
+                    {pkg.coverage.map((c, idx) => (
+                      <li key={idx} className="flex items-start gap-2.5 text-xs text-zinc-700">
+                        <CheckCircle2 className="w-4 h-4 text-[#9999ff] shrink-0 mt-0.5" />
+                        <span>{c}</span>
                       </li>
                     ))}
                   </ul>
-
-                  {/* Price */}
-                  <div className="flex items-center justify-between relative z-10">
-                    <span className="text-xs font-bold" style={{ color: svc.color }}>{svc.price}</span>
-                    <div className="flex items-center gap-1 text-xs opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: svc.color }}>
-                      Book Now <ArrowRight className="w-3 h-3" />
-                    </div>
-                  </div>
                 </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
 
-      {/* ══════════════════════════════════════════════════════
-          WHY CHOOSE US
-      ══════════════════════════════════════════════════════ */}
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-6xl mx-auto">
-
-            {/* Left */}
-            <div>
-              <SectionPill>Why DogPet Clinic</SectionPill>
-              <h2 className="text-3xl lg:text-4xl font-black text-gray-900 mb-6 leading-tight">
-                Excellence in Every <span style={{ color: "#34d399" }}>Treatment</span>
-              </h2>
-              <p className="text-gray-600 leading-relaxed mb-8">
-                We combine modern veterinary medicine with genuine compassion to deliver an experience
-                that both pets and their families trust. Here's what sets us apart:
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                {WHY_FEATURES.map((f, i) => {
-                  const Icon = f.icon;
-                  return (
-                    <div key={i} className="flex items-start gap-4 p-4 rounded-2xl border border-gray-100 hover:border-emerald-200 hover:shadow-sm transition-all">
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                        style={{ background: "rgba(52,211,153,0.12)" }}>
-                        <Icon className="w-5 h-5" style={{ color: "#34d399" }} />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-gray-900 text-sm mb-1">{f.title}</h4>
-                        <p className="text-xs text-gray-500 leading-relaxed">{f.desc}</p>
-                      </div>
-                    </div>
-                  );
-                })}
+                <Link href="/sign-in" className="pt-2">
+                  <button className="w-full py-3.5 rounded-full font-bold text-xs bg-[#9999ff] hover:bg-[#9999ff] text-white shadow-md shadow-[#9999ff]/20 active:scale-95 transition-all">
+                    Select Package
+                  </button>
+                </Link>
               </div>
-            </div>
-
-            {/* Right — Testimonials strip */}
-            <div className="space-y-4">
-              {[
-                { name: "Rahul Verma", pet: "Golden Retriever owner", stars: 5, review: "The team at DogPet is absolutely amazing. My dog Bruno had emergency surgery and they handled everything perfectly. Couldn't be more grateful!" },
-                { name: "Anjali Singh", pet: "Cat parent", stars: 5, review: "I bring both my cats here for all their checkups. The vets are so gentle and patient. The grooming service is phenomenal too!" },
-                { name: "Vikram Nair", pet: "Labrador owner", stars: 5, review: "Fantastic clinic! The diagnosis was accurate, treatment was effective, and follow-up care was exceptional. Highly recommended." },
-              ].map((t, i) => (
-                <div key={i} className="p-5 rounded-2xl border border-gray-100 hover:border-emerald-200 hover:shadow-md transition-all bg-white">
-                  <div className="flex gap-0.5 mb-3">
-                    {[...Array(t.stars)].map((_, s) => (
-                      <Star key={s} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                    ))}
-                  </div>
-                  <p className="text-sm text-gray-700 italic mb-3">"{t.review}"</p>
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white"
-                      style={{ background: "linear-gradient(135deg, #34d399, #059669)" }}>
-                      {t.name[0]}
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-gray-900">{t.name}</div>
-                      <div className="text-xs text-gray-400">{t.pet}</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════════════
-          PROCESS
-      ══════════════════════════════════════════════════════ */}
-      <section className="py-24" style={{ background: "linear-gradient(135deg, #f0fdf4 0%, #fefce8 50%, #f0fdf9 100%)" }}>
+      {/* ══════════════════════════════════════════════════════════════════════
+          EMERGENCY TRIAGE INSTRUCTIONS FOR PET PARENTS (LIGHT THEME)
+      ══════════════════════════════════════════════════════════════════════ */}
+      <section id="emergency" className="py-24 bg-zinc-50 border-b border-zinc-200">
         <div className="container mx-auto px-6">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <SectionPill>How It Works</SectionPill>
-            <h2 className="text-3xl lg:text-4xl font-black text-gray-900 mb-4">
-              Simple <span style={{ color: "#34d399" }}>4-Step Process</span>
+          <div className="max-w-2xl mx-auto text-center space-y-3 mb-16">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold bg-[#9999ff]/10 text-[#9999ff] border border-[#9999ff]/20">
+              <BadgeAlert className="w-3.5 h-3.5" />
+              Emergency Triage Guide
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-black text-zinc-950 tracking-tight">
+              What to Do in a Life-Threatening Pet Emergency
             </h2>
-            <p className="text-gray-500">Getting care for your pet is simple and stress-free with DogPet Clinic.</p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto relative">
-            {/* connector line */}
-            <div className="hidden lg:block absolute top-14 left-[12.5%] right-[12.5%] h-0.5 rounded-full"
-              style={{ background: "linear-gradient(90deg, #34d399, #d1fae5, #34d399)" }} />
-
-            {[
-              { step: "01", title: "Book Online", desc: "Schedule your appointment through our website or call us directly.", icon: Phone },
-              { step: "02", title: "Visit the Clinic", desc: "Bring your pet in at the scheduled time. We'll greet you warmly.", icon: MapPin },
-              { step: "03", title: "Expert Consultation", desc: "Our vet examines your pet, runs tests if needed, and creates a care plan.", icon: Stethoscope },
-              { step: "04", title: "Healthy & Happy", desc: "Treatment is provided and you receive full aftercare instructions.", icon: Heart },
-            ].map((s, i) => {
-              const Icon = s.icon;
-              return (
-                <div key={i} className="relative text-center group">
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-5 text-white text-sm font-black shadow-lg z-10 relative transition-transform group-hover:scale-110"
-                    style={{ background: "linear-gradient(135deg, #34d399, #059669)" }}>
-                    {s.step}
-                  </div>
-                  <div className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-emerald-200 hover:shadow-xl transition-all group-hover:-translate-y-1">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-4"
-                      style={{ background: "rgba(52,211,153,0.12)" }}>
-                      <Icon className="w-5 h-5" style={{ color: "#34d399" }} />
-                    </div>
-                    <h4 className="font-black text-gray-900 mb-2">{s.title}</h4>
-                    <p className="text-xs text-gray-500 leading-relaxed">{s.desc}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════
-          FAQ
-      ══════════════════════════════════════════════════════ */}
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-6">
-          <div className="max-w-3xl mx-auto">
-            <div className="text-center mb-14">
-              <SectionPill>FAQs</SectionPill>
-              <h2 className="text-3xl lg:text-4xl font-black text-gray-900 mb-4">
-                Common <span style={{ color: "#34d399" }}>Questions</span>
-              </h2>
-              <p className="text-gray-500">Everything you need to know before your first visit.</p>
-            </div>
-            <div className="space-y-3">
-              {FAQS.map((faq, i) => (
-                <FAQItem key={i} q={faq.q} a={faq.a} />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════
-          CTA BANNER
-      ══════════════════════════════════════════════════════ */}
-      <section
-        className="py-20"
-        style={{ background: "linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%)" }}
-      >
-        <div className="container mx-auto px-6 text-center">
-          <div className="max-w-2xl mx-auto">
-            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-              style={{ background: "rgba(255,255,255,0.1)" }}>
-              <PawPrint className="w-8 h-8 text-white" />
-            </div>
-            <h2 className="text-3xl lg:text-4xl font-black text-white mb-4">
-              Your Pet Deserves the Best
-            </h2>
-            <p className="text-emerald-200 mb-10 text-base">
-              Book an appointment today and give your pet the expert care they deserve — right here at DogPet Clinic.
+            <p className="text-zinc-600 text-sm leading-relaxed">
+              Stay calm and follow these immediate first-aid protocols while contacting our 24/7 hospital reception.
             </p>
-            <div className="flex gap-4 justify-center flex-wrap">
-              <Link
-                href="/sign-in"
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl font-bold text-sm bg-white transition-all hover:-translate-y-1 hover:shadow-xl"
-                style={{ color: "#059669" }}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {EMERGENCY_TIPS.map((tip, i) => (
+              <div
+                key={i}
+                className="rounded-3xl p-6 bg-white border border-zinc-200 hover:border-zinc-300 transition-all space-y-2.5 shadow-2xs"
               >
-                Book Appointment <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                href="tel:+911234567890"
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-2xl font-bold text-sm border-2 border-white/30 text-white bg-white/10 transition-all hover:-translate-y-1 hover:bg-white/20"
-              >
-                <Phone className="w-4 h-4" /> +91 12345 67890
-              </Link>
-            </div>
+                <div className="flex items-center gap-2 text-sm font-bold text-zinc-950">
+                  <span className="w-2 h-2 rounded-full bg-[#9999ff]" />
+                  <h4>{tip.condition}</h4>
+                </div>
+                <p className="text-xs text-zinc-600 leading-relaxed pl-4">
+                  {tip.action}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 text-center">
+            <a
+              href="tel:+911234567890"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-bold text-sm bg-[#9999ff] hover:bg-[#9999ff] text-white shadow-md shadow-[#9999ff]/20 active:scale-95 transition-all cursor-pointer"
+            >
+              <Phone className="w-4 h-4" />
+              <span>Call Emergency Reception: +91 12345 67890</span>
+            </a>
           </div>
         </div>
       </section>
 
-    </main>
+      {/* ══════════════════════════════════════════════════════════════════════
+          CLINICAL FAQS ACCORDION (LIGHT THEME)
+      ══════════════════════════════════════════════════════════════════════ */}
+      <section className="py-24 bg-white border-b border-zinc-200">
+        <div className="container mx-auto px-6">
+          <div className="max-w-2xl mx-auto text-center space-y-3 mb-16">
+            <h2 className="text-3xl sm:text-4xl font-black text-zinc-950 tracking-tight">
+              Clinical Procedures &amp; Care FAQs
+            </h2>
+            <p className="text-zinc-600 text-sm leading-relaxed">
+              Clear medical explanations regarding fasting, anesthesia risks, vaccination frequency, and test delivery.
+            </p>
+          </div>
+
+          <div className="max-w-3xl mx-auto space-y-3">
+            {SERVICES_FAQS.map((faq, i) => (
+              <div
+                key={i}
+                className="rounded-2xl p-5 bg-zinc-50 border border-zinc-200 space-y-2"
+              >
+                <h4 className="text-sm font-bold text-zinc-950">{faq.q}</h4>
+                <p className="text-xs text-zinc-600 leading-relaxed border-t border-zinc-200 pt-2">
+                  {faq.a}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          HEROUI CTA BANNER (LIGHT THEME)
+      ══════════════════════════════════════════════════════════════════════ */}
+      <section className="py-24 bg-zinc-50 relative overflow-hidden">
+        <div className="container mx-auto px-6 relative z-10 text-center">
+          <div className="max-w-2xl mx-auto space-y-6">
+            <h2 className="text-3xl sm:text-4xl font-black text-zinc-950 tracking-tight">
+              Ready to Schedule Your Pet&apos;s Treatment?
+            </h2>
+            <p className="text-sm text-zinc-600 leading-relaxed">
+              Book an appointment online in less than a minute. Our doctors are ready to deliver gentle, comprehensive care.
+            </p>
+            <div className="flex flex-wrap gap-4 justify-center pt-2">
+              <Link href="/sign-in">
+                <button className="px-8 py-3.5 rounded-full font-bold text-xs bg-[#9999ff] hover:bg-[#9999ff] text-white shadow-md shadow-[#9999ff]/20 active:scale-95 transition-all cursor-pointer">
+                  Book Online Appointment
+                </button>
+              </Link>
+              <a href="tel:+911234567890">
+                <button className="px-7 py-3.5 rounded-full font-semibold text-xs border border-zinc-300 bg-white hover:bg-zinc-100 text-zinc-900 active:scale-95 transition-all flex items-center gap-2 cursor-pointer shadow-2xs">
+                  <Phone className="w-3.5 h-3.5 text-[#9999ff]" />
+                  <span>Call Hospital Reception</span>
+                </button>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 }
