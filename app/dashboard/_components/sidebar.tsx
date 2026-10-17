@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboard, Users, ChevronDown, Package, Lock, Activity, ClipboardList, Shield, PawPrint, Pill } from "lucide-react";
+import { LayoutDashboard, Users, ChevronDown, Package, Lock, Activity, ClipboardList, Shield, PawPrint, Pill, LayoutList } from "lucide-react";
 
 import {
   Sidebar,
@@ -28,6 +28,11 @@ export const menu = [
     title: "Dashboard",
     url: "/dashboard",
     icon: LayoutDashboard,
+  },
+  {
+    title: "Master",
+    url: "/dashboard/master",
+    icon: LayoutList,
   },
   {
     title: "Records",
