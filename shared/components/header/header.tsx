@@ -22,17 +22,17 @@ const NAV_LINKS = [
 export default function Header() {
   const path = usePathname();
   const [sheetOpen, setSheetOpen] = useState(false);
+  const { data: session } = authClient.useSession();
 
   // Hide on auth & dashboard routes
   if (
+    !path ||
     path.startsWith("/sign") ||
     path.startsWith("/dashboard") ||
     path.startsWith("/verify")
   ) {
     return null;
   }
-
-  const { data: session } = authClient.useSession();
 
   const isActive = (href: string) =>
     href === "/" ? path === "/" : path.startsWith(href);

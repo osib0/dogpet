@@ -130,11 +130,12 @@ export default function Page() {
         <div className="w-full flex pb-4">
           <Link href={"/"} className="overflow-hidden">
             <Image
-              src={"logo.svg"}
+              src="/logo.svg"
               alt="logo"
               className="object-cover"
               width={100}
               height={100}
+              priority
             />
           </Link>
         </div>

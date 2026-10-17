@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { testsList } from "../page";
+import { testsList } from "../tests-list";
 import { TestFormLayout, WidalForm, HaematologyForm, GenericForm } from "../_components/test-forms";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";

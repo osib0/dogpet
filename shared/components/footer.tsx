@@ -21,6 +21,7 @@ export default function Footer() {
 
   // Hide on auth & dashboard routes
   if (
+    !path ||
     path.startsWith("/sign") ||
     path.startsWith("/dashboard") ||
     path.startsWith("/verify")

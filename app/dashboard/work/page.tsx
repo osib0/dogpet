@@ -2,34 +2,7 @@ import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Activity } from "lucide-react";
 
-export const testsList = [
-  { id: "a-widal", name: "A - WIDAL" },
-  { id: "b-haematology", name: "B - Haematology" },
-  { id: "c-bio-chemistry", name: "C - Bio- Chemistry" },
-  { id: "d-urine", name: "D - Urine" },
-  { id: "e-stool", name: "E - Stool" },
-  { id: "f-lipid-profile", name: "F - LIPID PROFILE" },
-  { id: "g-semen", name: "G - SEMEN" },
-  { id: "h-haemogram", name: "H - HAEMOGRAM" },
-  { id: "i-liver-function", name: "I - LIVER FUNCTION" },
-  { id: "j-fluid", name: "J - Fluid" },
-  { id: "k-mp-by-qbc", name: "K - MP BY Q.B.C" },
-  { id: "l-others-report", name: "L - Others Report" },
-  { id: "other-report", name: "Other Report" },
-  { id: "n-bone-marrow", name: "N - Bone Marrow" },
-  { id: "o-bonemarrow", name: "O - BoneMarrow" },
-  { id: "p-sputum", name: "P - SPUTUM" },
-  { id: "q-vdrl-in-dillution", name: "Q - VDRL IN DILLUTION" },
-  { id: "r-culture", name: "R - CULTURE" },
-  { id: "s-rhanit-titre", name: "S - RHANIT TITRE" },
-  { id: "t-fnac", name: "T - Fnac" },
-  { id: "u-bio-chemistry-normal", name: "U - Bio Chemistry Normal Value" },
-  { id: "v-misc-normal", name: "V - MISC NORMAL VALUE" },
-  { id: "w-hematology-normal", name: "W - Hematology Normal Value" },
-  { id: "x-hemogram-normal", name: "X - HEMOGRAM NORMAL VALUE" },
-  { id: "y-doctors-master", name: "Y - Doctor's Master" },
-  { id: "z-reporting-doctor", name: "Z - Reporting Doctor" },
-];
+import { testsList } from "./tests-list";
 
 export default function WorkPage() {
   return (
